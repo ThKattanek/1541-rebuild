@@ -5,7 +5,10 @@
 #include <avr/io.h>
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
+#include <string.h>
 #include <avr/pgmspace.h>
+#include <avr/sleep.h>
+
 #include <math.h>
 #include <util/delay.h>
 
@@ -15,6 +18,12 @@
 #include "./version.h"
 #include "./lcd.h"
 #include "./1541-rebuild.h"
+
+#include "./sd_card_lib/fat.h"
+#include "./sd_card_lib/fat_config.h"
+#include "./sd_card_lib/partition.h"
+#include "./sd_card_lib/sd_raw.h"
+#include "./sd_card_lib/sd_raw_config.h"
 
 #include "gcr_track18.h"
 
@@ -90,6 +99,28 @@ int main(void)
 
     // Global Interrupts aktivieren
     sei();
+
+    set_sleep_mode(SLEEP_MODE_IDLE);
+
+    /// Auf SD Karte prüfen ///
+
+    while (1)
+    {
+       if(!sd_raw_init())
+       {
+	   lcd_clear();
+	   lcd_setcursor( 0, 4);
+	   lcd_string("SD/MMC not found!");
+	   continue;
+       }
+       else
+       {
+	   lcd_clear();
+	   lcd_setcursor( 0, 4);
+	   lcd_string("SD/MMC gefunden!");
+	   continue;
+       }
+    }
 
     while(1)
     {	

@@ -66,9 +66,18 @@ AVRDUDE_PROGRAMMER = avrispmkII
 # com1 = serial port. Use lpt1 to connect to parallel port.
 AVRDUDE_PORT = usb    # programmer connected to serial device
 
+# ISP Speed in µs (1/4 vom CPU Takt)
+AVRDUDE_ISP_SPEED = 0.2  # (1/20000000Hz)*4
+
 # List C source files here. (C dependencies are automatically generated.)
 SRC = $(TARGET).c
 SRC += lcd.c
+# Sourcen der SD Card Lib von Roland Riegel hinzufügen
+SRC += sd_card_lib/byteordering.c
+SRC += sd_card_lib/fat.c
+SRC += sd_card_lib/partition.c
+SRC += sd_card_lib/sd_raw.c
+#SRC += sd_card_lib/uart.c
 
 # List Assembler source files here.
 # Make them always end in a capital .S.  Files ending in a lowercase .s
@@ -213,6 +222,7 @@ AVRDUDE_FLAGS = -c $(AVRDUDE_PROGRAMMER) -P $(AVRDUDE_PORT) -p $(MCU)
 AVRDUDE_FLAGS += $(AVRDUDE_NO_VERIFY)
 AVRDUDE_FLAGS += $(AVRDUDE_VERBOSE)
 AVRDUDE_FLAGS += $(AVRDUDE_ERASE_COUNTER)
+AVRDUDE_FLAGS += -B $(AVRDUDE_ISP_SPEED)
 
 
 
@@ -428,6 +438,8 @@ clean_list :
 	$(REMOVE) $(TARGET).lss
 	$(REMOVE) $(OBJ)
 	$(REMOVE) $(LST)
+	$(REMOVE) sd_card_lib/*.lst
+	$(REMOVE) sd_card_lib/*.o
 	$(REMOVE) $(SRC:.c=.s)
 	$(REMOVE) $(SRC:.c=.d)
 	$(REMOVE) .dep/*
