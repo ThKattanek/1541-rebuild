@@ -1,0 +1,1 @@
+Die Hardware wurde mit KiCad erstellt.
