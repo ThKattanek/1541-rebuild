@@ -1,0 +1,410 @@
+Fichier en provenance du site de M. Fabrice Frances (http://oric.ifrance.com/oric/programming.html)
+
+VIA 6522 - Versatile Interface Adapter brief reference (from Synertek data sheet)
+---------------------------------------------------------------------------------
+
+Features:
+	- two 8-bit bidirectional I/O ports
+	- two 16-bit programmable Timer/counters
+	- serial data port
+	- CMOS compatible peripheral port A lines
+	- expanded handshake capability allows positive control of data
+	transfers between processor and peripheral devices
+	- latched output and input registers
+
+Peripheral A port (PA0-PA7):
+	It consists of 8 lines which can be individually programmed to act
+	as inputs or outputs under control of a Data Direction Register. The
+	polarity of output pins is controlled by an Output Register and input
+	data may be latched into an internal register under control of the CA1
+	line.
+
+Peripheral A Control Lines (CA1,CA2):
+	The two peripheral A control lines act as interrupt inputs or as
+	handshake outputs. Each line controls an internal interrupt flag with a
+	corresponding interrupt enable bit. In addition, CA1 controls the
+	latching of data on peripheral A port input lines (CA1 is an input only)
+
+Peripheral B port (PB0-PB7):
+	It consists of eight bi-directional lines which are controlled by an
+	output register and a data direction register in much the same manner
+	as the PA port. In addition, the PB7 output signal can be controlled
+	by one of the interval timers while the second timer can be programmed
+	to count pulses on the PB6 pin.
+
+Peripheral B Control Lines (CB1,CB2):
+	They act as interrupt inputs or as handshake outputs. As with CA1 and
+	CA2, each line controls an interrupt flag with a corresponding interrupt
+	enable bit. In addition, these lines act as a serial port under control
+	of the Shift Register.
+
+Registers
+	Reading/writing registers of the chip allows to control the powerful
+	features. A register is read or written when the chip is selected and
+	the low four address bits indicate the desired register:
+
+	Address	Reg	                Description
+			       (Write)       |	    (Read)	
+	----------------------------------------------------------------
+	0000	ORB/IRB	Output Register B    | Input Register B
+	0001	ORA/IRA	Output Register A    | Input Register A
+	0010	DDRB	        Data Direction Register B
+	0011	DDRA	        Data Direction Register A
+	0100	T1C-L	T1 low-order Latches | T1 low-order Counter
+	0101	T1C-H	          T1 high-order Counter
+	0110	T1L-L	          T1 low-order Latches
+	0111	T1L-H	          T1 high-order Latches
+	1000	T2C-L	T2 low-order Latches | T2 low-order Counter
+	1001	T2C-H	          T2 high-order Counter
+	1010	SR	             Shift Register
+	1011	ACR	         Auxiliary Control Register
+	1100	PCR	        Peripheral Control Register
+	1101	IFR	          Interrupt Flag Register
+	1110	IER	        Interrupt Enable Register
+	1111	ORA/IRA	    Same as reg 1 except no handshake
+
+Port A and Port B operation:
+	Each 8-bit peripheral port has a Data Direction Register (DDRA, DDRB)
+	for specifying whether the peripheral pins are to act as inputs or
+	outputs. A 0 in a bit of the Data Direction Register causes the
+	corresponding peripheral pin to act as an input. A 1 causes the pin to
+	act as an output.
+	When programmed as an output each peripheral pin is also controlled by
+	a corresponding bit in the Output Register (ORA, ORB). A 1 in the
+	Output Register causes the output to go high, and a 0 causes the output
+	to go low. Data may be written into Output Register bits corresponding
+	to pins which are programmed as inputs. In this case, however, the
+	output signal is unaffected.
+	Reading a peripheral port causes the contents of the Input Register
+	(IRA, IRB) to be transferred onto the data bus. With input latching
+	disabled, IRA will always reflect the levels on the PA pins. With
+	input latching enabled and the selected active transition on CA1 having
+	occurred, IRA will contain the data present on the PA lines at the time
+	of the transition. Once IRA is read, however, it will appear transparent
+	and will reflect the current state of the PA lines until the next
+	latching transition.
+	The IRB register operates similar to the IRA register. However, for pins
+	programmed as outputs, there is a difference. When reading IRA, the
+	level on the pin determines whether a 0 or a 1 is sensed. When reading
+	IRB, however, the bit stored in the output register, ORB, is the bit
+	sensed.
+	Finally, the 6522 allows positive control of data transfers between the
+	system processor and peripheral devices through the operation of
+	handshakes lines. Port A lines (CA1, CA2) handshake data on both a read
+	and a write operation while the Port B lines (CB1, CB2) handshake on a
+	write operation only.
+
+Read Handshake
+	The peripheral device must generate the equivalent of a "data ready"
+	signal to the processor signifying that valid data is present on the
+	peripheral port. This signal normally interrupts the processor, which
+	then reads the data, causing generation of a "data taken" signal.
+	Automatic read handshaking is possible on the peripheral A port only.
+	The CA1 interrupt input pin accepts the "data ready" signal and CA2
+	generates the "data taken" signal. The "data ready" signal will set an
+	internal flag which may interrupt the processor or which may be polled
+	under program control. The "data taken" signal can either be a pulse
+	or a level which is set low by the system processor and is cleared by
+	the "data ready" signal.
+
+Write Handshake
+	For write handshaking, the 6522 generates the "data ready" signal and
+	the peripheral device must respond with the "data taken" signal. This
+	can be accomplished on both the PA port and the PB port. CA2 or CB2 act
+	as a "data ready" output in either the handshake mode or pulse mode and
+	CA1 or CB1 accept the "data taken" signal from the peripheral device,
+	setting the interrupt flag and cleaning the "data ready" output.
+	Selection of operating modes for CA1, CA2, CB1 and CB2 is accomplished
+	by the Peripheral Control Register.
+
+	Peripheral Control Register 
+		bit 0:		CA1 interrupt control
+			0 = negative active edge
+			1 = positive active edge
+		bits 321:	CA2 control
+			000 = input, negative active edge
+			001 = independant interrupt input, negative edge
+			010 = input, positive active edge
+			011 = independent interrupt input, positive edge
+			100 = handshake output
+			101 = pulse output
+			110 = low output
+			111 = high output
+		bit 4:		CB1 interrupt control
+			0 = negative active edge
+			1 = positive active edge
+		bits 765:	CB2 control
+			000 = input, negative active edge
+			001 = independant interrupt input, negative edge
+			010 = input, positive active edge
+			011 = independent interrupt input, positive edge
+			100 = handshake output
+			101 = pulse output
+			110 = low output
+			111 = high output
+			
+Timer operation:
+	Interval timer T1 consists of two 8-bit latches and a 16-bit counter.
+	The latches are used to store data which is to be loaded into the
+	counter. After loading, the counter decrements at 02 (Phi-2) clock rate.
+	Upon reaching zero, an interrupt flag will be set, and an IRQ will be
+	raised if the interrupt is enabled. The timer will then disable any
+	further interrupts, or (when programmed to) will automatically transfer
+	the contents of the latches into the counter and begin to decrement
+	again. In addition, the timer may be programmed to invert the output
+	signal on a peripheral pin each time it times-out.
+	Two bits are provided in the Auxiliary Control Register (bits 6 and 7)
+	to allow selection of the T1 operating modes.
+
+	Auxiliary Control Register
+		bit 0:		Port A Latch enable
+			0 = disable
+			1 = enable latching
+		bit 1:		Port B Latch enable
+			0 = disable
+			1 = enable latching
+		bits 432:	Shift Register Control
+			000 = disabled
+			001 = shift in under control of T2
+			010 = shift in under control of 02
+			011 = shift in under control of external clock
+			100 = shift out free-running at T2 rate
+			101 = shift out under control of T2
+			110 = shift out under control of 02
+			111 = shift out under control of external clock
+		bit 5:		T2 timer control
+			0 = timed interrupt
+			1 = count down with pulses on PB6
+		bits 76:	T1 timer control
+			00 = timed interrupt each time T1 is loaded,
+			     PB7 disabled
+			01 = continuous interrupts,
+			     PB7 disabled
+			10 = timed interrupt each time T1 is loaded,
+			     one-shot output on PB7
+			11 = continuous interrupts,
+			     square wave output on PB7
+
+Timer 1 One-Shot Mode
+	This allows generation of a single interrupt for each Timer load
+	operation. In addition, Timer 1 can be programmed to produce a single
+	negative pulse on PB7.
+	To generate a single interrupt, ACR bits 6 and 7 must be 0 then either
+	T1L-L or T1C-L must be written with the low-order count value. (A write
+	to T1C-L is effectively a write to T1L-L). Next the higher-order count
+	value is written to T1C-H, (the value is simultaneously written into
+	T1L-H), and T1L-L is transferred to T1C-L. Countdown begins on the 02
+	following the write T1C-H and decrements at the 02 rate. T1 interrupt
+	occurs when the counters reach 0. Generation of a negative pulse on PB7
+	is done in the same manner except ACR bit 7 must be a one. PB7 will go
+	low after a write T1C-H and go high again when the counters reach 0.
+	The T1 interrupt flag is reset by either writing T1C-H (starting a new
+	count) or by reading T1C-L.
+	
+Timer 1 Free-Run Mode
+	The most important advantage associated with the latches in T1 is the
+	ability to produce a continuous series of evenly spaces interrupts and
+	the ability to produce a square wave on PB7 whose frequency is not
+	affected by variations in the processor interrupt response time.
+	In the free-running mode, the interrupt flag is set and the signal on
+	PB7 is inverted each time the counter reaches zero. However, instead
+	of continuing to decrement from zero after a time-out, the timer
+	automatically transfers the contents of the latch into the counter (16
+	bits) and continues to decrement from there. It is not necessary to
+	rewrite the timer to enable setting the interrupt flag on the next
+	time-out. The interrupt flag can be cleared by reading T1C-L, by writing
+	directly into the flag as described later, or if a new count value is
+	desired by a write to T1C-H.
+
+
+	All interval timers are re-triggerable. Rewriting the counter will
+	always re-initialize the time-out period. In fact, the time-out can be
+	prevented completely if the processor continues to rewrite the timer
+	before it reaches zero. Timer 1 will operate in this manner if the
+	processor writes into the high order counter (T1C-H). However, by
+	loading the latches only, the processor can access the timer during
+	each down-counting operation without affecting the time-out in process.
+	Instead, the data loaded into the latches will determine the length of
+	the next time-out period. This capability is particularly valuable in
+	the free-running mode with the output enabled. In this mode, the signal
+	on PB7 is inverted and the interrupt flag is set with each time-out. By
+	responding to the interrupts with new data for the latches, the
+	processor can determine the period of the next half cycle during each
+	half cycle of the output signal on PB7. In this manner, very complex
+	waveforms can be generated.
+
+Timer 2 operation
+	Timer 2 operates as an interval timer (in the one-shot mode only), or
+	as a counter for counting negative pulses on the PB6 peripheral pin. A
+	single control bit is provided in the Auxiliary Control Register to
+	select between these two modes. This timer is comprised of a write-only
+	low-order latch (T2L-L), a read-only low-order counter and a read/write
+	high order counter. The counter registers act as a 16-bit counter which
+	decrements at 02 rate.
+
+Timer 2 One-shot Mode
+	In this mode, T2 provides a single interrupt for each write T2C-H
+	operation. After timing-out, (reading 0) the counters roll-over to all
+	1's (FFFF) and continue decrementing, allowing the user to read them
+	and determine how long T2 interrupt has been set. However, setting of
+	the interrupt flag will be disabled after initial time-out so that it
+	will not be set by the counter continuing to decrement through zero. The
+	processor must rewrite T2C-H to enable setting of the interrupt flag.
+	The interrupt flag is cleared by reading T2C-L or by writing T2C-H.
+
+Timer 2 Pulse Counting Mode
+	In the pulse counting mode, T2 serves primarily to count a predetermined
+	number of negative-going pulses on PB6. This is accomplished by first
+	loading a number into T2. Writing into T2C-H clears the interrupt flag
+	and allows the counter to decrement each time a pulse is applied to PB6.
+	The interrupt flag will be set when T2 reaches zero. At this time the
+	counter will continue to decrement with each pulse on PB6. However, it
+	is necessary to rewrite T2C-H to allow the interrupt flag to set on
+	subsequent down-counting operations.
+
+Shift Register operation
+	The Shift Register (SR) performs serial data transfers into and out of
+	the CB2 pin under control of an internal modulo-8 counter. Shift pulses
+	can be applied to the CB1 pin from an external source or, with the
+	proper mode selection, shift pulses generated internally will appear on
+	the CB1 pin for controlling external devices.
+	The control bits which select the various shift register operating modes
+	are located in the Auxiliary Control Register (see above).
+
+	Shift in under control of T2
+		The shifting rate is controlled by the low-order 8 bits of T2.
+		Shift pulses are generated on the CB1 pin to control shifting
+		in external devices. The time between transitions of this output
+		clock is a function of the system clock period and the contents
+		of the low-order T2 latch.
+		The shifting operation is triggered by writing or reading the
+		shift register. Data is shifted first into the low order bit of
+		SR and is then shifted into the next higher order bit of the
+		shift register on the negative-going edge of each clock pulse.
+		The input data should change before the positive-going edge of
+		the CB1 clock pulse. This data is shifted into SR during the 02
+		clock cycle following the positive-going edge of the CB1 clock
+		pulse. After 8 CB1 clock pulses, the shift register interrupt
+		flag will be set and IRQ will be raised.
+
+	Shift in under control of 02
+		CB1 becomes an output which generates shift pulses for
+		controlling external devices. Timer 2 operates as an independent
+		interval timer and has no effect on SR. The shifting operation
+		is triggered by reading or writing the Shift Register. Data is
+		shifted first into bit 0 and is then shifted into the next
+		higher order bit of the shift register on the trailing edge of
+		each 02 clock pulse. After 8 clock pulses, the shift register
+		interrupt flag will be set, and the output clock pulses on CB1
+		will stop.
+
+	Shift in under control of external CB1 clock
+		CB1 becomes an input. This allows an external device to load the
+		shift register at its own pace. The shift register counter will
+		interrupt the processor each time 8 bits have been shifted in.
+		However, the shift register counter does not stop the shifting
+		operation; it acts simply as a pulse counter. Reading or writing
+		the Shift Register resets the Interrupt flag and initializes the
+		SR counter to count another 8 pulses.
+		Note that the data is shifted during the first system clock
+		cycle following the positive-going edge of the CB1 shift pulse.
+		For this reason, data must be held stable during the first full
+		cycle following CB1 going high.
+
+	Shift out free-running at T2 rate
+		Very similar to next mode. However, the SR counter does not stop
+		the shifting operation. Since the Shift Register bit 7 is
+		recirculated back into bit 0, the 8 bits loaded into the shift
+		register will be clocked onto CB2 repetitively. In this mode,
+		the shift register counter is disabled, and IRQ is never set.
+
+	Shift out under control of T2
+		With each read or write of the shift register the SR counter is
+		reset and 8 bits are shifted onto CB2. At the same time, 8 shift
+		pulses are generated on CB1 to control shifting in external
+		devices. After the 8 shift pulses, the shifting is disabled, the
+		SR interrupt flag is set and CB2 remains at the last data level.
+
+	Shift out under control of 02
+		Same as previous mode but the shift rate is controlled by the
+		02 system clock.
+
+	Shift out under control of external CB1 clock
+		Shifting is controlled by pulses applied to the CB1 pin by an
+		external device. The SR counter sets the SR interrupt flag each
+		time it counts 8 pulses but it does not disable the shifting
+		function. Each time the microprocessor writes or read the shift
+		register, the SR Interrupt flag is reset and the SR counter is
+		initialized to begin counting the next 8 shift pulses on pin
+		CB1. After 8 shift pulses, the interrupt flag is set. The
+		microprocessor can then load the shift register with the next
+		byte of data.
+
+Interrupt operation
+	Controlling interrupts within the 6522 involves three principal
+	operations. These are flagging the interrupts, enabling interrupts and
+	signaling to the processor that an active interrupt exists within the
+	chip. Interrupt flags are set by interrupt conditions which exists
+	within the chip or on inputs to the chip. These flags normally remain
+	set until the interrupt has been serviced. To determine the source of
+	an interrupt, the microprocessor must examine these flags in order
+	from highest to lowest priority. This is accomplished by reading the
+	flag register into the processor accumulator, shifting this register
+	either right or left and then using conditional branch instructions to
+	detect an active interrupt.
+	Associated with each interrupt flag is an interrupt enable bit. This
+	can be set or cleared by the processor to enable interrupting the
+	processor from the corresponding interrupt flag. If an interrupt flag
+	is set to a logic 1 by an interrupting condition, and the corresponding
+	interrupt enable bit is set to a 1, the Interrupt Request output will
+	go low (negative logic). 
+	All the interrupt flags are contained in one register. In addition, bit
+	7 of this register will be read as a logic 1 when an interrupt exists
+	within the chip. This allows very convenient polling of several devices
+	within a system to locate the source of an interrupt.
+	The Interrupt Flag Register (IFR) may be read directly by the processor.
+	In addition, individual flag bits may be cleared by writing a 1 into the
+	appropriate bit of the IFR. When the proper chip select and register
+	signals are applied to the chip, the contents of this register are
+	placed on the data bus. Bit 7 indicates the status of the IRQ output.
+	This bit corresponds to the logic function 
+	IFR6*IER6+IFR5*IER5+IFR4*IER4+IFR3*IER3+IFR2*IER2+IFR1*IER1+IFR0*IER0
+	(note: * = logic AND, + = logic OR)
+	The IFR bit 7 is not a flag. Therefore, this bit is not directly cleared
+	by writing a logic 1 into it. It can only be cleared by clearing all the
+	flags in the register or by disabling all the active interrupts as
+	discussed in next section.
+	For each interrupt flag in IFR, there is a corresponding bit in the
+	Interrupt Enable Register (IER). The system processor can set or clear
+	selected bits in this register to facilitate controlling individual
+	interrupts without affecting others. This is accomplished by writing to
+	IER. If bit 7 of the data placed on the system data bus during this
+	write operation is a 0, each 1 in bits 6 through 0 clears the
+	corresponding bit in the IER. For each zero in bits 6 through 0, the
+	corresponding bit is unaffected.
+	Setting selected bits in the IER is accomplished by writing to it with
+	bit 7 in the data word set to a logic 1. In this case, each 1 in bits 6
+	through 0 will set the corresponding bit. For each zero, the
+	corresponding bit will be unaffected. This individual control of the
+	setting and clearing operations allows very convenient control of the
+	interrupts during system operation.
+	In addition to setting and clearing IER bits, the processor can read the
+	contents of this register, bit 7 will be read as a logic 1.
+
+	Interrupt Flag Register
+		bit  |    set by                 | cleared by
+		-------------------------------------------------------------
+		0      CA2 active edge             read or write reg 1 (ORA) *
+		1      CA1 active edge             read or write reg 1 (ORA)
+		2      complete 8 shifts           read or write shift reg
+		3      CB2 active edge             read or write ORB *
+		4      CB1 active edge             read or write ORB
+		5      time-out of T2              read T2 low or write T2 high
+		6      time-out of T1              read T1 low or write T1 high
+		7      any enabled interrupt       clear all interrupts
+
+	note * : if the CA2/CB2 control in the PCR is selected as independent
+	interrupt input, then reading or writing the output register ORA/ORB
+	will NOT clear the flag bit. Instead, the bit must be cleared by writing
+	into the IFR, as described previously.
+
