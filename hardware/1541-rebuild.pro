@@ -1,4 +1,4 @@
-update=Mo 14 Sep 2015 19:01:57 CEST
+update=15.09.2015 08:07:08
 version=1
 last_client=kicad
 [pcbnew]
@@ -56,5 +56,15 @@ LibName26=opto
 LibName27=atmel
 LibName28=contrib
 LibName29=valves
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
 [general]
 version=1
