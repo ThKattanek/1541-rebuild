@@ -104,31 +104,21 @@ int main(void)
 
     /// Auf SD Karte prüfen ///
 
-    while (1)
-    {
-       if(!sd_raw_init())
-       {
-	   lcd_clear();
-	   lcd_setcursor( 0, 4);
-	   lcd_string("SD/MMC not found!");
-	   continue;
-       }
-       else
-       {
-	   lcd_clear();
-	   lcd_setcursor( 0, 4);
-	   lcd_string("SD/MMC gefunden!");
-	   continue;
-       }
-    }
-
     while(1)
     {	
-
+	/*
+	if(!sd_raw_init())
+	{
+	    lcd_clear();
+	    lcd_setcursor( 0, 4);
+	    lcd_string("SD/MMC not found!");
+	    continue;
+	}
+	*/
 
 	// Motor An oder Aus ?
 
-	motor_status = (PINB & (1<<PB4)) >> PB4;
+	motor_status = (PINC & (1<<2)) >> 2;
 
 	if(motor_status != old_motor_status)
 	{

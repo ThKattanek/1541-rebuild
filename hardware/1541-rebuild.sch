@@ -287,13 +287,6 @@ Wire Wire Line
 	2900 1000 2900 1350
 Wire Wire Line
 	2800 1200 2800 1350
-Wire Wire Line
-	7450 3400 7450 3100
-Connection ~ 7450 3400
-Text GLabel 7450 3100 1    60   Input ~ 0
-VIA2_PIN12_PB2
-Text Notes 7550 2550 0    60   ~ 0
-Kann nicht so sein\nSD Karte und MOTOR Status\nan einem PIN
 $Comp
 L CONN_01X06 P?
 U 1 1 55F8E45C
@@ -309,20 +302,6 @@ Wire Wire Line
 	6950 1900 6950 3000
 Wire Wire Line
 	6950 3000 6100 3000
-Wire Wire Line
-	7050 1900 7050 3100
-Wire Wire Line
-	7050 3100 6100 3100
-Wire Wire Line
-	7150 1900 7150 3200
-Wire Wire Line
-	7150 3200 6100 3200
-Wire Wire Line
-	7250 1900 7250 3300
-Wire Wire Line
-	7250 3300 6100 3300
-Text Notes 6650 1500 0    60   ~ 0
-Noch abgleichen !!
 $Comp
 L CONN_01X08 P?
 U 1 1 55F921A0
@@ -350,4 +329,32 @@ Wire Wire Line
 	6500 5400 6100 5400
 Wire Wire Line
 	6500 5500 6100 5500
+Text GLabel 6350 4100 2    60   Input ~ 0
+1541_CN4_PIN7
+Wire Wire Line
+	6100 4100 6350 4100
+Wire Wire Line
+	6100 3100 7150 3100
+Wire Wire Line
+	7150 3100 7150 1900
+Wire Wire Line
+	6100 3200 7050 3200
+Wire Wire Line
+	7050 3200 7050 1900
+Wire Wire Line
+	6100 3300 7250 3300
+Wire Wire Line
+	7250 3300 7250 1900
+Wire Wire Line
+	6100 3900 6350 3900
+Text GLabel 6350 3900 2    60   Input ~ 0
+VIA2_PIN40_[BYTE_READY]
+Wire Wire Line
+	6100 4000 7600 4000
+Text GLabel 7600 4000 2    60   Input ~ 0
+VIA2_PIN17_[SYNC]
+Wire Wire Line
+	6100 4500 6350 4500
+Text GLabel 6350 4500 2    60   Input ~ 0
+VIA2_PIN39_[SOE]
 $EndSCHEMATC
