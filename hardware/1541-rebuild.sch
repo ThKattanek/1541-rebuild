@@ -28,6 +28,7 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
+LIBS:Oscillators
 LIBS:1541-rebuild-cache
 EELAYER 25 0
 EELAYER END
@@ -120,4 +121,98 @@ Text Label 7850 3900 0    60   ~ 0
 SCK
 Text Notes 650  7450 0    60   ~ 0
 Am meinem 1541II Board sind folgende modifiktionen durchgeführt worden:\n- PIN 40 von U10 (Gate Array 251828) von Platine getrennt (BYTE READY)\n- U8 (VIA 6522) ausgelötet und gesockelt\n- Dauerläufer behoben durch trennen einer Leiterbahn (genauer beschreiben)
+$Comp
+L TCXO3 X1
+U 1 1 55F7CB9E
+P 4450 3250
+F 0 "X1" H 4450 3550 70  0000 C CNN
+F 1 "20Mhz" H 4450 3250 70  0000 C CNN
+F 2 "" H 4450 3250 60  0000 C CNN
+F 3 "" H 4450 3250 60  0000 C CNN
+	1    4450 3250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5150 3100 5850 3100
+NoConn ~ 5150 3400
+$Comp
+L GND #PWR2
+U 1 1 55F7D4A6
+P 3550 3400
+F 0 "#PWR2" H 3550 3150 50  0001 C CNN
+F 1 "GND" H 3550 3250 50  0000 C CNN
+F 2 "" H 3550 3400 60  0000 C CNN
+F 3 "" H 3550 3400 60  0000 C CNN
+	1    3550 3400
+	0    1    1    0   
+$EndComp
+$Comp
+L +5V #PWR1
+U 1 1 55F7D4E4
+P 3550 3100
+F 0 "#PWR1" H 3550 2950 50  0001 C CNN
+F 1 "+5V" H 3550 3240 50  0000 C CNN
+F 2 "" H 3550 3100 60  0000 C CNN
+F 3 "" H 3550 3100 60  0000 C CNN
+	1    3550 3100
+	0    -1   -1   0   
+$EndComp
+$Comp
+L C C1
+U 1 1 55F7D642
+P 3650 3250
+F 0 "C1" H 3675 3350 50  0000 L CNN
+F 1 "100n" H 3675 3150 50  0000 L CNN
+F 2 "" H 3688 3100 30  0000 C CNN
+F 3 "" H 3650 3250 60  0000 C CNN
+	1    3650 3250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3550 3100 3750 3100
+Connection ~ 3650 3100
+Wire Wire Line
+	3550 3400 3750 3400
+Connection ~ 3650 3400
+NoConn ~ 5850 2700
+$Comp
+L GND #PWR?
+U 1 1 55F7EFD4
+P 6750 6150
+F 0 "#PWR?" H 6750 5900 50  0001 C CNN
+F 1 "GND" H 6750 6000 50  0000 C CNN
+F 2 "" H 6750 6150 60  0000 C CNN
+F 3 "" H 6750 6150 60  0000 C CNN
+	1    6750 6150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6650 6000 6650 6100
+Wire Wire Line
+	6650 6100 6850 6100
+Wire Wire Line
+	6750 6100 6750 6150
+Wire Wire Line
+	6850 6100 6850 6000
+Connection ~ 6750 6100
+$Comp
+L +5V #PWR?
+U 1 1 55F7F7C2
+P 6750 1850
+F 0 "#PWR?" H 6750 1700 50  0001 C CNN
+F 1 "+5V" H 6750 1990 50  0000 C CNN
+F 2 "" H 6750 1850 60  0000 C CNN
+F 3 "" H 6750 1850 60  0000 C CNN
+	1    6750 1850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6650 2000 6650 1900
+Wire Wire Line
+	6650 1900 6850 1900
+Wire Wire Line
+	6750 1900 6750 1850
+Wire Wire Line
+	6850 1900 6850 2000
+Connection ~ 6750 1900
 $EndSCHEMATC
