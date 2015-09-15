@@ -118,4 +118,6 @@ Text Label 7850 3800 0    60   ~ 0
 MISO
 Text Label 7850 3900 0    60   ~ 0
 SCK
+Text Notes 650  7450 0    60   ~ 0
+Am meinem 1541II Board sind folgende modifiktionen durchgeführt worden:\n- PIN 40 von U10 (Gate Array 251828) von Platine getrennt (BYTE READY)\n- U8 (VIA 6522) ausgelötet und gesockelt\n- Dauerläufer behoben durch trennen einer Leiterbahn (genauer beschreiben)
 $EndSCHEMATC
