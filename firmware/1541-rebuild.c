@@ -100,21 +100,48 @@ int main(void)
     // Global Interrupts aktivieren
     sei();
 
+    /// SD Karte ///
+
+    unsigned char sd_found = 0;
+    struct partition_struct* partition;
+
     set_sleep_mode(SLEEP_MODE_IDLE);
 
-    /// Auf SD Karte prüfen ///
-
     while(1)
-    {	
-	/*
-	if(!sd_raw_init())
+    {
+	if(sd_found == 0)
 	{
-	    lcd_clear();
-	    lcd_setcursor( 0, 4);
-	    lcd_string("SD/MMC not found!");
-	    continue;
+	    if(sd_raw_init())
+	    {
+		lcd_setcursor( 0, 4);
+		lcd_string("SD Karte gefunden !");
+		sd_found = 1;
+	    }
+
+
+	    if(!partition)
+	    {
+		partition = partition_open(sd_raw_read,sd_raw_read_interval,0,0,0);
+	    }
+
+	    if(!partition)
+	    {
+		partition = partition_open(sd_raw_read,sd_raw_read_interval,0,0,-1);
+	    }
+
+	    if(!partition)
+	    {
+		lcd_setcursor( 0, 4);
+		lcd_string("Partition nicht gefunden !");
+		sd_found = 1;
+	    }
+	    else
+	    {
+		lcd_setcursor( 0, 4);
+		lcd_string("Partition gefunden !");
+		sd_found = 1;
+	    }
 	}
-	*/
 
 	// Motor An oder Aus ?
 
