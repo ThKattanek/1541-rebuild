@@ -67,7 +67,7 @@ AVRDUDE_PROGRAMMER = avrispmkII
 AVRDUDE_PORT = usb    # programmer connected to serial device
 
 # ISP Speed in µs (1/4 vom CPU Takt)
-AVRDUDE_ISP_SPEED = 0.2  # (1/20000000Hz)*4
+AVRDUDE_ISP_SPEED = 0.4  # (1/20000000Hz)*4
 
 # List C source files here. (C dependencies are automatically generated.)
 SRC = $(TARGET).c
