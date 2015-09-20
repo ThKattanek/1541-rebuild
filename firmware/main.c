@@ -34,6 +34,9 @@ int main(void)
     // Timer0 --> GCR senden
     init_timer0();
 
+    // Tasten Initialisieren
+    init_keys();
+
     // Meldung ausgeben, das auf SD Karte gewartet wird
     lcd_setcursor(0,2);
     lcd_string("Wait for SD-Karte...");
@@ -51,6 +54,9 @@ int main(void)
 
     lcd_setcursor(5,4);
     lcd_string("M:");
+
+    lcd_setcursor(9,4);
+    lcd_string("K:");
 
     lcd_setcursor(2,4);
     sprintf(byte_str,"%d",akt_half_track >> 1);
@@ -105,7 +111,27 @@ int main(void)
 	if(get_motor_status())
 	    lcd_string("*");
 	else
-	    lcd_string(" ");
+	    lcd_string("-");
+#endif
+
+#ifdef DEBUG_MODE
+	lcd_setcursor(11,4);
+	if(get_key0_status())
+	    lcd_string("1");
+	else
+	    lcd_string("0");
+
+	lcd_setcursor(12,4);
+	if(get_key1_status())
+	    lcd_string("1");
+	else
+	    lcd_string("0");
+
+	lcd_setcursor(13,4);
+	if(get_key2_status())
+	    lcd_string("1");
+	else
+	    lcd_string("0");
 #endif
     }
 }
@@ -220,6 +246,32 @@ void init_timer0()
 
     // Compare Interrupt erlauben
     TIMSK0 |= (1<<OCIE0A);
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void init_keys()
+{
+    // Entsprechende Ports auf Eingangschalten
+    KEY0_DDR &= ~(1<<KEY0);
+    KEY1_DDR &= ~(1<<KEY1);
+    KEY2_DDR &= ~(1<<KEY2);
+
+    // Interne Pullup Setzen
+    KEY0_PORT |= 1<<KEY0;
+    KEY1_PORT |= 1<<KEY1;
+    KEY2_PORT |= 1<<KEY2;
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void view_dir()
+{
+    struct fat_dir_entry_struct dir_entry;
+    while(fat_read_dir(dd, dir_entry))
+    {
+
+    }
 }
 
 /////////////////////////////////////////////////////////////////////

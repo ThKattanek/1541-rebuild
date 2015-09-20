@@ -79,6 +79,26 @@
 
 #define out_gcr_byte(gcr_byte) DATA_PORT = gcr_byte
 
+// Einabetasten
+#define KEY0_DDR DDRB
+#define KEY0_PORT PORTB
+#define KEY0_PIN PINB
+#define KEY0	 PINB0
+
+#define KEY1_DDR DDRB
+#define KEY1_PORT PORTB
+#define KEY1_PIN PINB
+#define KEY1	 PINB1
+
+#define KEY2_DDR DDRC
+#define KEY2_PORT PORTC
+#define KEY2_PIN PINC
+#define KEY2	 PINC3
+
+#define get_key0_status() (~KEY0_PIN & (1<<KEY0))
+#define get_key1_status() (~KEY1_PIN & (1<<KEY1))
+#define get_key2_status() (~KEY2_PIN & (1<<KEY2))
+
 //////////////////////////////////////////////////////////////////
 // #define __AVR_ATmega128__
 
@@ -90,6 +110,9 @@ void stepper_dec();
 void init_motor();
 void init_controll_signals();
 void init_timer0();
+void init_keys();
+
+void view_dir();
 
 uint8_t find_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name, struct fat_dir_entry_struct* dir_entry);
 struct fat_file_struct* open_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name);
@@ -104,10 +127,12 @@ struct fat_fs_struct* fs = NULL;
 struct fat_dir_entry_struct directory;
 struct fat_dir_struct* dd = NULL;
 
-unsigned char gcr_track[8192];
-const int gcr_track_length = 7139;
-volatile unsigned char akt_gcr_byte = 0;
-volatile unsigned short int akt_track_pos = 0;
+uint8_t gcr_track[8192];
+int16_t gcr_track_length = 7139;
+volatile uint8_t akt_gcr_byte = 0;
+volatile uint16_t akt_track_pos = 0;
+
+
 
 uint8_t akt_half_track;
 
