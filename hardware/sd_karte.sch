@@ -100,8 +100,6 @@ F 3 "" H 5450 4950 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 NoConn ~ 5800 4100
-NoConn ~ 7600 3500
-NoConn ~ 7600 3600
 NoConn ~ 7600 3800
 NoConn ~ 7600 3900
 Text HLabel 4250 4000 0    60   Input ~ 0
@@ -114,10 +112,10 @@ Text HLabel 4250 3400 0    60   Input ~ 0
 SS
 NoConn ~ 5800 3300
 $Comp
-L R R5
+L R R2
 U 1 1 55F7B36C
 P 4700 3400
-F 0 "R5" V 4780 3400 50  0000 C CNN
+F 0 "R2" V 4780 3400 50  0000 C CNN
 F 1 "1,8k" V 4700 3400 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 4630 3400 30  0001 C CNN
 F 3 "" H 4700 3400 30  0000 C CNN
@@ -125,10 +123,10 @@ F 3 "" H 4700 3400 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R6
+L R R5
 U 1 1 55F7B401
 P 4900 3500
-F 0 "R6" V 4980 3500 50  0000 C CNN
+F 0 "R5" V 4980 3500 50  0000 C CNN
 F 1 "1,8k" V 4900 3500 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 4830 3500 30  0001 C CNN
 F 3 "" H 4900 3500 30  0000 C CNN
@@ -136,10 +134,10 @@ F 3 "" H 4900 3500 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R7
+L R R3
 U 1 1 55F7B48C
 P 4700 3800
-F 0 "R7" V 4780 3800 50  0000 C CNN
+F 0 "R3" V 4780 3800 50  0000 C CNN
 F 1 "1,8k" V 4700 3800 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 4630 3800 30  0001 C CNN
 F 3 "" H 4700 3800 30  0000 C CNN
@@ -147,10 +145,10 @@ F 3 "" H 4700 3800 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R2
+L R R4
 U 1 1 55F7BA6C
 P 4900 3150
-F 0 "R2" V 4980 3150 50  0000 C CNN
+F 0 "R4" V 4980 3150 50  0000 C CNN
 F 1 "3,3k" V 4900 3150 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 4830 3150 30  0001 C CNN
 F 3 "" H 4900 3150 30  0000 C CNN
@@ -158,10 +156,10 @@ F 3 "" H 4900 3150 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R3
+L R R6
 U 1 1 55F7BC20
 P 5100 3150
-F 0 "R3" V 5180 3150 50  0000 C CNN
+F 0 "R6" V 5180 3150 50  0000 C CNN
 F 1 "3,3k" V 5100 3150 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 5030 3150 30  0001 C CNN
 F 3 "" H 5100 3150 30  0000 C CNN
@@ -169,10 +167,10 @@ F 3 "" H 5100 3150 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R4
+L R R7
 U 1 1 55F7BCCD
 P 5300 3150
-F 0 "R4" V 5380 3150 50  0000 C CNN
+F 0 "R7" V 5380 3150 50  0000 C CNN
 F 1 "3,3k" V 5300 3150 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 5230 3150 30  0001 C CNN
 F 3 "" H 5300 3150 30  0000 C CNN
@@ -237,4 +235,12 @@ Wire Wire Line
 Wire Wire Line
 	5800 3900 5700 3900
 Connection ~ 5700 3900
+Text HLabel 7750 3500 2    60   Input ~ 0
+SD_DETECT
+Text HLabel 7750 3600 2    60   Input ~ 0
+SD_WP
+Wire Wire Line
+	7750 3500 7600 3500
+Wire Wire Line
+	7750 3600 7600 3600
 $EndSCHEMATC

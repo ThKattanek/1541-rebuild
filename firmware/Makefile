@@ -70,7 +70,7 @@ AVRDUDE_PORT = usb    # programmer connected to serial device
 AVRDUDE_ISP_SPEED = 0.4  # (1/20000000Hz)*4
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c
+SRC = main.c
 SRC += lcd.c
 # Sourcen der SD Card Lib von Roland Riegel hinzufügen
 SRC += sd_card_lib/byteordering.c

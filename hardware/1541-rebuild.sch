@@ -56,7 +56,7 @@ F 3 "" H 5100 3800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Text Notes 650  7450 0    60   ~ 0
-Am meiner 1541II Platine (ASSY ???) habe ich folgende modifiktionen durchgeführt:\n- PIN 40 von U10 (Gate Array 251828) von Platine getrennt (BYTE READY)\n- U8 (VIA 6522) ausgelötet und gesockelt\n- Dauerläufer behoben durch trennen einer Leiterbahn (genauer beschreiben)
+Am meiner 1541II Platine (ASSY NO 345003 REV 9) habe ich folgende modifiktionen durchgeführt:\n- PIN 40 von U10 (Gate Array 251828) von Platine getrennt (BYTE READY)\n- U8 (VIA 6522) ausgelötet und gesockelt\n- Dauerläufer behoben durch trennen einer Leiterbahn (genauer beschreiben)
 $Comp
 L TCXO3 X1
 U 1 1 55F7CB9E
@@ -68,8 +68,6 @@ F 3 "" H 2700 3050 60  0000 C CNN
 	1    2700 3050
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	3400 2900 4100 2900
 NoConn ~ 3400 3200
 $Comp
 L GND #PWR01
@@ -104,12 +102,6 @@ F 3 "" H 1900 3050 60  0000 C CNN
 	1    1900 3050
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	1800 2900 2000 2900
-Connection ~ 1900 2900
-Wire Wire Line
-	1800 3200 2000 3200
-Connection ~ 1900 3200
 NoConn ~ 4100 2500
 $Comp
 L GND #PWR03
@@ -122,15 +114,6 @@ F 3 "" H 5000 5950 60  0000 C CNN
 	1    5000 5950
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	4900 5800 4900 5900
-Wire Wire Line
-	4900 5900 5100 5900
-Wire Wire Line
-	5000 5900 5000 5950
-Wire Wire Line
-	5100 5900 5100 5800
-Connection ~ 5000 5900
 $Comp
 L +5V #PWR04
 U 1 1 55F7F7C2
@@ -142,15 +125,6 @@ F 3 "" H 5000 1650 60  0000 C CNN
 	1    5000 1650
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	4900 1800 4900 1700
-Wire Wire Line
-	4900 1700 5100 1700
-Wire Wire Line
-	5000 1700 5000 1650
-Wire Wire Line
-	5100 1700 5100 1800
-Connection ~ 5000 1700
 NoConn ~ 4100 3300
 $Comp
 L R R1
@@ -174,10 +148,6 @@ F 3 "" H 3600 2100 60  0000 C CNN
 	1    3600 2100
 	0    -1   -1   0   
 $EndComp
-Wire Wire Line
-	3700 2100 3600 2100
-Wire Wire Line
-	4000 2100 4100 2100
 $Comp
 L C C1
 U 1 1 55F7F83D
@@ -222,59 +192,20 @@ F 3 "" H 1200 1050 60  0000 C CNN
 	1    1200 1050
 	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	1200 1050 1200 1550
-Connection ~ 1200 1250
-Wire Wire Line
-	1500 1050 1500 1550
-Connection ~ 1500 1250
 Text Notes 650  750  0    60   ~ 0
 Stützkondensatoren für IC1
-Wire Wire Line
-	6100 3400 8800 3400
-Wire Wire Line
-	6100 3500 8800 3500
-Wire Wire Line
-	6100 3600 8800 3600
-Wire Wire Line
-	6100 3700 8800 3700
 $Sheet
-S 8800 3300 850  500 
+S 6800 3300 950  450 
 U 55F7A0F9
 F0 "SD Karte" 60
 F1 "sd_karte.sch" 60
-F2 "MISO" I L 8800 3600 60 
-F3 "SCK" I L 8800 3700 60 
-F4 "MOSI" I L 8800 3500 60 
-F5 "SS" I L 8800 3400 60 
+F2 "MISO" I L 6800 3600 60 
+F3 "SCK" I L 6800 3700 60 
+F4 "MOSI" I L 6800 3500 60 
+F5 "SS" I L 6800 3400 60 
+F6 "SD_DETECT" I R 7750 3500 60 
+F7 "SD_WP" I R 7750 3400 60 
 $EndSheet
-$Comp
-L CONN_01X06 P1
-U 1 1 55F8E45C
-P 7500 1700
-F 0 "P1" H 7500 2050 50  0000 C CNN
-F 1 "1541_CN3" V 7600 1700 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x06" H 7500 1700 60  0001 C CNN
-F 3 "" H 7500 1700 60  0000 C CNN
-	1    7500 1700
-	0    -1   -1   0   
-$EndComp
-Wire Wire Line
-	7450 1900 7450 3000
-Wire Wire Line
-	7450 3000 6100 3000
-Wire Wire Line
-	6100 3100 7650 3100
-Wire Wire Line
-	7650 3100 7650 1900
-Wire Wire Line
-	6100 3200 7550 3200
-Wire Wire Line
-	7550 3200 7550 1900
-Wire Wire Line
-	6100 3300 7750 3300
-Wire Wire Line
-	7750 3300 7750 1900
 $Sheet
 S 6400 1400 600  500 
 U 55F9179B
@@ -287,6 +218,67 @@ F5 "D3" I B 6750 1900 60
 F6 "RS" I B 6850 1900 60 
 F7 "EN" I B 6950 1900 60 
 $EndSheet
+NoConn ~ 6100 4200
+NoConn ~ 6100 4300
+NoConn ~ 6100 4400
+NoConn ~ 6100 4600
+$Sheet
+S 6600 4250 1100 1300
+U 55F9B22C
+F0 "VIA 6522 Sockel" 60
+F1 "via6522_sockel.sch" 60
+F2 "PA0" I L 6600 4800 60 
+F3 "PA1" I L 6600 4900 60 
+F4 "PA2" I L 6600 5000 60 
+F5 "PA3" I L 6600 5100 60 
+F6 "PA4" I L 6600 5200 60 
+F7 "PA5" I L 6600 5300 60 
+F8 "PA6" I L 6600 5400 60 
+F9 "PA7" I L 6600 5500 60 
+F10 "BRDY" I L 6600 4300 60 
+F11 "SPT0" I R 7700 4400 60 
+F12 "STP1" I R 7700 4500 60 
+F13 "SYNC" I L 6600 4400 60 
+F14 "OE" I R 7700 4600 60 
+F15 "SOE" I L 6600 4500 60 
+F16 "MTR" I R 7700 4300 60 
+$EndSheet
+Wire Wire Line
+	3400 2900 4100 2900
+Wire Wire Line
+	1800 2900 2000 2900
+Connection ~ 1900 2900
+Wire Wire Line
+	1800 3200 2000 3200
+Connection ~ 1900 3200
+Wire Wire Line
+	4900 5800 4900 5900
+Wire Wire Line
+	4900 5900 5100 5900
+Wire Wire Line
+	5000 5900 5000 5950
+Wire Wire Line
+	5100 5900 5100 5800
+Connection ~ 5000 5900
+Wire Wire Line
+	4900 1800 4900 1700
+Wire Wire Line
+	4900 1700 5100 1700
+Wire Wire Line
+	5000 1700 5000 1650
+Wire Wire Line
+	5100 1700 5100 1800
+Connection ~ 5000 1700
+Wire Wire Line
+	3700 2100 3600 2100
+Wire Wire Line
+	4000 2100 4100 2100
+Wire Wire Line
+	1200 1050 1200 1550
+Connection ~ 1200 1250
+Wire Wire Line
+	1500 1050 1500 1550
+Connection ~ 1500 1250
 Wire Wire Line
 	6450 1900 6450 2100
 Wire Wire Line
@@ -311,34 +303,6 @@ Wire Wire Line
 	6950 1900 6950 2600
 Wire Wire Line
 	6950 2600 6100 2600
-NoConn ~ 7250 1900
-NoConn ~ 7350 1900
-NoConn ~ 6100 2700
-NoConn ~ 6100 2800
-NoConn ~ 6100 4200
-NoConn ~ 6100 4300
-NoConn ~ 6100 4400
-NoConn ~ 6100 4600
-$Sheet
-S 6600 4250 1100 1300
-U 55F9B22C
-F0 "VIA 6522 Sockel" 60
-F1 "via6522_sockel.sch" 60
-F2 "PA0" I L 6600 4800 60 
-F3 "PA1" I L 6600 4900 60 
-F4 "PA2" I L 6600 5000 60 
-F5 "PA3" I L 6600 5100 60 
-F6 "PA4" I L 6600 5200 60 
-F7 "PA5" I L 6600 5300 60 
-F8 "PA6" I L 6600 5400 60 
-F9 "PA7" I L 6600 5500 60 
-F10 "BRDY" I L 6600 4300 60 
-F11 "SPT0" I R 7700 4350 60 
-F12 "STP1" I R 7700 4450 60 
-F13 "SYNC" I L 6600 4400 60 
-F14 "OE" I R 7700 4550 60 
-F15 "SOE" I L 6600 4500 60 
-$EndSheet
 Wire Wire Line
 	6100 4800 6600 4800
 Wire Wire Line
@@ -369,19 +333,52 @@ Wire Wire Line
 	6400 3900 6400 4300
 Wire Wire Line
 	6400 4300 6600 4300
-$Comp
-L CONN_01X01 P2
-U 1 1 55F9A2C7
-P 8050 3850
-F 0 "P2" H 8050 3950 50  0000 C CNN
-F 1 "1541_CN4_PIN7_[MOTOR]" V 8150 3850 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x01" H 8050 3850 60  0001 C CNN
-F 3 "" H 8050 3850 60  0000 C CNN
-	1    8050 3850
-	0    -1   -1   0   
-$EndComp
 Wire Wire Line
-	6100 4100 8050 4100
+	6100 4100 7850 4100
 Wire Wire Line
-	8050 4100 8050 4050
+	6100 2700 8150 2700
+Wire Wire Line
+	6100 2800 8050 2800
+Wire Wire Line
+	8150 2700 8150 4500
+Wire Wire Line
+	8050 2800 8050 4400
+Wire Wire Line
+	8050 4400 7700 4400
+Wire Wire Line
+	8150 4500 7700 4500
+Wire Wire Line
+	7850 4100 7850 4300
+Wire Wire Line
+	7850 4300 7700 4300
+Wire Wire Line
+	6100 3400 6800 3400
+Wire Wire Line
+	6100 3500 6800 3500
+Wire Wire Line
+	6100 3600 6800 3600
+Wire Wire Line
+	6100 3700 6800 3700
+Wire Wire Line
+	6100 3300 6550 3300
+Wire Wire Line
+	6550 3300 6550 3150
+Wire Wire Line
+	6550 3150 7850 3150
+Wire Wire Line
+	7850 3150 7850 3400
+Wire Wire Line
+	7850 3400 7750 3400
+Wire Wire Line
+	6100 3200 6450 3200
+Wire Wire Line
+	6450 3200 6450 3050
+Wire Wire Line
+	6450 3050 7950 3050
+Wire Wire Line
+	7950 3050 7950 3500
+Wire Wire Line
+	7950 3500 7750 3500
+NoConn ~ 6100 3000
+NoConn ~ 6100 3100
 $EndSCHEMATC
