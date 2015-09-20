@@ -28,6 +28,10 @@
 
 // Konfiguration /////////////////////////////////////////////////
 
+// LCD
+#define LCD_LINE_COUNT 4
+#define LCD_LINE_SIZE 20
+
 // Zeit in ms wie lange die Version nach dem Start angezeigt wird
 #define START_MESSAGE_TIME 2000
 
@@ -111,7 +115,6 @@ void init_motor();
 void init_controll_signals();
 void init_timer0();
 void init_keys();
-
 void view_dir();
 
 uint8_t find_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name, struct fat_dir_entry_struct* dir_entry);
@@ -132,7 +135,9 @@ int16_t gcr_track_length = 7139;
 volatile uint8_t akt_gcr_byte = 0;
 volatile uint16_t akt_track_pos = 0;
 
-
+uint8_t wait_key_counter0 = 0;
+uint8_t wait_key_counter1 = 0;
+uint8_t wait_key_counter2 = 0;
 
 uint8_t akt_half_track;
 

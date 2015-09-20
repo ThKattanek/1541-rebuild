@@ -10,7 +10,7 @@
 
 #include "./main.h"
 
-#define DEBUG_MODE
+//#define DEBUG_MODE
 
 int main(void)
 {
@@ -47,6 +47,8 @@ int main(void)
     while(init_sd_card()){}
 
     lcd_clear();
+
+    view_dir();
 
 #ifdef DEBUG_MODE
     lcd_setcursor(0,4);
@@ -133,6 +135,29 @@ int main(void)
 	else
 	    lcd_string("0");
 #endif
+	static uint16_t dir_pos;
+	if(get_key0_status() && !wait_key_counter0)
+	{
+	    wait_key_counter0 = 80000;
+	    view_dir(dir_pos);
+	    dir_pos++;
+	}
+	if(get_key1_status() && !wait_key_counter1)
+	{
+	    wait_key_counter1 = 80000;
+	    view_dir(dir_pos);
+	    if(dir_pos > 0)
+	    {
+		dir_pos--;
+	    }
+	}
+
+	if(wait_key_counter0)
+	    wait_key_counter0--;
+	if(wait_key_counter1)
+	    wait_key_counter1--;
+	if(wait_key_counter2)
+	    wait_key_counter2--;
     }
 }
 
@@ -265,12 +290,23 @@ void init_keys()
 
 /////////////////////////////////////////////////////////////////////
 
-void view_dir()
+void view_dir(uint16_t entry_start)
 {
-    struct fat_dir_entry_struct dir_entry;
-    while(fat_read_dir(dd, dir_entry))
-    {
+    uint16_t entry_pos = 0;
 
+    struct fat_dir_entry_struct dir_entry;
+
+    fat_reset_dir(dd);
+
+    while(fat_read_dir(dd, &dir_entry))
+    {
+	if(entry_pos == entry_start)
+	{
+	    lcd_setcursor(0,1);
+	    lcd_string(dir_entry.long_name);
+	    break;
+	}
+	entry_pos++;
     }
 }
 
@@ -369,6 +405,8 @@ ISR (TIMER0_COMPA_vect)
 	}
     }
     bit_counter++;
+
+    // Key
 }
 
 
