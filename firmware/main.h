@@ -38,6 +38,9 @@
 // Spur auf dem der Lesekopf beim Start/Reset stehen soll
 #define INIT_TRACK 18
 
+// Prellzeit der Taster in ms
+#define PRELL_TIME 200
+
 // Anschluss der Stepper Signale
 // Zwingend diese PINs wegen Extern Interrupts PCINT6/7
 // Bei Änderung muss der Sourcecode angepasst werden !
@@ -77,6 +80,14 @@
 
 #define get_soe_status() (SOE_PIN & (1<<SOE))
 
+// WPS
+#define WPS_DDR DDRC
+#define WPS_PORT PORTC
+#define WPS  PC4
+
+#define set_wps() WPS_PORT |= 1 << WPS
+#define clear_wps() WPS_PORT &= ~(1 << WPS)
+
 // Anschluss der Datenleitungen
 #define DATA_DDR   DDRD
 #define DATA_PORT  PORTD
@@ -115,7 +126,8 @@ void init_motor();
 void init_controll_signals();
 void init_timer0();
 void init_keys();
-void view_dir();
+int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_entry);
+void send_disk_change();
 
 uint8_t find_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name, struct fat_dir_entry_struct* dir_entry);
 struct fat_file_struct* open_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name);
@@ -130,14 +142,19 @@ struct fat_fs_struct* fs = NULL;
 struct fat_dir_entry_struct directory;
 struct fat_dir_struct* dd = NULL;
 
+struct fat_dir_entry_struct file_entry;
+struct fat_file_struct* fd;
+
 uint8_t gcr_track[8192];
 int16_t gcr_track_length = 7139;
 volatile uint8_t akt_gcr_byte = 0;
 volatile uint16_t akt_track_pos = 0;
 
-uint8_t wait_key_counter0 = 0;
-uint8_t wait_key_counter1 = 0;
-uint8_t wait_key_counter2 = 0;
+int8_t lcd_puffer[33]; // Maximal 32 Zeichen
+
+volatile uint16_t wait_key_counter0 = 0;
+volatile uint16_t wait_key_counter1 = 0;
+volatile uint16_t wait_key_counter2 = 0;
 
 uint8_t akt_half_track;
 

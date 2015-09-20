@@ -10,7 +10,7 @@
 
 #include "./main.h"
 
-//#define DEBUG_MODE
+#define DEBUG_MODE
 
 int main(void)
 {
@@ -37,6 +37,10 @@ int main(void)
     // Tasten Initialisieren
     init_keys();
 
+    // Timer2 --> wird alle 1ms aufgerufen
+    // z.B. zu Tasten entprellen
+    init_timer2();
+
     // Meldung ausgeben, das auf SD Karte gewartet wird
     lcd_setcursor(0,2);
     lcd_string("Wait for SD-Karte...");
@@ -48,7 +52,7 @@ int main(void)
 
     lcd_clear();
 
-    view_dir();
+    view_dir_entry(0,&file_entry);
 
 #ifdef DEBUG_MODE
     lcd_setcursor(0,4);
@@ -64,23 +68,6 @@ int main(void)
     sprintf(byte_str,"%d",akt_half_track >> 1);
     lcd_string(byte_str);
 #endif
-
-    /// Kommt wieder raus !
-    ////////////////// Zu Testzwecken ein Track von SD Karte laden ////////////////////
-
-    struct fat_file_struct* fd = open_file_in_dir(fs, dd, "aceoace_track18_gcr.raw");
-    if(!fd)
-    {
-	lcd_setcursor( 0, 2);
-	lcd_string("File not found!");
-    }
-    else
-    {
-	int count = fat_read_file(fd, gcr_track, gcr_track_length);
-    }
-    fat_close_file(fd);
-
-    ///////////////////////////////////////////////////////////////////////////////////
 
     // Interrupts erlauben
     sei();
@@ -133,31 +120,78 @@ int main(void)
 	if(get_key2_status())
 	    lcd_string("1");
 	else
-	    lcd_string("0");
+	    lcd_string("0");	
 #endif
-	static uint16_t dir_pos;
+	static uint16_t dir_pos = 0;
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//// Image Auswahl
+
+	// Runter
 	if(get_key0_status() && !wait_key_counter0)
 	{
-	    wait_key_counter0 = 80000;
-	    view_dir(dir_pos);
-	    dir_pos++;
-	}
-	if(get_key1_status() && !wait_key_counter1)
-	{
-	    wait_key_counter1 = 80000;
-	    view_dir(dir_pos);
+	    wait_key_counter0 = PRELL_TIME;
 	    if(dir_pos > 0)
 	    {
 		dir_pos--;
 	    }
+	    view_dir_entry(dir_pos,&file_entry);
 	}
 
-	if(wait_key_counter0)
-	    wait_key_counter0--;
-	if(wait_key_counter1)
-	    wait_key_counter1--;
-	if(wait_key_counter2)
-	    wait_key_counter2--;
+	// Hoch
+	if(get_key1_status() && !wait_key_counter1)
+	{
+	    wait_key_counter1 = PRELL_TIME;
+	    dir_pos++;
+	    if(!view_dir_entry(dir_pos,&file_entry)) dir_pos--;
+	}
+
+	// Enter
+	if(get_key2_status() && !wait_key_counter2)
+	{
+	    wait_key_counter2 = PRELL_TIME;
+
+	    fd = fat_open_file(fs, &file_entry);
+	    if(!fd)
+	    {
+		lcd_setcursor( 0, 3);
+		lcd_string("File not open!");
+	    }
+	    else
+	    {
+		/// Track18 eines G64 einlesen
+
+
+		int32_t offset = 0x94;
+
+		uint8_t is_read = 0;
+
+
+		if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
+		{
+		    if(fat_read_file(fd, &offset, sizeof(uint32_t)))
+		    {
+			if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
+			{
+			    fat_read_file(fd, &gcr_track_length, sizeof(gcr_track_length));
+			    int count = fat_read_file(fd, gcr_track, gcr_track_length);
+			    akt_track_pos = 0;
+			    is_read = 1;
+			}
+		    }
+		}
+
+		if(!is_read)
+		{
+		    lcd_setcursor( 0, 3);
+		    lcd_string("Lesefehler !!");
+		}
+		else
+		    send_disk_change();
+	    }
+	    fat_close(fd);
+	}
+
     }
 }
 
@@ -249,6 +283,7 @@ void init_controll_signals()
     // Als Ausgang schalten
     BYTE_READY_DDR |= 1<<BYTE_READY;
     SYNC_DDR |= 1<<SYNC;
+    WPS_DDR |= 1<<WPS;
 
     // DATEN Leitungen als Ausgang schalten
     DATA_DDR = 0xff;
@@ -275,6 +310,21 @@ void init_timer0()
 
 /////////////////////////////////////////////////////////////////////
 
+void init_timer2()
+{
+    TCCR2A = (1<<WGM21);    // CTC Modus
+    TCCR2B |= (1<<CS20) | (1<<CS21) | (1<<CS22);    // Prescaler 1024
+
+    // jede ms aufrufen --> 1KHz
+    // ((20000000/1024)/1000) = 20
+
+    OCR2A = 20-1;
+
+    // Compare Interrupt erlauben
+    TIMSK2 |= (1<<OCIE2A);
+}
+/////////////////////////////////////////////////////////////////////
+
 void init_keys()
 {
     // Entsprechende Ports auf Eingangschalten
@@ -290,24 +340,43 @@ void init_keys()
 
 /////////////////////////////////////////////////////////////////////
 
-void view_dir(uint16_t entry_start)
+int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_entry)
 {
     uint16_t entry_pos = 0;
 
-    struct fat_dir_entry_struct dir_entry;
-
     fat_reset_dir(dd);
-
-    while(fat_read_dir(dd, &dir_entry))
+    while(fat_read_dir(dd, dir_entry) && (entry_pos < entry_start))
     {
-	if(entry_pos == entry_start)
-	{
-	    lcd_setcursor(0,1);
-	    lcd_string(dir_entry.long_name);
-	    break;
-	}
 	entry_pos++;
     }
+
+    if(entry_pos == entry_start)
+    {
+	strcpy(lcd_puffer, dir_entry->long_name);
+	uint8_t len = strlen(lcd_puffer);
+	if(len > 20)
+	    lcd_puffer[20] = 0;
+	else
+	{
+	    for(int i=len; i<20; i++)
+		lcd_puffer[i] = ' ';
+	    lcd_puffer[20] = 0;
+	}
+
+	lcd_setcursor(0,1);
+	lcd_string(lcd_puffer);
+	return 1;
+    }
+    return 0;
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void send_disk_change()
+{
+    set_wps();
+    _delay_ms(1);
+    clear_wps();
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -362,11 +431,6 @@ ISR (PCINT0_vect)
     stp_signals_old = stp_signals;
 }
 
-ISR (PCINT1_vect)
-{
-
-}
-
 ISR (TIMER0_COMPA_vect)
 {
     static uint8_t bit_counter = 0;
@@ -405,8 +469,14 @@ ISR (TIMER0_COMPA_vect)
 	}
     }
     bit_counter++;
-
-    // Key
 }
 
-
+ISR (TIMER2_COMPA_vect)
+{
+    if(wait_key_counter0)
+	wait_key_counter0--;
+    if(wait_key_counter1)
+	wait_key_counter1--;
+    if(wait_key_counter2)
+	wait_key_counter2--;
+}

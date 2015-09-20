@@ -302,4 +302,9 @@ Wire Wire Line
 	3850 2400 3850 3300
 Wire Wire Line
 	3950 2400 3950 3200
+Text HLabel 5250 2650 1    60   Input ~ 0
+WPS
+Wire Wire Line
+	5250 2650 5250 4200
+Connection ~ 5250 4200
 $EndSCHEMATC
