@@ -36,7 +36,7 @@
 #define START_MESSAGE_TIME 2000
 
 // Spur auf dem der Lesekopf beim Start/Reset stehen soll
-#define INIT_TRACK 18
+#define INIT_TRACK 1
 
 // Prellzeit der Taster in ms
 #define PRELL_TIME 200
@@ -125,14 +125,19 @@ void stepper_dec();
 void init_motor();
 void init_controll_signals();
 void init_timer0();
+void start_timer0();
+void stop_timer0();
+void init_timer2();
+void start_timer2();
+void stop_timer2();
 void init_keys();
 int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_entry);
+int8_t open_disk_image(struct fat_dir_entry_struct* file_entry);
+int8_t close_disk_image(struct fat_dir_entry_struct* file_entry);
+int8_t open_g64_image(struct fat_dir_entry_struct* file_entry);
+int8_t open_d64_image(struct fat_dir_entry_struct* file_entry);
+
 void send_disk_change();
-
-uint8_t find_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name, struct fat_dir_entry_struct* dir_entry);
-struct fat_file_struct* open_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name);
-
-ISR (PCINT0_vect);
 
 /////////////////////////////////////////////////////////////////
 // Globale Variablen

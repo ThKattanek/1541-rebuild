@@ -162,11 +162,18 @@ int main(void)
 		/// Track18 eines G64 einlesen
 
 
-		int32_t offset = 0x94;
+		//int32_t offset = 0x94;
+		int32_t offset = 0x0c;
 
 		uint8_t is_read = 0;
 
+		stop_timer0();
 
+		DATA_PORT = 0x00;
+
+#ifdef DEBUG_MODE
+		wait_key_counter0 = 1000;
+#endif
 		if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
 		{
 		    if(fat_read_file(fd, &offset, sizeof(uint32_t)))
@@ -181,6 +188,15 @@ int main(void)
 		    }
 		}
 
+#ifdef DEBUG_MODE
+		uint16_t time_ms = 1000-wait_key_counter0;
+		int8_t str00[6];
+		sprintf(str00,"%d",time_ms);
+		lcd_setcursor( 16, 4);
+		lcd_string(str00);
+#endif
+		start_timer0();
+
 		if(!is_read)
 		{
 		    lcd_setcursor( 0, 3);
@@ -191,7 +207,6 @@ int main(void)
 	    }
 	    fat_close(fd);
 	}
-
     }
 }
 
@@ -249,7 +264,7 @@ void init_stepper()
 
     // Pin Change Ineterrupt für beide PIN's aktivieren
     PCICR = 0x01;   // Enable PCINT0..7
-    PCMSK0 = 0xc0;  // Set Mask Register für PCINT6 und PCINT7
+    PCMSK0 = 0x40;  // Set Mask Register für PCINT6 und PCINT7
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -304,8 +319,23 @@ void init_timer0()
 
     OCR0A = 70-1;
 
+    start_timer0();
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void start_timer0()
+{
     // Compare Interrupt erlauben
     TIMSK0 |= (1<<OCIE0A);
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void stop_timer0()
+{
+    // Compare Interrupt verhindern
+    TIMSK0 &= ~(1<<OCIE0A);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -320,9 +350,24 @@ void init_timer2()
 
     OCR2A = 20-1;
 
+    start_timer2();
+}
+/////////////////////////////////////////////////////////////////////
+
+void start_timer2()
+{
     // Compare Interrupt erlauben
     TIMSK2 |= (1<<OCIE2A);
 }
+
+/////////////////////////////////////////////////////////////////////
+
+void stop_timer2()
+{
+    // Compare Interrupt verhindern
+    TIMSK2 &= ~(1<<OCIE2A);
+}
+
 /////////////////////////////////////////////////////////////////////
 
 void init_keys()
@@ -372,38 +417,39 @@ int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_ent
 
 /////////////////////////////////////////////////////////////////////
 
+int8_t opene_disk_image(struct fat_dir_entry_struct* file_entry)
+{
+
+}
+
+/////////////////////////////////////////////////////////////////////
+
+int8_t close_disk_image(struct fat_dir_entry_struct* file_entry)
+{
+
+}
+
+/////////////////////////////////////////////////////////////////////
+
+int8_t open_g64_image(struct fat_dir_entry_struct* file_entry)
+{
+
+}
+
+/////////////////////////////////////////////////////////////////////
+
+int8_t open_d64_image(struct fat_dir_entry_struct* file_entry)
+{
+
+}
+
+/////////////////////////////////////////////////////////////////////
+
 void send_disk_change()
 {
     set_wps();
     _delay_ms(1);
     clear_wps();
-}
-
-/////////////////////////////////////////////////////////////////////
-
-uint8_t find_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name, struct fat_dir_entry_struct* dir_entry)
-{
-    while(fat_read_dir(dd, dir_entry))
-    {
-	if(strcmp(dir_entry->long_name, name) == 0)
-	{
-	    fat_reset_dir(dd);
-	    return 1;
-	}
-    }
-
-    return 0;
-}
-
-/////////////////////////////////////////////////////////////////////
-
-struct fat_file_struct* open_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name)
-{
-    struct fat_dir_entry_struct file_entry;
-    if(!find_file_in_dir(fs, dd, name, &file_entry))
-	return 0;
-
-    return fat_open_file(fs, &file_entry);
 }
 
 /////////////////////////////////////////////////////////////////////
