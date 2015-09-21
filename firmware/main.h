@@ -36,7 +36,7 @@
 #define START_MESSAGE_TIME 2000
 
 // Spur auf dem der Lesekopf beim Start/Reset stehen soll
-#define INIT_TRACK 1
+#define INIT_TRACK 18
 
 // Prellzeit der Taster in ms
 #define PRELL_TIME 200
@@ -132,10 +132,11 @@ void start_timer2();
 void stop_timer2();
 void init_keys();
 int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_entry);
-int8_t open_disk_image(struct fat_dir_entry_struct* file_entry);
-int8_t close_disk_image(struct fat_dir_entry_struct* file_entry);
-int8_t open_g64_image(struct fat_dir_entry_struct* file_entry);
-int8_t open_d64_image(struct fat_dir_entry_struct* file_entry);
+struct fat_file_struct* open_disk_image(struct fat_fs_struct *fs, struct fat_dir_entry_struct* file_entry, uint8_t *image_type);
+void close_disk_image(struct fat_file_struct*);
+int8_t open_g64_image(struct fat_file_struct *fd);
+int8_t open_d64_image(struct fat_file_struct *fd);
+int8_t read_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
 
 void send_disk_change();
 
@@ -150,6 +151,10 @@ struct fat_dir_struct* dd = NULL;
 struct fat_dir_entry_struct file_entry;
 struct fat_file_struct* fd;
 
+uint8_t akt_image_type = 0;	// 0=kein Image, 1=G64, 2=D64
+
+volatile static uint8_t stp_signals_old = 0;
+
 uint8_t gcr_track[8192];
 int16_t gcr_track_length = 7139;
 volatile uint8_t akt_gcr_byte = 0;
@@ -163,4 +168,4 @@ volatile uint16_t wait_key_counter2 = 0;
 
 uint8_t akt_half_track;
 
-volatile stepper_msg = 0;   // 0-keine Stepperaktivität ; 1=StepperDec ; 2-255=StepperInc
+volatile uint8_t stepper_msg = 0;   // 0-keine Stepperaktivität ; 1=StepperDec ; 2-255=StepperInc

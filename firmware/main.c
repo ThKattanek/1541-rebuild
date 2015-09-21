@@ -31,6 +31,9 @@ int main(void)
     // Steursignale BYTE_READY, SYNC und SOE Initialisieren
     init_controll_signals();
 
+    // Schreibschutz setzen
+    clear_wps();
+
     // Timer0 --> GCR senden
     init_timer0();
 
@@ -76,6 +79,7 @@ int main(void)
     {
 	// Auf Steppermotor aktivität prüfen
 	// und auswerten
+
 	if(stepper_msg)
 	{
 	    uint8_t stp = stepper_msg;
@@ -151,61 +155,25 @@ int main(void)
 	{
 	    wait_key_counter2 = PRELL_TIME;
 
-	    fd = fat_open_file(fs, &file_entry);
+	    stop_timer0();
+	    DATA_PORT = 0x00;
+
+	    close_disk_image(fd);
+	    fd = open_disk_image(fs, &file_entry, &akt_image_type);
 	    if(!fd)
 	    {
-		lcd_setcursor( 0, 3);
-		lcd_string("File not open!");
+		lcd_setcursor( 0, 2);
+		lcd_string("Image not open!");
 	    }
-	    else
-	    {
-		/// Track18 eines G64 einlesen
 
+	    read_disk_track(fd,akt_image_type,INIT_TRACK,gcr_track, &gcr_track_length);
 
-		//int32_t offset = 0x94;
-		int32_t offset = 0x0c;
+	    stp_signals_old = STP_PIN >> 6;
+	    akt_half_track = INIT_TRACK << 1;
+	    akt_track_pos = 0;
 
-		uint8_t is_read = 0;
-
-		stop_timer0();
-
-		DATA_PORT = 0x00;
-
-#ifdef DEBUG_MODE
-		wait_key_counter0 = 1000;
-#endif
-		if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
-		{
-		    if(fat_read_file(fd, &offset, sizeof(uint32_t)))
-		    {
-			if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
-			{
-			    fat_read_file(fd, &gcr_track_length, sizeof(gcr_track_length));
-			    int count = fat_read_file(fd, gcr_track, gcr_track_length);
-			    akt_track_pos = 0;
-			    is_read = 1;
-			}
-		    }
-		}
-
-#ifdef DEBUG_MODE
-		uint16_t time_ms = 1000-wait_key_counter0;
-		int8_t str00[6];
-		sprintf(str00,"%d",time_ms);
-		lcd_setcursor( 16, 4);
-		lcd_string(str00);
-#endif
-		start_timer0();
-
-		if(!is_read)
-		{
-		    lcd_setcursor( 0, 3);
-		    lcd_string("Lesefehler !!");
-		}
-		else
-		    send_disk_change();
-	    }
-	    fat_close(fd);
+	    start_timer0();
+	    send_disk_change();
 	}
     }
 }
@@ -264,7 +232,7 @@ void init_stepper()
 
     // Pin Change Ineterrupt für beide PIN's aktivieren
     PCICR = 0x01;   // Enable PCINT0..7
-    PCMSK0 = 0x40;  // Set Mask Register für PCINT6 und PCINT7
+    PCMSK0 = 0xc0;  // Set Mask Register für PCINT6 und PCINT7
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -273,6 +241,14 @@ void stepper_inc()
 {
     if(akt_half_track == 83) return;
     akt_half_track++;
+
+    if(!akt_half_track & 0x01)
+    {
+	stop_timer0();
+	read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
+	akt_track_pos = 0;
+	start_timer0();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -281,6 +257,14 @@ void stepper_dec()
 {
     if(akt_half_track == 2) return;
     akt_half_track--;
+
+    if(!akt_half_track & 0x01)
+    {
+	stop_timer0();
+	read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
+	akt_track_pos = 0;
+	start_timer0();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -417,30 +401,113 @@ int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_ent
 
 /////////////////////////////////////////////////////////////////////
 
-int8_t opene_disk_image(struct fat_dir_entry_struct* file_entry)
+struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir_entry_struct* file_entry, uint8_t* image_type)
 {
+    if(strlen(file_entry->long_name) < 4) return NULL;
 
+    struct fat_file_struct* fd = NULL;
+    int8_t extension[5];
+    int i;
+
+    // Extension überprüfen --> g64 oder d64
+    strcpy(extension, file_entry->long_name+(strlen(file_entry->long_name)-4));
+
+    i=0;
+    while(extension[i] != 0)
+    {
+	extension[i] = tolower(extension[i]);
+	i++;
+    }
+
+    fd = fat_open_file(fs, file_entry);
+    if(!fd)
+    {
+	*image_type = 0;
+	return fd;
+    }
+
+    if(!strcmp(extension,".g64"))
+    {
+	// Laut Extension ein G64
+	*image_type = 1;
+	open_g64_image(fd);
+    }else if(!strcmp(extension,".d64"))
+    {
+	// Laut Extensions ein D64
+	*image_type = 2;
+	open_d64_image(fd);
+    }else
+    {
+	// Nicht unterstützt
+	lcd_setcursor( 0, 3);
+	lcd_string("Not Supported");
+	fat_close_file(fd);
+	fd = NULL;
+	*image_type = 0;
+    }
+
+    return fd;
 }
 
 /////////////////////////////////////////////////////////////////////
 
-int8_t close_disk_image(struct fat_dir_entry_struct* file_entry)
+void close_disk_image(struct fat_file_struct* fd)
 {
-
+    fat_close(fd);
+    fd = NULL;
+    return 0;
 }
 
 /////////////////////////////////////////////////////////////////////
 
-int8_t open_g64_image(struct fat_dir_entry_struct* file_entry)
+int8_t open_g64_image(struct fat_file_struct* fd)
 {
-
+    return 0;
 }
 
 /////////////////////////////////////////////////////////////////////
 
-int8_t open_d64_image(struct fat_dir_entry_struct* file_entry)
+int8_t open_d64_image(struct fat_file_struct* fd)
 {
+    return 0;
+}
 
+/////////////////////////////////////////////////////////////////////
+
+int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length)
+{
+    uint8_t is_read = 0;
+    int32_t offset = 0;
+
+    switch(image_type)
+    {
+    ///////////////////////////////////////////////////////////////////////////
+    case 1:	// G64
+	/// Track18 eines G64 einlesen
+
+	offset = (int32_t)track_nr - 1;
+	offset = (offset << 3) + 0x0c;
+
+	if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
+	{
+	    if(fat_read_file(fd, &offset, sizeof(uint32_t)))
+	    {
+		if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
+		{
+		    fat_read_file(fd, &gcr_track_length, sizeof(gcr_track_length));
+		    fat_read_file(fd, track_buffer, gcr_track_length);
+
+		    is_read = 1;
+		}
+	    }
+	}
+	break;
+
+    ///////////////////////////////////////////////////////////////////////////
+    case 2:	// D64
+	break;
+    }
+    return is_read;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -458,23 +525,21 @@ void send_disk_change()
 
 ISR (PCINT0_vect)
 {
-    static uint8_t stp_signals_old = 0;
-
+    // Stepper Signale an PA6 und PA7
     uint8_t stp_signals = PINA >> 6;
 
-    // Stepper Signale an PA6 und PA7
-    stp_signals = PINA >> 6;
-
-    if (stp_signals_old == ((stp_signals+1) & 3))
+    if(stp_signals != stp_signals_old)
     {
-	stepper_msg = 1;
+	if (stp_signals_old == ((stp_signals+1) & 3))
+	{
+	    stepper_msg = 1;
+	}
+	else if (stp_signals_old == ((stp_signals-1) & 3))
+	{
+	    stepper_msg = 2;
+	}
+	stp_signals_old = stp_signals;
     }
-    else if (stp_signals_old == ((stp_signals-1) & 3))
-    {
-	stepper_msg = 2;
-    }
-
-    stp_signals_old = stp_signals;
 }
 
 ISR (TIMER0_COMPA_vect)
