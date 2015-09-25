@@ -10,7 +10,7 @@
 
 #include "./main.h"
 
-#define DEBUG_MODE
+//#define DEBUG_MODE
 
 int main(void)
 {
@@ -86,9 +86,13 @@ int main(void)
 	    stepper_msg = 0;		// Schnell auf Null setzten um nicht einen Step zu verpassen
 
 	    if(stp == 1)
+	    {
 		stepper_dec();		// Spur Dekrementieren
-	    else stepper_inc();		// Spur Inkrementieren
-
+	    }
+	    else
+	    {
+		stepper_inc();		// Spur Inkrementieren
+	    }
 #ifdef DEBUG_MODE
 	    lcd_setcursor(2,4);
 	    lcd_string("   ");
@@ -233,16 +237,23 @@ void init_stepper()
     // Pin Change Ineterrupt für beide PIN's aktivieren
     PCICR = 0x01;   // Enable PCINT0..7
     PCMSK0 = 0xc0;  // Set Mask Register für PCINT6 und PCINT7
+
+    // Debug
+    DDRC |= 1<<PC5;
+    PORTC |= 1<<PC5;
 }
 
 /////////////////////////////////////////////////////////////////////
 
 void stepper_inc()
-{
+{            
     if(akt_half_track == 83) return;
     akt_half_track++;
 
-    if(!akt_half_track & 0x01)
+    // Geschwindigkeit setzen
+    OCR0A = timer0_orca0[akt_half_track>>1];
+
+    if(!(akt_half_track & 0x01))
     {
 	stop_timer0();
 	read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
@@ -258,7 +269,10 @@ void stepper_dec()
     if(akt_half_track == 2) return;
     akt_half_track--;
 
-    if(!akt_half_track & 0x01)
+    // Geschwindigkeit setzen
+    OCR0A = timer0_orca0[akt_half_track>>1];
+
+    if(!(akt_half_track & 0x01))
     {
 	stop_timer0();
 	read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
@@ -298,10 +312,7 @@ void init_timer0()
     TCCR0A = (1<<WGM01);    // CTC Modus
     TCCR0B |= (1<<CS00);    // Prescaler 1
 
-    // 35695 * 8 Hz entspr. 28µs / 8	// Spur18
-    // ((20000000/1)/35695*8 / 1) = 70
-
-    OCR0A = 70-1;
+    OCR0A = timer0_orca0[akt_half_track>>1];
 
     start_timer0();
 }
@@ -532,10 +543,12 @@ ISR (PCINT0_vect)
     {
 	if (stp_signals_old == ((stp_signals+1) & 3))
 	{
+	    //stepper_dec();
 	    stepper_msg = 1;
 	}
 	else if (stp_signals_old == ((stp_signals-1) & 3))
 	{
+	    //stepper_inc();
 	    stepper_msg = 2;
 	}
 	stp_signals_old = stp_signals;

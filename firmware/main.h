@@ -36,7 +36,8 @@
 #define START_MESSAGE_TIME 2000
 
 // Spur auf dem der Lesekopf beim Start/Reset stehen soll
-#define INIT_TRACK 18
+// Track 18 --> Directory
+#define INIT_TRACK 1
 
 // Prellzeit der Taster in ms
 #define PRELL_TIME 200
@@ -167,5 +168,20 @@ volatile uint16_t wait_key_counter1 = 0;
 volatile uint16_t wait_key_counter2 = 0;
 
 uint8_t akt_half_track;
+
+// Bitraten
+//Zone 0: 8000000/26 = 307692 Hz
+//Zone 1: 8000000/28 = 285714 Hz
+//Zone 2: 8000000/30 = 266667 Hz
+//Zone 3: 8000000/32 = 250000 Hz
+
+//Zone 0: 20MHz / 307692Hz = 65 /1-17
+//Zone 1: 20MHz / 285714Hz = 70 /18-24
+//Zone 2: 20MHz / 266667Hz = 75 /25-30
+//Zone 3: 20MHz / 250000Hz = 80 /31-42
+const uint8_t timer0_orca0[43] = {0,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64
+				   ,69,69,69,69,69,69,69
+				   ,74,74,74,74,74,74
+				   ,79,79,79,79,79,79,79,79,79,79,79,79};
 
 volatile uint8_t stepper_msg = 0;   // 0-keine Stepperaktivität ; 1=StepperDec ; 2-255=StepperInc
