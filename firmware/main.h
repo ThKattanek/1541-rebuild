@@ -179,9 +179,16 @@ uint8_t akt_half_track;
 //Zone 1: 20MHz / 285714Hz = 70 /18-24
 //Zone 2: 20MHz / 266667Hz = 75 /25-30
 //Zone 3: 20MHz / 250000Hz = 80 /31-42
+
 const uint8_t timer0_orca0[43] = {0,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64
 				   ,69,69,69,69,69,69,69
 				   ,74,74,74,74,74,74
 				   ,79,79,79,79,79,79,79,79,79,79,79,79};
+
+
+// Ringpuffer für reinkommende Stepper Signale
+uint8_t stepper_signal_puffer[0x100]; // Ringpuffer für Stepper Signale (256 Bytes)
+volatile uint8_t stepper_signal_r_pos = 0;
+volatile uint8_t stepper_signal_w_pos = 0;
 
 volatile uint8_t stepper_msg = 0;   // 0-keine Stepperaktivität ; 1=StepperDec ; 2-255=StepperInc

@@ -80,18 +80,22 @@ int main(void)
 	// Auf Steppermotor aktivität prüfen
 	// und auswerten
 
-	if(stepper_msg)
+	if(stepper_signal_r_pos != stepper_signal_w_pos)
 	{
-	    uint8_t stp = stepper_msg;
-	    stepper_msg = 0;		// Schnell auf Null setzten um nicht einen Step zu verpassen
+	    uint8_t stepper = stepper_signal_puffer[stepper_signal_r_pos++]>>2 | stepper_signal_puffer[stepper_signal_r_pos-1];
+	    //stepper_signal_r_pos++;
 
-	    if(stp == 1)
+	    switch(stepper)
 	    {
-		stepper_dec();		// Spur Dekrementieren
-	    }
-	    else
-	    {
-		stepper_inc();		// Spur Inkrementieren
+	    case 0x30: case 0x40: case 0x90: case 0xE0:
+		// DEC
+		stepper_dec();
+		break;
+
+	    case 0x10: case 0x60: case 0xB0: case 0xC0:
+		// INC
+		stepper_inc();
+		break;
 	    }
 #ifdef DEBUG_MODE
 	    lcd_setcursor(2,4);
@@ -101,15 +105,6 @@ int main(void)
 	    lcd_string(byte_str);
 #endif
 	}
-
-#ifdef DEBUG_MODE
-	// Auf Laufwerksmotor prüfen
-	lcd_setcursor(7,4);
-	if(get_motor_status())
-	    lcd_string("*");
-	else
-	    lcd_string("-");
-#endif
 
 #ifdef DEBUG_MODE
 	lcd_setcursor(11,4);
@@ -250,14 +245,16 @@ void stepper_inc()
     if(akt_half_track == 83) return;
     akt_half_track++;
 
-    // Geschwindigkeit setzen
-    OCR0A = timer0_orca0[akt_half_track>>1];
-
     if(!(akt_half_track & 0x01))
     {
 	stop_timer0();
+
 	read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
 	akt_track_pos = 0;
+
+	// Geschwindigkeit setzen
+	OCR0A = timer0_orca0[akt_half_track>>1];
+
 	start_timer0();
     }
 }
@@ -269,14 +266,16 @@ void stepper_dec()
     if(akt_half_track == 2) return;
     akt_half_track--;
 
-    // Geschwindigkeit setzen
-    OCR0A = timer0_orca0[akt_half_track>>1];
-
     if(!(akt_half_track & 0x01))
     {
 	stop_timer0();
+
 	read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
 	akt_track_pos = 0;
+
+	// Geschwindigkeit setzen
+	OCR0A = timer0_orca0[akt_half_track>>1];
+
 	start_timer0();
     }
 }
@@ -506,6 +505,7 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
 		if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
 		{
 		    fat_read_file(fd, &gcr_track_length, sizeof(gcr_track_length));
+
 		    fat_read_file(fd, track_buffer, gcr_track_length);
 
 		    is_read = 1;
@@ -537,22 +537,8 @@ void send_disk_change()
 ISR (PCINT0_vect)
 {
     // Stepper Signale an PA6 und PA7
-    uint8_t stp_signals = PINA >> 6;
-
-    if(stp_signals != stp_signals_old)
-    {
-	if (stp_signals_old == ((stp_signals+1) & 3))
-	{
-	    //stepper_dec();
-	    stepper_msg = 1;
-	}
-	else if (stp_signals_old == ((stp_signals-1) & 3))
-	{
-	    //stepper_inc();
-	    stepper_msg = 2;
-	}
-	stp_signals_old = stp_signals;
-    }
+    stepper_signal_puffer[stepper_signal_w_pos] = STP_PIN & 0xc0;
+    stepper_signal_w_pos++;
 }
 
 ISR (TIMER0_COMPA_vect)
