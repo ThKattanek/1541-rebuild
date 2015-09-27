@@ -185,10 +185,11 @@ const uint8_t timer0_orca0[43] = {0,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64
 				   ,74,74,74,74,74,74
 				   ,79,79,79,79,79,79,79,79,79,79,79,79};
 
-
 // Ringpuffer für reinkommende Stepper Signale
 uint8_t stepper_signal_puffer[0x100]; // Ringpuffer für Stepper Signale (256 Bytes)
 volatile uint8_t stepper_signal_r_pos = 0;
 volatile uint8_t stepper_signal_w_pos = 0;
+volatile uint8_t stepper_signal_time = 0;
+volatile uint8_t stepper_signal = 0;
 
 volatile uint8_t stepper_msg = 0;   // 0-keine Stepperaktivität ; 1=StepperDec ; 2-255=StepperInc

@@ -83,18 +83,21 @@ int main(void)
 	if(stepper_signal_r_pos != stepper_signal_w_pos)
 	{
 	    uint8_t stepper = stepper_signal_puffer[stepper_signal_r_pos++]>>2 | stepper_signal_puffer[stepper_signal_r_pos-1];
-	    //stepper_signal_r_pos++;
 
 	    switch(stepper)
 	    {
 	    case 0x30: case 0x40: case 0x90: case 0xE0:
 		// DEC
 		stepper_dec();
+		    stepper_signal_time = 0;
+		    stepper_signal = 1;
 		break;
 
 	    case 0x10: case 0x60: case 0xB0: case 0xC0:
 		// INC
 		stepper_inc();
+		    stepper_signal_time = 0;
+		    stepper_signal = 1;
 		break;
 	    }
 #ifdef DEBUG_MODE
@@ -104,6 +107,18 @@ int main(void)
 	    sprintf(byte_str,"%d",akt_half_track >> 1);
 	    lcd_string(byte_str);
 #endif
+	}
+	else if(stepper_signal && (stepper_signal_time >= 20))
+	{
+		stepper_signal = 0;
+
+		stop_timer0();
+		read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
+		akt_track_pos = 0;
+
+		// Geschwindigkeit setzen
+		OCR0A = timer0_orca0[akt_half_track>>1];
+		start_timer0();
 	}
 
 #ifdef DEBUG_MODE
@@ -244,19 +259,6 @@ void stepper_inc()
 {            
     if(akt_half_track == 83) return;
     akt_half_track++;
-
-    if(!(akt_half_track & 0x01))
-    {
-	stop_timer0();
-
-	read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
-	akt_track_pos = 0;
-
-	// Geschwindigkeit setzen
-	OCR0A = timer0_orca0[akt_half_track>>1];
-
-	start_timer0();
-    }
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -265,19 +267,6 @@ void stepper_dec()
 {
     if(akt_half_track == 2) return;
     akt_half_track--;
-
-    if(!(akt_half_track & 0x01))
-    {
-	stop_timer0();
-
-	read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
-	akt_track_pos = 0;
-
-	// Geschwindigkeit setzen
-	OCR0A = timer0_orca0[akt_half_track>>1];
-
-	start_timer0();
-    }
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -583,6 +572,8 @@ ISR (TIMER0_COMPA_vect)
 
 ISR (TIMER2_COMPA_vect)
 {
+    stepper_signal_time++;
+
     if(wait_key_counter0)
 	wait_key_counter0--;
     if(wait_key_counter1)
