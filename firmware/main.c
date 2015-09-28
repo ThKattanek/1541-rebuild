@@ -6,7 +6,9 @@
 */
 
 /// CPU Clock
-#define F_CPU 20000000L
+#ifndef F_CPU
+#define F_CPU 20000000UL
+#endif
 
 #include "./main.h"
 
@@ -117,7 +119,7 @@ int main(void)
 		akt_track_pos = 0;
 
 		// Geschwindigkeit setzen
-		OCR0A = timer0_orca0[akt_half_track>>1];
+		OCR0A = timer0_orca0[d64_track_zone[akt_half_track>>1]];
 		start_timer0();
 	}
 
@@ -247,10 +249,6 @@ void init_stepper()
     // Pin Change Ineterrupt für beide PIN's aktivieren
     PCICR = 0x01;   // Enable PCINT0..7
     PCMSK0 = 0xc0;  // Set Mask Register für PCINT6 und PCINT7
-
-    // Debug
-    DDRC |= 1<<PC5;
-    PORTC |= 1<<PC5;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -298,10 +296,9 @@ void init_controll_signals()
 void init_timer0()
 {
     TCCR0A = (1<<WGM01);    // CTC Modus
-    TCCR0B |= (1<<CS00);    // Prescaler 1
+    TCCR0B |= (1<<CS01);    // Prescaler 8
 
-    OCR0A = timer0_orca0[akt_half_track>>1];
-
+    OCR0A = timer0_orca0[d64_track_zone[akt_half_track>>1]];
     start_timer0();
 }
 
@@ -421,19 +418,19 @@ struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir
     fd = fat_open_file(fs, file_entry);
     if(!fd)
     {
-	*image_type = 0;
+	*image_type = UNDEF_IMAGE;
 	return fd;
     }
 
     if(!strcmp(extension,".g64"))
     {
 	// Laut Extension ein G64
-	*image_type = 1;
+	*image_type = G64_IMAGE;
 	open_g64_image(fd);
     }else if(!strcmp(extension,".d64"))
     {
 	// Laut Extensions ein D64
-	*image_type = 2;
+	*image_type = D64_IMAGE;
 	open_d64_image(fd);
     }else
     {
@@ -442,7 +439,7 @@ struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir
 	lcd_string("Not Supported");
 	fat_close_file(fd);
 	fd = NULL;
-	*image_type = 0;
+	*image_type = UNDEF_IMAGE;
     }
 
     return fd;
@@ -475,13 +472,21 @@ int8_t open_d64_image(struct fat_file_struct* fd)
 
 int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length)
 {
+    uint8_t id1 = 0;
+    uint8_t id2 = 0;
+
+    uint8_t* P;
+    uint8_t buffer[4];
+    uint8_t d64_sector_puffer[D64_SECTOR_SIZE];
     uint8_t is_read = 0;
     int32_t offset = 0;
+    uint8_t sector_nr;
+    uint8_t SUM;
 
     switch(image_type)
     {
     ///////////////////////////////////////////////////////////////////////////
-    case 1:	// G64
+    case G64_IMAGE:	// G64
 	/// Track18 eines G64 einlesen
 
 	offset = (int32_t)track_nr - 1;
@@ -504,10 +509,110 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
 	break;
 
     ///////////////////////////////////////////////////////////////////////////
-    case 2:	// D64
+    case D64_IMAGE:	// D64
+
+	offset = d64_track_offset[track_nr];
+
+	if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
+	{
+	    P = track_buffer;
+
+	    for(sector_nr=0;sector_nr<d64_sector_count[track_nr];sector_nr++)
+	    {
+		fat_read_file(fd, d64_sector_puffer, D64_SECTOR_SIZE);
+
+		*P++ = 0xFF;								// SYNC
+		*P++ = 0xFF;								// SYNC
+		*P++ = 0xFF;								// SYNC
+		*P++ = 0xFF;								// SYNC
+		*P++ = 0xFF;								// SYNC
+
+		buffer[0] = 0x08;							// Header Markierung
+		buffer[1] = sector_nr ^ track_nr ^ id2 ^ id1;				// Checksumme
+		buffer[2] = sector_nr;
+		buffer[3] = track_nr;
+		ConvertToGCR(buffer, P);
+		buffer[0] = id2;
+		buffer[1] = id1;
+		buffer[2] = 0x0F;
+		buffer[3] = 0x0F;
+		ConvertToGCR(buffer, P+5);
+		P += 10;
+
+		// 10 GCR Bytes als Lücke
+		memset(P, 0x55, 10);
+		P += 10;
+
+		// SYNC
+		*P++ = 0xFF;								// SYNC
+		*P++ = 0xFF;								// SYNC
+		*P++ = 0xFF;								// SYNC
+		*P++ = 0xFF;								// SYNC
+		*P++ = 0xFF;								// SYNC
+
+		buffer[0] = 0x07;							// Data mark
+		SUM = buffer[1] = d64_sector_puffer[0];
+		SUM ^= buffer[2] = d64_sector_puffer[1];
+		SUM ^= buffer[3] = d64_sector_puffer[2];
+		ConvertToGCR(buffer, P);
+		P += 5;
+
+		for (int i=3; i<255; i+=4)
+		{
+		    SUM ^= buffer[0] = d64_sector_puffer[i];
+		    SUM ^= buffer[1] = d64_sector_puffer[i+1];
+		    SUM ^= buffer[2] = d64_sector_puffer[i+2];
+		    SUM ^= buffer[3] = d64_sector_puffer[i+3];
+		    ConvertToGCR(buffer, P);
+		    P += 5;
+		}
+
+		SUM ^= buffer[0] = d64_sector_puffer[255];
+		buffer[1] = SUM;							// Checksum
+		buffer[2] = 0;
+		buffer[3] = 0;
+		ConvertToGCR(buffer, P);
+		P += 5;
+
+		// GCR Bytes als Lücken auffüllen (sorgt für eine Gleichverteilung)
+		uint8_t gap_size = d64_sector_gap[d64_track_zone[track_nr]];
+		memset(P, 0x55, gap_size);
+		P += gap_size;
+
+		//*gcr_track_length = d64_track_length[d64_track_zone[track_nr]];
+		*gcr_track_length = P - gcr_track;
+	    }
+	}
 	break;
     }
     return is_read;
+}
+
+/////////////////////////////////////////////////////////////////////
+
+inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer)
+{
+    const uint8_t GCR_TBL[16] = {0x0a, 0x0b, 0x12, 0x13, 0x0e, 0x0f, 0x16, 0x17,0x09, 0x19, 0x1a, 0x1b, 0x0d, 0x1d, 0x1e, 0x15};
+    uint16_t tmp;
+
+    tmp = (GCR_TBL[*source_buffer >> 4] << 5) | GCR_TBL[*source_buffer & 15];
+    *destination_buffer++ = tmp >> 2;
+    *destination_buffer = (tmp << 6) & 0xc0;
+    source_buffer++;
+
+    tmp = (GCR_TBL[*source_buffer >> 4] << 5) | GCR_TBL[*source_buffer & 15];
+    *destination_buffer++ |= (tmp >> 4) & 0x3f;
+    *destination_buffer = (tmp << 4) & 0xf0;
+    source_buffer++;
+
+    tmp = (GCR_TBL[*source_buffer >> 4] << 5) | GCR_TBL[*source_buffer & 15];
+    *destination_buffer++ |= (tmp >> 6) & 0x0f;
+    *destination_buffer = (tmp << 2) & 0xfc;
+    source_buffer++;
+
+    tmp = (GCR_TBL[*source_buffer >> 4] << 5) | GCR_TBL[*source_buffer & 15];
+    *destination_buffer++ |= (tmp >> 8) & 0x03;
+    *destination_buffer = (uint8_t)tmp;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -535,10 +640,10 @@ ISR (TIMER0_COMPA_vect)
     static uint8_t bit_counter = 0;
 
     // BYTE READY setzen (HIGH)
-    set_byte_ready();
+    //set_byte_ready();
 
-    if(bit_counter == 8)
-    {
+    //if(bit_counter == 8)
+    //{
 	bit_counter = 0;
 
 	if(get_motor_status())	// Daten aus Ringpuffer senden wenn Motor an
@@ -546,7 +651,7 @@ ISR (TIMER0_COMPA_vect)
 	    akt_gcr_byte = gcr_track[akt_track_pos++];
 	    if(akt_track_pos == gcr_track_length) akt_track_pos = 0;
 
-	    if(akt_gcr_byte == 0xff)
+	    if(akt_gcr_byte == (uint8_t)0xff)
 		clear_sync();
 	    else
 		 set_sync();
@@ -564,10 +669,12 @@ ISR (TIMER0_COMPA_vect)
 	    {
 		out_gcr_byte(akt_gcr_byte);
 		clear_byte_ready();
+		_delay_us(3);
+		set_byte_ready();
 	    }
 	}
-    }
-    bit_counter++;
+    //}
+    //bit_counter++;
 }
 
 ISR (TIMER2_COMPA_vect)

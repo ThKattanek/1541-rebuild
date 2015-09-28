@@ -37,7 +37,7 @@
 
 // Spur auf dem der Lesekopf beim Start/Reset stehen soll
 // Track 18 --> Directory
-#define INIT_TRACK 1
+#define INIT_TRACK 18
 
 // Prellzeit der Taster in ms
 #define PRELL_TIME 200
@@ -118,6 +118,8 @@
 //////////////////////////////////////////////////////////////////
 // #define __AVR_ATmega128__
 
+enum {UNDEF_IMAGE, G64_IMAGE, D64_IMAGE};
+
 int8_t init_sd_card();
 void show_start_message();
 void init_stepper();
@@ -138,6 +140,7 @@ void close_disk_image(struct fat_file_struct*);
 int8_t open_g64_image(struct fat_file_struct *fd);
 int8_t open_d64_image(struct fat_file_struct *fd);
 int8_t read_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
+inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
 
 void send_disk_change();
 
@@ -156,7 +159,7 @@ uint8_t akt_image_type = 0;	// 0=kein Image, 1=G64, 2=D64
 
 volatile static uint8_t stp_signals_old = 0;
 
-uint8_t gcr_track[8192];
+
 int16_t gcr_track_length = 7139;
 volatile uint8_t akt_gcr_byte = 0;
 volatile uint16_t akt_track_pos = 0;
@@ -175,15 +178,26 @@ uint8_t akt_half_track;
 //Zone 2: 8000000/30 = 266667 Hz
 //Zone 3: 8000000/32 = 250000 Hz
 
-//Zone 0: 20MHz / 307692Hz = 65 /1-17
-//Zone 1: 20MHz / 285714Hz = 70 /18-24
-//Zone 2: 20MHz / 266667Hz = 75 /25-30
-//Zone 3: 20MHz / 250000Hz = 80 /31-42
+const uint32_t d64_track_offset[41] = {0,0x00000,0x01500,0x02A00,0x03F00,0x05400,0x06900,0x07E00,0x09300,0x0A800,0x0BD00,0x0D200,0x0E700,0x0FC00,0x11100,0x12600,0x13B00,0x15000,0x16500,0x17800,0x18B00,
+				 0x19E00,0x1B100,0x1C400,0x1D700,0x1EA00,0x1FC00,0x20E00,0x22000,0x23200,0x24400,0x25600,0x26700,0x27800,0x28900,0x29A00,0x2AB00,0x2BC00,0x2CD00,0x2DE00,0x2EF00};
 
-const uint8_t timer0_orca0[43] = {0,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64
-				   ,69,69,69,69,69,69,69
-				   ,74,74,74,74,74,74
-				   ,79,79,79,79,79,79,79,79,79,79,79,79};
+const uint8_t d64_sector_count[41] = {0,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,
+				       19,19,19,19,19,19,19,
+				       18,18,18,18,18,18,
+				       17,17,17,17,17,17,17,17,17,17};
+
+const uint8_t d64_track_zone[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+			       1,1,1,1,1,1,1,
+			       2,2,2,2,2,2,
+			       3,3,3,3,3,3,3,3,3,3};
+
+const uint8_t d64_sector_gap[4] = {8,8,8,8};
+const uint16_t d64_track_length[4] = {7692,7143,6667,6250};
+const uint8_t timer0_orca0[4] = {64,69,74,79};
+
+volatile uint8_t *test_addr;
+
+#define D64_SECTOR_SIZE 256
 
 // Ringpuffer für reinkommende Stepper Signale
 uint8_t stepper_signal_puffer[0x100]; // Ringpuffer für Stepper Signale (256 Bytes)
@@ -193,3 +207,5 @@ volatile uint8_t stepper_signal_time = 0;
 volatile uint8_t stepper_signal = 0;
 
 volatile uint8_t stepper_msg = 0;   // 0-keine Stepperaktivität ; 1=StepperDec ; 2-255=StepperInc
+
+volatile uint8_t gcr_track[8192];

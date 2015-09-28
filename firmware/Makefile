@@ -53,7 +53,12 @@ TARGET = 1541-rebuild
 
 # FUSE CALULATOR -- http://www.engbedded.com/fusecalc/ --
 # Low Fuse Bits
+
+# Externer Oszillator
 LFUSE = 0xD0
+
+# Externer Quarz
+#LFUSE = 0xFF
 
 # High Fuse Bits
 HFUSE = 0xD3
