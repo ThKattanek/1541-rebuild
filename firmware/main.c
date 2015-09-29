@@ -110,7 +110,7 @@ int main(void)
 	    lcd_string(byte_str);
 #endif
 	}
-	else if(stepper_signal && (stepper_signal_time >= 20))
+    else if(stepper_signal && (stepper_signal_time >= 20))
 	{
 		stepper_signal = 0;
 
@@ -637,44 +637,53 @@ ISR (PCINT0_vect)
 
 ISR (TIMER0_COMPA_vect)
 {
-    static uint8_t bit_counter = 0;
+    // ISR wird alle 26,28,30 oder 32µs ausfgrufen
+    // Je nach dem welche Spur gerade aktiv ist
 
-    // BYTE READY setzen (HIGH)
-    //set_byte_ready();
+    static uint8_t old_gcr_byte = 0;
+    uint8_t is_sync;
 
-    //if(bit_counter == 8)
-    //{
-	bit_counter = 0;
+    // Daten aus Ringpuffer senden wenn Motor an
+    if(get_motor_status())
+    {                                                               // Wenn Motor läuft
+        akt_gcr_byte = gcr_track[akt_track_pos++];                  // Nächstes GCR Byte holen
+        if(akt_track_pos == gcr_track_length) akt_track_pos = 0;    // Ist Spurende erreicht? Zurück zum Anfang
 
-	if(get_motor_status())	// Daten aus Ringpuffer senden wenn Motor an
-	{
-	    akt_gcr_byte = gcr_track[akt_track_pos++];
-	    if(akt_track_pos == gcr_track_length) akt_track_pos = 0;
 
-	    if(akt_gcr_byte == (uint8_t)0xff)
-		clear_sync();
+        if((akt_gcr_byte == 0xff) && (old_gcr_byte == 0xff))        // Prüfen auf SYNC (mindesten 2 aufeinanderfolgende 0xFF)
+        {                                                           // Wenn SYNC
+            clear_sync();                                           // SYNC Leitung auf Low setzen
+            is_sync = 1;                                            // SYNC Merker auf 1
+        }
 	    else
-		 set_sync();
+        {                                                           // Wenn kein SYNC
+            set_sync();                                             // SYNC Leitung auf High setzen
+            is_sync = 0;                                            // SYNC Merker auf 0
+        }
 	}
-	else			// Nullen senden wenn Motor aus
-	{
-	    akt_gcr_byte = 0x00;
+    else
+    {                                                               // Wenn Motor nicht läuft
+        akt_gcr_byte = 0x00;                                        // 0 senden wenn Motor aus
+        is_sync = 0;                                                // SYNC Merker auf 0
 	}
 
 	// SOE
+    // Unabhängig ob der Motor läuft oder nicht
 	if(get_soe_status())
 	{
-	    // BYTE READY löschen (LOW)
-	    if(akt_gcr_byte != 0xff)
+        if(!is_sync)
 	    {
-		out_gcr_byte(akt_gcr_byte);
-		clear_byte_ready();
-		_delay_us(3);
-		set_byte_ready();
+            out_gcr_byte(akt_gcr_byte);
+
+            // BYTE_READY für 3µs löschen
+            clear_byte_ready();
+            _delay_us(3);
+            set_byte_ready();
 	    }
+        // else --> kein Byte senden !!
 	}
-    //}
-    //bit_counter++;
+
+    old_gcr_byte = akt_gcr_byte;
 }
 
 ISR (TIMER2_COMPA_vect)
