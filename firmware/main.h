@@ -42,6 +42,10 @@
 // Prellzeit der Taster in ms
 #define PRELL_TIME 200
 
+// Zeit die nach der letzten Stepperaktivität vergehen muss, um einen neuen Track von SD Karte zu laden
+// Default 20
+#define STEPPER_DELAY_TIME 16
+
 // Anschluss der Stepper Signale
 // Zwingend diese PINs wegen Extern Interrupts PCINT6/7
 // Bei Änderung muss der Sourcecode angepasst werden !
@@ -160,7 +164,7 @@ uint8_t akt_image_type = 0;	// 0=kein Image, 1=G64, 2=D64
 volatile static uint8_t stp_signals_old = 0;
 
 
-int16_t gcr_track_length = 7139;
+uint16_t gcr_track_length = 7139;
 volatile uint8_t akt_gcr_byte = 0;
 volatile uint16_t akt_track_pos = 0;
 
@@ -191,9 +195,11 @@ const uint8_t d64_track_zone[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 			       2,2,2,2,2,2,
 			       3,3,3,3,3,3,3,3,3,3};
 
-const uint8_t d64_sector_gap[4] = {8,8,8,8};
-const uint16_t d64_track_length[4] = {7692,7143,6667,6250};
-const uint8_t timer0_orca0[4] = {64,69,74,79};
+const uint8_t d64_sector_gap[4] = {1,10,5,2};
+#define HEADER_GAP_BYTES 8	// Early 9
+
+const uint8_t timer0_orca0[4] = {66,71,76,81};	    // Mit "Align the 1541 Drive" an Originaler Floppy angepasst. (321.23 Umdrehungen/min (Programm für NTSC))
+//const uint8_t timer0_orca0[4] = {64,69,74,79};
 
 volatile uint8_t *test_addr;
 

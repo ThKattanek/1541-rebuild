@@ -110,17 +110,17 @@ int main(void)
 	    lcd_string(byte_str);
 #endif
 	}
-    else if(stepper_signal && (stepper_signal_time >= 20))
+	else if(stepper_signal && (stepper_signal_time >= STEPPER_DELAY_TIME))
 	{
 		stepper_signal = 0;
-
-		stop_timer0();
-		read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
-		akt_track_pos = 0;
-
 		// Geschwindigkeit setzen
 		OCR0A = timer0_orca0[d64_track_zone[akt_half_track>>1]];
-		start_timer0();
+		akt_track_pos = 0;
+
+		//stop_timer0();
+		read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
+
+		//start_timer0();
 	}
 
 #ifdef DEBUG_MODE
@@ -483,6 +483,8 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
     uint8_t sector_nr;
     uint8_t SUM;
 
+    int32_t len;
+
     switch(image_type)
     {
     ///////////////////////////////////////////////////////////////////////////
@@ -494,12 +496,11 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
 
 	if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
 	{
-	    if(fat_read_file(fd, &offset, sizeof(uint32_t)))
+	    if(fat_read_file(fd, &offset, 4))
 	    {
 		if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
 		{
-		    fat_read_file(fd, &gcr_track_length, sizeof(gcr_track_length));
-
+		    fat_read_file(fd, &gcr_track_length, 2);
 		    fat_read_file(fd, track_buffer, gcr_track_length);
 
 		    is_read = 1;
@@ -539,9 +540,9 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
 		ConvertToGCR(buffer, P+5);
 		P += 10;
 
-		// 10 GCR Bytes als Lücke
-		memset(P, 0x55, 10);
-		P += 10;
+		// GAP Bytes als Lücke
+		memset(P, 0x55, HEADER_GAP_BYTES);
+		P += HEADER_GAP_BYTES;
 
 		// SYNC
 		*P++ = 0xFF;								// SYNC
