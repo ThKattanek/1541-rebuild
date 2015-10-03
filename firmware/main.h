@@ -43,8 +43,8 @@
 #define PRELL_TIME 200
 
 // Zeit die nach der letzten Stepperaktivität vergehen muss, um einen neuen Track von SD Karte zu laden
-// Default 20
-#define STEPPER_DELAY_TIME 10
+// Default 15
+#define STEPPER_DELAY_TIME 15
 
 // Anschluss der Stepper Signale
 // Zwingend diese PINs wegen Extern Interrupts PCINT6/7
