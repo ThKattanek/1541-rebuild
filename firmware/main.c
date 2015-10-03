@@ -112,13 +112,15 @@ int main(void)
 	}
 	else if(stepper_signal && (stepper_signal_time >= STEPPER_DELAY_TIME))
 	{
+
 		stepper_signal = 0;
 		// Geschwindigkeit setzen
 		OCR0A = timer0_orca0[d64_track_zone[akt_half_track>>1]];
 		akt_track_pos = 0;
 
 		//stop_timer0();
-		read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
+		if(!(akt_half_track & 0x01))
+		    read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
 
 		//start_timer0();
 	}
@@ -182,7 +184,7 @@ int main(void)
 		lcd_string("Image not open!");
 	    }
 
-	    read_disk_track(fd,akt_image_type,INIT_TRACK,gcr_track, &gcr_track_length);
+	    read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
 
 	    stp_signals_old = STP_PIN >> 6;
 	    akt_half_track = INIT_TRACK << 1;
