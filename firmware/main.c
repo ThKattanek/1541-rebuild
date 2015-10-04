@@ -377,22 +377,43 @@ int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_ent
 	entry_pos++;
     }
 
-    if(entry_pos == entry_start)
+    if((entry_pos == entry_start) && (dir_entry->attributes != FAT_ATTRIB_VOLUME))
     {
-	strcpy(lcd_puffer, dir_entry->long_name);
-	uint8_t len = strlen(lcd_puffer);
-	if(len > 20)
-	    lcd_puffer[20] = 0;
+	if(dir_entry->attributes == FAT_ATTRIB_DIR)
+	{
+	    lcd_puffer[0] = '*';
+	    strcpy(lcd_puffer+1, dir_entry->long_name);
+	    uint8_t len = strlen(lcd_puffer);
+	    if(len > 19)
+		lcd_puffer[20] = 0;
+	    else
+	    {
+		for(int i=len; i<20; i++)
+		    lcd_puffer[i] = ' ';
+		lcd_puffer[20] = 0;
+	    }
+
+	    lcd_setcursor(0,1);
+	    lcd_string(lcd_puffer);
+	}
 	else
 	{
-	    for(int i=len; i<20; i++)
-		lcd_puffer[i] = ' ';
-	    lcd_puffer[20] = 0;
-	}
+	    strcpy(lcd_puffer, dir_entry->long_name);
+	    uint8_t len = strlen(lcd_puffer);
+	    if(len > 20)
+		lcd_puffer[20] = 0;
+	    else
+	    {
+		for(int i=len; i<20; i++)
+		    lcd_puffer[i] = ' ';
+		lcd_puffer[20] = 0;
+	    }
 
-	lcd_setcursor(0,1);
-	lcd_string(lcd_puffer);
-	return 1;
+	    lcd_setcursor(0,1);
+	    lcd_string(lcd_puffer);
+	}
+	    return 1;
+
     }
     return 0;
 }
