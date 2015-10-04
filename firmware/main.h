@@ -44,7 +44,7 @@
 
 // Zeit die nach der letzten Stepperaktivität vergehen muss, um einen neuen Track von SD Karte zu laden
 // Default 15
-#define STEPPER_DELAY_TIME 15
+#define STEPPER_DELAY_TIME 7
 
 // Anschluss der Stepper Signale
 // Zwingend diese PINs wegen Extern Interrupts PCINT6/7
