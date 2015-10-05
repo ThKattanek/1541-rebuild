@@ -39,8 +39,8 @@
 // Track 18 --> Directory
 #define INIT_TRACK 18
 
-// Prellzeit der Taster in ms
-#define PRELL_TIME 200
+// Prellzeit der Taster in ms (200)
+#define PRELL_TIME 150
 
 // Anschluss der Stepper Signale
 // Zwingend diese PINs wegen Extern Interrupts PCINT6/7
@@ -170,9 +170,6 @@ struct fat_dir_entry_struct file_entry;
 struct fat_file_struct* fd;
 
 uint8_t akt_image_type = 0;	// 0=kein Image, 1=G64, 2=D64
-
-volatile static uint8_t stp_signals_old = 0;
-
 
 uint16_t gcr_track_length = 7139;
 volatile uint8_t akt_gcr_byte = 0;

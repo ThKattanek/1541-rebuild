@@ -98,6 +98,7 @@ int main(void)
 		{
 		    read_track.track_nr = akt_half_track>>1;
 		    open_disk_track(&read_track);
+		    akt_track_pos = 0;
 		    track_is_changed = 1;
 		}
 		break;
@@ -107,6 +108,7 @@ int main(void)
 		if(stepper_inc())
 		{
 		    read_track.track_nr = akt_half_track>>1;
+		    akt_track_pos = 0;
 		    open_disk_track(&read_track);
 		    track_is_changed = 1;
 		}
@@ -187,9 +189,6 @@ int main(void)
 	    read_track.image_type = akt_image_type;
 	    read_track.track_nr = akt_half_track>>1;
 	    open_disk_track(&read_track);
-
-	    stp_signals_old = STP_PIN >> 6;
-	    akt_half_track = INIT_TRACK << 1;
 	    akt_track_pos = 0;
 
 	    start_timer0();
