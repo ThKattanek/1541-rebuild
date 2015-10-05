@@ -42,10 +42,6 @@
 // Prellzeit der Taster in ms
 #define PRELL_TIME 200
 
-// Zeit die nach der letzten Stepperaktivität vergehen muss, um einen neuen Track von SD Karte zu laden
-// Default 15
-#define STEPPER_DELAY_TIME 7
-
 // Anschluss der Stepper Signale
 // Zwingend diese PINs wegen Extern Interrupts PCINT6/7
 // Bei Änderung muss der Sourcecode angepasst werden !
@@ -120,15 +116,28 @@
 #define get_key2_status() (~KEY2_PIN & (1<<KEY2))
 
 //////////////////////////////////////////////////////////////////
-// #define __AVR_ATmega128__
+
+struct TRACK_READ_STRUCT
+{
+    struct fat_file_struct* fd;
+    uint8_t* track_buffer;
+    uint8_t image_type;
+    uint8_t track_nr;
+    uint16_t *gcr_track_length;
+
+    uint8_t akt_track_sector_count;
+    uint8_t akt_read_sector;
+
+    uint8_t* P;
+}typedef TRACK_READ_STRUCT;
 
 enum {UNDEF_IMAGE, G64_IMAGE, D64_IMAGE};
 
 int8_t init_sd_card();
 void show_start_message();
 void init_stepper();
-void stepper_inc();
-void stepper_dec();
+uint8_t stepper_inc();
+uint8_t stepper_dec();
 void init_motor();
 void init_controll_signals();
 void init_timer0();
@@ -143,7 +152,8 @@ struct fat_file_struct* open_disk_image(struct fat_fs_struct *fs, struct fat_dir
 void close_disk_image(struct fat_file_struct*);
 int8_t open_g64_image(struct fat_file_struct *fd);
 int8_t open_d64_image(struct fat_file_struct *fd);
-int8_t read_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
+int8_t open_disk_track(TRACK_READ_STRUCT *track);
+uint8_t read_next_sector(TRACK_READ_STRUCT* track);
 inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
 
 void send_disk_change();
@@ -198,10 +208,8 @@ const uint8_t d64_track_zone[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 const uint8_t d64_sector_gap[4] = {1,10,5,2};
 #define HEADER_GAP_BYTES 8	// Early 9
 
-const uint8_t timer0_orca0[4] = {66,71,76,81};	    // Mit "Align the 1541 Drive" an Originaler Floppy angepasst. (321.23 Umdrehungen/min (Programm für NTSC))
-//const uint8_t timer0_orca0[4] = {64,69,74,79};
-
-volatile uint8_t *test_addr;
+//const uint8_t timer0_orca0[4] = {66,71,76,81};	    // Mit "Align the 1541 Drive" an Originaler Floppy angepasst. (321.23 Umdrehungen/min (Programm für NTSC))
+const uint8_t timer0_orca0[4] = {64,69,74,79};
 
 #define D64_SECTOR_SIZE 256
 
@@ -209,9 +217,8 @@ volatile uint8_t *test_addr;
 uint8_t stepper_signal_puffer[0x100]; // Ringpuffer für Stepper Signale (256 Bytes)
 volatile uint8_t stepper_signal_r_pos = 0;
 volatile uint8_t stepper_signal_w_pos = 0;
-volatile uint8_t stepper_signal_time = 0;
-volatile uint8_t stepper_signal = 0;
-
-volatile uint8_t stepper_msg = 0;   // 0-keine Stepperaktivität ; 1=StepperDec ; 2-255=StepperInc
 
 volatile uint8_t gcr_track[8192];
+volatile uint8_t track_is_changed = 0;
+
+TRACK_READ_STRUCT read_track;

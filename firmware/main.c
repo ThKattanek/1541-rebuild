@@ -77,6 +77,10 @@ int main(void)
     // Interrupts erlauben
     sei();
 
+    // read_track mit Standartwerte füllen ... diese bleiben immer gleich
+    read_track.track_buffer = gcr_track;
+    read_track.gcr_track_length = &gcr_track_length;
+
     while(1)
     {
 	// Auf Steppermotor aktivität prüfen
@@ -90,16 +94,22 @@ int main(void)
 	    {
 	    case 0x30: case 0x40: case 0x90: case 0xE0:
 		// DEC
-		stepper_dec();
-		    stepper_signal_time = 0;
-		    stepper_signal = 1;
+		if(stepper_dec())
+		{
+		    read_track.track_nr = akt_half_track>>1;
+		    open_disk_track(&read_track);
+		    track_is_changed = 1;
+		}
 		break;
 
 	    case 0x10: case 0x60: case 0xB0: case 0xC0:
 		// INC
-		stepper_inc();
-		    stepper_signal_time = 0;
-		    stepper_signal = 1;
+		if(stepper_inc())
+		{
+		    read_track.track_nr = akt_half_track>>1;
+		    open_disk_track(&read_track);
+		    track_is_changed = 1;
+		}
 		break;
 	    }
 #ifdef DEBUG_MODE
@@ -110,20 +120,9 @@ int main(void)
 	    lcd_string(byte_str);
 #endif
 	}
-	else if(stepper_signal && (stepper_signal_time >= STEPPER_DELAY_TIME))
-	{
 
-		stepper_signal = 0;
-		// Geschwindigkeit setzen
-		OCR0A = timer0_orca0[d64_track_zone[akt_half_track>>1]];
-		akt_track_pos = 0;
-
-		//stop_timer0();
-		if(!(akt_half_track & 0x01))
-		    read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
-
-		//start_timer0();
-	}
+	if(read_next_sector(&read_track))
+	    track_is_changed = 0;
 
 #ifdef DEBUG_MODE
 	lcd_setcursor(11,4);
@@ -184,7 +183,10 @@ int main(void)
 		lcd_string("Image not open!");
 	    }
 
-	    read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
+	    read_track.fd = fd;
+	    read_track.image_type = akt_image_type;
+	    read_track.track_nr = akt_half_track>>1;
+	    open_disk_track(&read_track);
 
 	    stp_signals_old = STP_PIN >> 6;
 	    akt_half_track = INIT_TRACK << 1;
@@ -255,18 +257,22 @@ void init_stepper()
 
 /////////////////////////////////////////////////////////////////////
 
-void stepper_inc()
+uint8_t stepper_inc()
 {            
-    if(akt_half_track == 83) return;
+    if(akt_half_track == 83) return !(akt_half_track & 1);
     akt_half_track++;
+
+    return !(akt_half_track & 1);
 }
 
 /////////////////////////////////////////////////////////////////////
 
-void stepper_dec()
+uint8_t stepper_dec()
 {
-    if(akt_half_track == 2) return;
+    if(akt_half_track == 2) return !(akt_half_track & 1);
     akt_half_track--;
+
+    return !(akt_half_track & 1);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -493,123 +499,108 @@ int8_t open_d64_image(struct fat_file_struct* fd)
 
 /////////////////////////////////////////////////////////////////////
 
-int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length)
+int8_t open_disk_track(TRACK_READ_STRUCT* track)
 {
-    uint8_t id1 = 0;
-    uint8_t id2 = 0;
-
-    uint8_t* P;
-    uint8_t buffer[4];
-    uint8_t d64_sector_puffer[D64_SECTOR_SIZE];
-    uint8_t is_read = 0;
     int32_t offset = 0;
-    uint8_t sector_nr;
-    uint8_t SUM;
 
-    int32_t len;
-
-    switch(image_type)
+    switch(track->image_type)
     {
-    ///////////////////////////////////////////////////////////////////////////
     case G64_IMAGE:	// G64
-	/// Track18 eines G64 einlesen
-
-	offset = (int32_t)track_nr - 1;
-	offset = (offset << 3) + 0x0c;
-
-	if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
-	{
-	    if(fat_read_file(fd, &offset, 4))
-	    {
-		if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
-		{
-		    fat_read_file(fd, &gcr_track_length, 2);
-		    fat_read_file(fd, track_buffer, gcr_track_length);
-
-		    is_read = 1;
-		}
-	    }
-	}
 	break;
-
-    ///////////////////////////////////////////////////////////////////////////
     case D64_IMAGE:	// D64
+	*track->gcr_track_length = d64_sector_count[track->track_nr] * (345 + HEADER_GAP_BYTES + d64_sector_gap[d64_track_zone[track->track_nr]]);
+	track->akt_read_sector = 0;
+	track->akt_track_sector_count = d64_sector_count[track->track_nr];
+	track->P = track->track_buffer;
 
-	offset = d64_track_offset[track_nr];
-
-	if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
-	{
-	    P = track_buffer;
-
-	    for(sector_nr=0;sector_nr<d64_sector_count[track_nr];sector_nr++)
-	    {
-		fat_read_file(fd, d64_sector_puffer, D64_SECTOR_SIZE);
-
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-
-		buffer[0] = 0x08;							// Header Markierung
-		buffer[1] = sector_nr ^ track_nr ^ id2 ^ id1;				// Checksumme
-		buffer[2] = sector_nr;
-		buffer[3] = track_nr;
-		ConvertToGCR(buffer, P);
-		buffer[0] = id2;
-		buffer[1] = id1;
-		buffer[2] = 0x0F;
-		buffer[3] = 0x0F;
-		ConvertToGCR(buffer, P+5);
-		P += 10;
-
-		// GAP Bytes als Lücke
-		memset(P, 0x55, HEADER_GAP_BYTES);
-		P += HEADER_GAP_BYTES;
-
-		// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-
-		buffer[0] = 0x07;							// Data mark
-		SUM = buffer[1] = d64_sector_puffer[0];
-		SUM ^= buffer[2] = d64_sector_puffer[1];
-		SUM ^= buffer[3] = d64_sector_puffer[2];
-		ConvertToGCR(buffer, P);
-		P += 5;
-
-		for (int i=3; i<255; i+=4)
-		{
-		    SUM ^= buffer[0] = d64_sector_puffer[i];
-		    SUM ^= buffer[1] = d64_sector_puffer[i+1];
-		    SUM ^= buffer[2] = d64_sector_puffer[i+2];
-		    SUM ^= buffer[3] = d64_sector_puffer[i+3];
-		    ConvertToGCR(buffer, P);
-		    P += 5;
-		}
-
-		SUM ^= buffer[0] = d64_sector_puffer[255];
-		buffer[1] = SUM;							// Checksum
-		buffer[2] = 0;
-		buffer[3] = 0;
-		ConvertToGCR(buffer, P);
-		P += 5;
-
-		// GCR Bytes als Lücken auffüllen (sorgt für eine Gleichverteilung)
-		uint8_t gap_size = d64_sector_gap[d64_track_zone[track_nr]];
-		memset(P, 0x55, gap_size);
-		P += gap_size;
-
-		//*gcr_track_length = d64_track_length[d64_track_zone[track_nr]];
-		*gcr_track_length = P - gcr_track;
-	    }
-	}
+	offset = d64_track_offset[track->track_nr];
+	fat_seek_file(fd,&offset,FAT_SEEK_SET);
 	break;
     }
-    return is_read;
+}
+
+uint8_t read_next_sector(TRACK_READ_STRUCT* track)
+{
+    if(track->akt_read_sector == track->akt_track_sector_count) return 1;
+
+    uint8_t buffer[4];
+    uint8_t d64_sector_puffer[D64_SECTOR_SIZE];
+
+    uint8_t id1 = 0;
+    uint8_t id2 = 0;
+    uint8_t SUM;
+
+    switch(track->image_type)
+    {
+    case G64_IMAGE:	// G64
+	break;
+    case D64_IMAGE:	// D64
+	fat_read_file(track->fd, d64_sector_puffer, D64_SECTOR_SIZE);
+
+	*track->P++ = 0xFF;								// SYNC
+	*track->P++ = 0xFF;								// SYNC
+	*track->P++ = 0xFF;								// SYNC
+	*track->P++ = 0xFF;								// SYNC
+	*track->P++ = 0xFF;								// SYNC
+
+	buffer[0] = 0x08;							// Header Markierung
+	buffer[1] = track->akt_read_sector ^ track->track_nr ^ id2 ^ id1;				// Checksumme
+	buffer[2] = track->akt_read_sector;
+	buffer[3] = track->track_nr;
+	ConvertToGCR(buffer, track->P);
+	buffer[0] = id2;
+	buffer[1] = id1;
+	buffer[2] = 0x0F;
+	buffer[3] = 0x0F;
+	ConvertToGCR(buffer, track->P+5);
+	track->P += 10;
+
+	// GAP Bytes als Lücke
+	memset(track->P, 0x55, HEADER_GAP_BYTES);
+	track->P += HEADER_GAP_BYTES;
+
+	// SYNC
+	*track->P++ = 0xFF;								// SYNC
+	*track->P++ = 0xFF;								// SYNC
+	*track->P++ = 0xFF;								// SYNC
+	*track->P++ = 0xFF;								// SYNC
+	*track->P++ = 0xFF;								// SYNC
+
+	buffer[0] = 0x07;							// Data mark
+	SUM = buffer[1] = d64_sector_puffer[0];
+	SUM ^= buffer[2] = d64_sector_puffer[1];
+	SUM ^= buffer[3] = d64_sector_puffer[2];
+	ConvertToGCR(buffer, track->P);
+	track->P += 5;
+
+	for (int i=3; i<255; i+=4)
+	{
+	    SUM ^= buffer[0] = d64_sector_puffer[i];
+	    SUM ^= buffer[1] = d64_sector_puffer[i+1];
+	    SUM ^= buffer[2] = d64_sector_puffer[i+2];
+	    SUM ^= buffer[3] = d64_sector_puffer[i+3];
+	    ConvertToGCR(buffer, track->P);
+	    track->P += 5;
+	}
+
+	SUM ^= buffer[0] = d64_sector_puffer[255];
+	buffer[1] = SUM;							// Checksum
+	buffer[2] = 0;
+	buffer[3] = 0;
+	ConvertToGCR(buffer, track->P);
+	track->P += 5;
+
+	// GCR Bytes als Lücken auffüllen (sorgt für eine Gleichverteilung)
+	uint8_t gap_size = d64_sector_gap[d64_track_zone[track->track_nr]];
+	memset(track->P, 0x55, gap_size);
+	track->P += gap_size;
+
+	track->akt_read_sector++;
+
+	break;
+    }
+
+    return 0;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -684,7 +675,7 @@ ISR (TIMER0_COMPA_vect)
             set_sync();                                             // SYNC Leitung auf High setzen
             is_sync = 0;                                            // SYNC Merker auf 0
         }
-	}
+    }
     else
     {                                                               // Wenn Motor nicht läuft
         akt_gcr_byte = 0x00;                                        // 0 senden wenn Motor aus
@@ -692,19 +683,21 @@ ISR (TIMER0_COMPA_vect)
 	}
 
 	// SOE
-    // Unabhängig ob der Motor läuft oder nicht
+	// Unabhängig ob der Motor läuft oder nicht
 	if(get_soe_status())
 	{
         if(!is_sync)
 	    {
-            out_gcr_byte(akt_gcr_byte);
+		if(!track_is_changed)
+		    out_gcr_byte(akt_gcr_byte);
+		else out_gcr_byte(0x55);
 
-            // BYTE_READY für 3µs löschen
-            clear_byte_ready();
-            _delay_us(3);
-            set_byte_ready();
+		// BYTE_READY für 3µs löschen
+		clear_byte_ready();
+		_delay_us(3);
+		set_byte_ready();
 	    }
-        // else --> kein Byte senden !!
+	    // else --> kein Byte senden !!
 	}
 
     old_gcr_byte = akt_gcr_byte;
@@ -712,8 +705,6 @@ ISR (TIMER0_COMPA_vect)
 
 ISR (TIMER2_COMPA_vect)
 {
-    stepper_signal_time++;
-
     if(wait_key_counter0)
 	wait_key_counter0--;
     if(wait_key_counter1)
