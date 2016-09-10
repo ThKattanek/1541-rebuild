@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:1541-rebuild-rescue
 LIBS:power
 LIBS:device
 LIBS:transistors

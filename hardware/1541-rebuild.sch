@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:1541-rebuild-rescue
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -264,17 +265,6 @@ F 3 "" H 8800 3150 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR08
-U 1 1 55FEB137
-P 9300 3150
-F 0 "#PWR08" H 9300 3000 50  0001 C CNN
-F 1 "+5V" H 9300 3290 50  0000 C CNN
-F 2 "" H 9300 3150 60  0000 C CNN
-F 3 "" H 9300 3150 60  0000 C CNN
-	1    9300 3150
-	0    1    1    0   
-$EndComp
-$Comp
 L SW_PUSH SW3
 U 1 1 55FECA06
 P 8800 3450
@@ -472,4 +462,15 @@ Wire Wire Line
 	7850 4600 7700 4600
 Wire Wire Line
 	6200 4400 6100 4400
+$Comp
+L GND #PWR?
+U 1 1 57D3E94E
+P 9300 3150
+F 0 "#PWR?" H 9300 2900 50  0001 C CNN
+F 1 "GND" H 9300 3000 50  0000 C CNN
+F 2 "" H 9300 3150 60  0000 C CNN
+F 3 "" H 9300 3150 60  0000 C CNN
+	1    9300 3150
+	0    -1   -1   0   
+$EndComp
 $EndSCHEMATC

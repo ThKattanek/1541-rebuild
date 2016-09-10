@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:1541-rebuild-rescue
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -130,7 +131,7 @@ $EndComp
 Wire Wire Line
 	5450 3350 5450 3500
 $Comp
-L POT RV1
+L POT-RESCUE-1541-rebuild RV1
 U 1 1 55F9F8C0
 P 5000 3400
 F 0 "RV1" H 5000 3300 50  0000 C CNN
