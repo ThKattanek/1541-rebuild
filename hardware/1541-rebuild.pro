@@ -1,4 +1,4 @@
-update=Sa 10 Sep 2016 08:42:34 CEST
+update=Sa 10 Dez 2016 10:13:04 CET
 version=1
 last_client=kicad
 [pcbnew]
@@ -23,8 +23,17 @@ ModuleOutlineThickness=0.150000000000
 [cvpcb]
 version=1
 NetIExt=net
-[general]
+[schematic_editor]
 version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
+ERC_TestSimilarLabels=1
 [eeschema]
 version=1
 LibDir=
@@ -60,14 +69,5 @@ LibName28=atmel
 LibName29=contrib
 LibName30=valves
 LibName31=Oscillators
-[schematic_editor]
+[general]
 version=1
-PageLayoutDescrFile=
-PlotDirectoryName=
-SubpartIdSeparator=0
-SubpartFirstId=65
-NetFmtName=
-SpiceForceRefPrefix=0
-SpiceUseNetNumbers=0
-LabSize=60
-ERC_TestSimilarLabels=1
