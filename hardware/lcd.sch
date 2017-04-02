@@ -30,6 +30,17 @@ LIBS:atmel
 LIBS:contrib
 LIBS:valves
 LIBS:Oscillators
+LIBS:w_analog
+LIBS:w_connectors
+LIBS:w_device
+LIBS:w_logic
+LIBS:w_memory
+LIBS:w_microcontrollers
+LIBS:w_opto
+LIBS:w_relay
+LIBS:w_rtx
+LIBS:w_transistor
+LIBS:w_vacuum
 LIBS:1541-rebuild-cache
 EELAYER 25 0
 EELAYER END
@@ -109,7 +120,7 @@ U 1 1 55F9CFCD
 P 6100 2850
 F 0 "DS1" H 5300 3250 40  0000 C CNN
 F 1 "LCD16X2" H 6800 3250 40  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x16" H 6100 2800 35  0000 C CIN
+F 2 "w_indicators:lcd_20x4" H 6100 2800 35  0000 C CIN
 F 3 "" H 6100 2850 60  0000 C CNN
 	1    6100 2850
 	1    0    0    -1  

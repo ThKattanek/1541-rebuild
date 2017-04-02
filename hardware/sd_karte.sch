@@ -30,6 +30,17 @@ LIBS:atmel
 LIBS:contrib
 LIBS:valves
 LIBS:Oscillators
+LIBS:w_analog
+LIBS:w_connectors
+LIBS:w_device
+LIBS:w_logic
+LIBS:w_memory
+LIBS:w_microcontrollers
+LIBS:w_opto
+LIBS:w_relay
+LIBS:w_rtx
+LIBS:w_transistor
+LIBS:w_vacuum
 LIBS:1541-rebuild-cache
 EELAYER 25 0
 EELAYER END
@@ -51,7 +62,7 @@ U 1 1 55F7A1C8
 P 6700 3700
 F 0 "CON1" H 6050 4250 50  0000 C CNN
 F 1 "SD_Card" H 7300 3150 50  0000 C CNN
-F 2 "Connect:SD_Card_Receptacle" H 6900 4050 50  0001 C CNN
+F 2 "w_conn_misc:sd_socket" H 6900 4050 50  0001 C CNN
 F 3 "" H 6700 3700 60  0000 C CNN
 	1    6700 3700
 	1    0    0    -1  
@@ -113,10 +124,10 @@ Text HLabel 4250 3400 0    60   Input ~ 0
 SS
 NoConn ~ 5800 3300
 $Comp
-L R R2
+L R R5
 U 1 1 55F7B36C
 P 4700 3400
-F 0 "R2" V 4780 3400 50  0000 C CNN
+F 0 "R5" V 4780 3400 50  0000 C CNN
 F 1 "1,8k" V 4700 3400 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 4630 3400 30  0001 C CNN
 F 3 "" H 4700 3400 30  0000 C CNN
@@ -124,10 +135,10 @@ F 3 "" H 4700 3400 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R5
+L R R6
 U 1 1 55F7B401
 P 4900 3500
-F 0 "R5" V 4980 3500 50  0000 C CNN
+F 0 "R6" V 4980 3500 50  0000 C CNN
 F 1 "1,8k" V 4900 3500 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 4830 3500 30  0001 C CNN
 F 3 "" H 4900 3500 30  0000 C CNN
@@ -135,10 +146,10 @@ F 3 "" H 4900 3500 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R3
+L R R7
 U 1 1 55F7B48C
 P 4700 3800
-F 0 "R3" V 4780 3800 50  0000 C CNN
+F 0 "R7" V 4780 3800 50  0000 C CNN
 F 1 "1,8k" V 4700 3800 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 4630 3800 30  0001 C CNN
 F 3 "" H 4700 3800 30  0000 C CNN
@@ -146,10 +157,10 @@ F 3 "" H 4700 3800 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R4
+L R R2
 U 1 1 55F7BA6C
 P 4900 3150
-F 0 "R4" V 4980 3150 50  0000 C CNN
+F 0 "R2" V 4980 3150 50  0000 C CNN
 F 1 "3,3k" V 4900 3150 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 4830 3150 30  0001 C CNN
 F 3 "" H 4900 3150 30  0000 C CNN
@@ -157,10 +168,10 @@ F 3 "" H 4900 3150 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R6
+L R R3
 U 1 1 55F7BC20
 P 5100 3150
-F 0 "R6" V 5180 3150 50  0000 C CNN
+F 0 "R3" V 5180 3150 50  0000 C CNN
 F 1 "3,3k" V 5100 3150 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 5030 3150 30  0001 C CNN
 F 3 "" H 5100 3150 30  0000 C CNN
@@ -168,10 +179,10 @@ F 3 "" H 5100 3150 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R7
+L R R4
 U 1 1 55F7BCCD
 P 5300 3150
-F 0 "R7" V 5380 3150 50  0000 C CNN
+F 0 "R4" V 5380 3150 50  0000 C CNN
 F 1 "3,3k" V 5300 3150 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 5230 3150 30  0001 C CNN
 F 3 "" H 5300 3150 30  0000 C CNN

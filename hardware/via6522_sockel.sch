@@ -30,6 +30,17 @@ LIBS:atmel
 LIBS:contrib
 LIBS:valves
 LIBS:Oscillators
+LIBS:w_analog
+LIBS:w_connectors
+LIBS:w_device
+LIBS:w_logic
+LIBS:w_memory
+LIBS:w_microcontrollers
+LIBS:w_opto
+LIBS:w_relay
+LIBS:w_rtx
+LIBS:w_transistor
+LIBS:w_vacuum
 LIBS:1541-rebuild-cache
 EELAYER 25 0
 EELAYER END
@@ -51,7 +62,7 @@ U 1 1 55F9CFCC
 P 6400 3850
 F 0 "P3" H 6400 4900 70  0000 C CNN
 F 1 "DIL40" V 6400 3850 60  0000 C CNN
-F 2 "Housings_DIP:DIP-40_W15.24mm_LongPads" H 6400 3850 60  0001 C CNN
+F 2 "w_pth_circuits:dil_40-600_socket" H 6400 3850 60  0001 C CNN
 F 3 "" H 6400 3850 60  0000 C CNN
 	1    6400 3850
 	1    0    0    -1  

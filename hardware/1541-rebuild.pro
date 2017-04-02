@@ -1,4 +1,4 @@
-update=Sa 10 Dez 2016 10:13:04 CET
+update=Di 28 Mär 2017 22:02:45 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -34,9 +34,11 @@ SpiceForceRefPrefix=0
 SpiceUseNetNumbers=0
 LabSize=60
 ERC_TestSimilarLabels=1
+[general]
+version=1
 [eeschema]
 version=1
-LibDir=
+LibDir=/home/thorsten/Elektronik/KiCad Libs_Walter
 [eeschema/libraries]
 LibName1=1541-rebuild-rescue
 LibName2=power
@@ -69,5 +71,14 @@ LibName28=atmel
 LibName29=contrib
 LibName30=valves
 LibName31=Oscillators
-[general]
-version=1
+LibName32=w_analog
+LibName33=w_connectors
+LibName34=w_device
+LibName35=w_logic
+LibName36=w_memory
+LibName37=w_microcontrollers
+LibName38=w_opto
+LibName39=w_relay
+LibName40=w_rtx
+LibName41=w_transistor
+LibName42=w_vacuum

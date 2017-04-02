@@ -30,6 +30,17 @@ LIBS:atmel
 LIBS:contrib
 LIBS:valves
 LIBS:Oscillators
+LIBS:w_analog
+LIBS:w_connectors
+LIBS:w_device
+LIBS:w_logic
+LIBS:w_memory
+LIBS:w_microcontrollers
+LIBS:w_opto
+LIBS:w_relay
+LIBS:w_rtx
+LIBS:w_transistor
+LIBS:w_vacuum
 LIBS:1541-rebuild-cache
 EELAYER 25 0
 EELAYER END
@@ -51,7 +62,7 @@ U 1 1 55F7E447
 P 5100 3800
 F 0 "IC1" H 4250 5680 40  0000 L BNN
 F 1 "ATMEGA1284P-P" H 5500 1850 40  0000 L BNN
-F 2 "Housings_DIP:DIP-40_W15.24mm_LongPads" H 5100 3800 30  0000 C CIN
+F 2 "w_pth_circuits:dil_40-600_socket" H 5100 3800 30  0000 C CIN
 F 3 "" H 5100 3800 60  0000 C CNN
 	1    5100 3800
 	1    0    0    -1  
@@ -98,7 +109,7 @@ U 1 1 55F7D642
 P 1900 3050
 F 0 "C3" H 1925 3150 50  0000 L CNN
 F 1 "100n" H 1925 2950 50  0000 L CNN
-F 2 "Capacitors_THT:C_Disc_D3_P2.5" H 1938 2900 30  0001 C CNN
+F 2 "w_capacitors:cnp_3mm_disc" H 1938 2900 30  0001 C CNN
 F 3 "" H 1900 3050 60  0000 C CNN
 	1    1900 3050
 	1    0    0    -1  
@@ -155,7 +166,7 @@ U 1 1 55F7F83D
 P 1350 1250
 F 0 "C1" H 1375 1350 50  0000 L CNN
 F 1 "100n" H 1375 1150 50  0000 L CNN
-F 2 "Capacitors_THT:C_Disc_D3_P2.5" H 1388 1100 30  0001 C CNN
+F 2 "w_capacitors:cnp_3mm_disc" H 1388 1100 30  0001 C CNN
 F 3 "" H 1350 1250 60  0000 C CNN
 	1    1350 1250
 	0    1    1    0   
@@ -166,7 +177,7 @@ U 1 1 55F7FBA4
 P 1350 1550
 F 0 "C2" H 1375 1650 50  0000 L CNN
 F 1 "100n" H 1375 1450 50  0000 L CNN
-F 2 "Capacitors_THT:C_Disc_D3_P2.5" H 1388 1400 30  0001 C CNN
+F 2 "w_capacitors:cnp_3mm_disc" H 1388 1400 30  0001 C CNN
 F 3 "" H 1350 1550 60  0000 C CNN
 	1    1350 1550
 	0    1    1    0   
