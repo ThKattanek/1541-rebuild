@@ -1,4 +1,4 @@
-update=Sa 07 Apr 2018 15:08:57 CEST
+update=Sa 07 Apr 2018 15:27:17 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -23,17 +23,6 @@ ModuleOutlineThickness=0.150000000000
 [cvpcb]
 version=1
 NetIExt=net
-[schematic_editor]
-version=1
-PageLayoutDescrFile=
-PlotDirectoryName=
-SubpartIdSeparator=0
-SubpartFirstId=65
-NetFmtName=
-SpiceForceRefPrefix=0
-SpiceUseNetNumbers=0
-LabSize=60
-ERC_TestSimilarLabels=1
 [general]
 version=1
 [eeschema]
@@ -82,3 +71,13 @@ LibName39=w_relay
 LibName40=w_rtx
 LibName41=w_transistor
 LibName42=w_vacuum
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
