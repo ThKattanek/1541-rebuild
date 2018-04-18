@@ -1,7 +1,7 @@
 /* Name: main.h
 * Project: 1541-rebuild
 * Author: Thorsten Kattanek
-* Copyright: (c) 2015 by Thorsten Kattanek <thorsten.kattanek@gmx.de>
+* Copyright: (c) 2018 by Thorsten Kattanek <thorsten.kattanek@gmx.de>
 * License: GPL 2
 */
 
@@ -45,6 +45,11 @@
 // Zeit die nach der letzten Stepperaktivität vergehen muss, um einen neuen Track von SD Karte zu laden
 // Default 15
 #define STEPPER_DELAY_TIME 7
+
+// DEBUG LED (Optional / vorrerst)
+#define DBG_LED_DDR DDRC
+#define DBG_LED_PORT PORTC
+#define DBG_LED PC7
 
 // Anschluss der Stepper Signale
 // Zwingend diese PINs wegen Extern Interrupts PCINT6/7
@@ -138,6 +143,10 @@ void init_timer2();
 void start_timer2();
 void stop_timer2();
 void init_keys();
+void dbg_led_init();
+void dbg_led_on();
+void dbg_led_off();
+
 int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_entry);
 struct fat_file_struct* open_disk_image(struct fat_fs_struct *fs, struct fat_dir_entry_struct* file_entry, uint8_t *image_type);
 void close_disk_image(struct fat_file_struct*);

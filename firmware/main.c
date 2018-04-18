@@ -1,7 +1,7 @@
 /* Name: main.c
 * Project: 1541-rebuild
 * Author: Thorsten Kattanek
-* Copyright: (c) 2015 by Thorsten Kattanek <thorsten.kattanek@gmx.de>
+* Copyright: (c) 2018 by Thorsten Kattanek <thorsten.kattanek@gmx.de>
 * License: GPL 2
 */
 
@@ -17,6 +17,9 @@
 int main(void)
 {
     int8_t byte_str[4];	    // Wird benutzt um hier ein Byte als String abzulegen
+
+    // Debug LED initialisieren
+    dbg_led_init();
 
     // LCD Display intialisieren
     lcd_init();
@@ -363,6 +366,30 @@ void init_keys()
     KEY0_PORT |= 1<<KEY0;
     KEY1_PORT |= 1<<KEY1;
     KEY2_PORT |= 1<<KEY2;
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void dbg_led_init()
+{
+    //DDxn = 0 , PORTxn = 0 --> HiZ
+    //DDxn = 1 , PORTxn = 0 --> Output Low (Sink)
+    DBG_LED_DDR &= ~(1<<DBG_LED);
+    DBG_LED_PORT &= ~(1<<DBG_LED);
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void dbg_led_on()
+{
+    DBG_LED_DDR |= 1<<DBG_LED;
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void dbg_led_off()
+{
+    DBG_LED_DDR &= ~(1<<DBG_LED);
 }
 
 /////////////////////////////////////////////////////////////////////
