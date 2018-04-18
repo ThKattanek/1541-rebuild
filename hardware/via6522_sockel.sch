@@ -319,4 +319,13 @@ WPS
 Wire Wire Line
 	5250 2650 5250 4200
 Connection ~ 5250 4200
+Text HLabel 7350 2600 1    60   Input ~ 0
+~RESET
+Wire Wire Line
+	7350 2600 7350 3500
+Connection ~ 7350 3500
+Text Label 6800 3000 0    60   ~ 0
+SOE
+Text Label 6800 3500 0    60   ~ 0
+~RESET
 $EndSCHEMATC
