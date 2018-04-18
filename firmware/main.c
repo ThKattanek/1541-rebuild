@@ -87,7 +87,8 @@ int main(void)
 
 	if(stepper_signal_r_pos != stepper_signal_w_pos)
 	{
-	    uint8_t stepper = stepper_signal_puffer[stepper_signal_r_pos++]>>2 | stepper_signal_puffer[stepper_signal_r_pos-1];
+            uint8_t stepper = stepper_signal_puffer[stepper_signal_r_pos]>>2 | stepper_signal_puffer[stepper_signal_r_pos-1];
+            stepper_signal_r_pos++;
 
 	    switch(stepper)
 	    {
