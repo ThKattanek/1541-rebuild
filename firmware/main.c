@@ -173,20 +173,15 @@ int main(void)
 		OCR0A = timer0_orca0[d64_track_zone[akt_half_track>>1]];
 		akt_track_pos = 0;
 
-		//stop_timer0();
+                stop_timer0();
 		if(!(akt_half_track & 0x01))
                 {
                     if(track_is_written == 1)
                     {
-                        no_byte_ready_send = 1;
-
                         track_is_written = 0;
                         write_disk_track(fd,akt_image_type,old_half_track>>1,gcr_track, &gcr_track_length);
-
                         read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
                         old_half_track = akt_half_track;    // Merken um evtl. dort zurück zu schreiben
-
-                        no_byte_ready_send = 0;
                     }
                     else
                     {
@@ -194,7 +189,7 @@ int main(void)
                         old_half_track = akt_half_track;    // Merken um evtl. dort zurück zu schreiben
                     }
                 }
-		//start_timer0();
+                start_timer0();
 	}
 
 #ifdef DEBUG_MODE
@@ -251,10 +246,10 @@ int main(void)
             // Sollte der aktuelle Track noch veränderungen haben so wird hier erstmal gesichert.
             if(track_is_written == 1)
             {
-                no_byte_ready_send = 1;
+                stop_timer0();
                 track_is_written = 0;
                 write_disk_track(fd,akt_image_type,old_half_track>>1,gcr_track, &gcr_track_length);
-                no_byte_ready_send = 0;
+                start_timer0();
             }
         }
 
@@ -291,17 +286,6 @@ int main(void)
 	    stop_timer0();
             DATA_PORT = 0x00;
 
-            // Sollte der aktuelle Track noch veränderungen haben so wird hier erstmal gesichert.
-            /*
-            if(track_is_written == 1)
-            {
-                no_byte_ready_send = 1;
-                track_is_written = 0;
-                write_disk_track(fd,akt_image_type,old_half_track>>1,gcr_track, &gcr_track_length);
-                no_byte_ready_send = 0;
-            }
-            */
-
 	    close_disk_image(fd);
 	    fd = open_disk_image(fs, &file_entry, &akt_image_type);
 	    if(!fd)
@@ -313,7 +297,6 @@ int main(void)
 	    read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
 
 	    stp_signals_old = STP_PIN >> 6;
-            //akt_half_track = INIT_TRACK << 1;
 	    akt_track_pos = 0;
 
 	    start_timer0();
@@ -895,13 +878,10 @@ ISR (TIMER0_COMPA_vect)
                 DATA_DDR = 0xff;
                 out_gcr_byte(akt_gcr_byte);
 
-                if(no_byte_ready_send == 0)
-                {
-                    // BYTE_READY für 3µs löschen
-                    clear_byte_ready();
-                    _delay_us(3);
-                    set_byte_ready();
-                }
+                // BYTE_READY für 3µs löschen
+                clear_byte_ready();
+                _delay_us(3);
+                set_byte_ready();
             }
         // else --> kein Byte senden !!
         }
@@ -919,12 +899,10 @@ ISR (TIMER0_COMPA_vect)
             akt_gcr_byte = in_gcr_byte;
 
             // BYTE_READY für 3µs löschen
-            if(no_byte_ready_send == 0)
-            {
-                clear_byte_ready();
-                _delay_us(3);
-                set_byte_ready();
-            }
+            clear_byte_ready();
+            _delay_us(3);
+            set_byte_ready();
+
         }
 
         // Daten aus Ringpuffer senden wenn Motor an

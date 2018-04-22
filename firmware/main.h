@@ -43,8 +43,8 @@
 #define PRELL_TIME 200
 
 // Zeit die nach der letzten Stepperaktivität vergehen muss, um einen neuen Track von SD Karte zu laden
-// Default 15
-#define STEPPER_DELAY_TIME 15
+// Default 15 -> 7 scheint besser zu laufen
+#define STEPPER_DELAY_TIME 7
 
 // DEBUG LED (Optional / vorrerst)
 #define DBG_LED_DDR DDRC
@@ -240,4 +240,3 @@ volatile uint8_t gcr_track[8192];
 
 volatile uint8_t track_is_written = 0;
 volatile uint8_t track_is_written_old = 0;
-volatile uint8_t no_byte_ready_send = 0;
