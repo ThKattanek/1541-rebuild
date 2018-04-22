@@ -12,7 +12,7 @@
 
 #include "./main.h"
 
-//#define DEBUG_MODE
+#define DEBUG_MODE
 
 int main(void)
 {
@@ -37,7 +37,10 @@ int main(void)
     init_controll_signals();
 
     // Schreibschutz setzen
-    clear_wps();
+    //clear_wps();
+
+    // Schreibschutz aufheben
+    //set_wps();
 
     // Timer0 --> GCR senden
     init_timer0();
@@ -59,8 +62,46 @@ int main(void)
     while(init_sd_card()){}
 
     lcd_clear();
-
     view_dir_entry(0,&file_entry);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /*
+    lcd_setcursor(0,1);
+    lcd_string("- File Write Test -");
+
+    lcd_setcursor(0,2);
+
+    uint8_t ret = fat_create_file(dd,"rebuild.g64",&file_entry);
+    if(ret == 0)
+    {
+        lcd_string("Err: No Created File");
+    }
+    else if(ret == 2)
+    {
+        ret = fat_delete_file(fs,&file_entry);
+        if(ret == 0)
+        {
+            lcd_setcursor(0,2);
+            lcd_string("File not deleted.");
+        }
+        else
+        {
+            ret = fat_create_file(dd,"rebuild.d64",&file_entry);
+            if(ret == 0)
+                lcd_string("Err: No Created File");
+        }
+    }
+
+    fd = open_disk_image(fs, &file_entry, &akt_image_type);
+    if(!fd)
+    {
+        lcd_setcursor( 0, 2);
+        lcd_string("Image not open!");
+    }
+    */
+
+    //////////////////////////////////////////////////////////////////////////
 
 #ifdef DEBUG_MODE
     lcd_setcursor(0,4);
@@ -112,11 +153,21 @@ int main(void)
 	    lcd_setcursor(2,4);
 	    sprintf(byte_str,"%d",akt_half_track >> 1);
 	    lcd_string(byte_str);
+
+            lcd_setcursor(0,3);
+            if(track_is_written == 1)
+            {
+                lcd_string("*");
+            }
+            else
+            {
+                lcd_string(" ");
+            }
+
 #endif
 	}
 	else if(stepper_signal && (stepper_signal_time >= STEPPER_DELAY_TIME))
 	{
-
 		stepper_signal = 0;
 		// Geschwindigkeit setzen
 		OCR0A = timer0_orca0[d64_track_zone[akt_half_track>>1]];
@@ -124,12 +175,30 @@ int main(void)
 
 		//stop_timer0();
 		if(!(akt_half_track & 0x01))
-		    read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
+                {
+                    if(track_is_written == 1)
+                    {
+                        no_byte_ready_send = 1;
 
+                        track_is_written = 0;
+                        write_disk_track(fd,akt_image_type,old_half_track>>1,gcr_track, &gcr_track_length);
+
+                        read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
+                        old_half_track = akt_half_track;    // Merken um evtl. dort zurück zu schreiben
+
+                        no_byte_ready_send = 0;
+                    }
+                    else
+                    {
+                        read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
+                        old_half_track = akt_half_track;    // Merken um evtl. dort zurück zu schreiben
+                    }
+                }
 		//start_timer0();
 	}
 
 #ifdef DEBUG_MODE
+        // KEY STATUS
 	lcd_setcursor(11,4);
 	if(get_key0_status())
 	    lcd_string("1");
@@ -147,7 +216,49 @@ int main(void)
 	    lcd_string("1");
 	else
 	    lcd_string("0");	
+
+        if(track_is_written != track_is_written_old)
+        {
+            track_is_written_old = track_is_written;
+            lcd_setcursor(0,3);
+            if(track_is_written == 1)
+            {
+                lcd_string("*");
+            }
+            else
+            {
+                lcd_string(" ");
+            }
+        }
+
+        if(old_motor_status != get_motor_status())
+        {
+            old_motor_status = get_motor_status();
+            lcd_setcursor(7,4);
+            if(get_motor_status())
+            {
+                lcd_string("*");
+            }
+            else
+            {
+                lcd_string(" ");
+            }
+        }
 #endif
+
+        if(!get_motor_status())
+        {
+            // Sollte der aktuelle Track noch veränderungen haben so wird hier erstmal gesichert.
+            if(track_is_written == 1)
+            {
+                no_byte_ready_send = 1;
+                track_is_written = 0;
+                write_disk_track(fd,akt_image_type,old_half_track>>1,gcr_track, &gcr_track_length);
+                no_byte_ready_send = 0;
+            }
+        }
+
+
 	static uint16_t dir_pos = 0;
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -178,7 +289,18 @@ int main(void)
 	    wait_key_counter2 = PRELL_TIME;
 
 	    stop_timer0();
-	    DATA_PORT = 0x00;
+            DATA_PORT = 0x00;
+
+            // Sollte der aktuelle Track noch veränderungen haben so wird hier erstmal gesichert.
+            /*
+            if(track_is_written == 1)
+            {
+                no_byte_ready_send = 1;
+                track_is_written = 0;
+                write_disk_track(fd,akt_image_type,old_half_track>>1,gcr_track, &gcr_track_length);
+                no_byte_ready_send = 0;
+            }
+            */
 
 	    close_disk_image(fd);
 	    fd = open_disk_image(fs, &file_entry, &akt_image_type);
@@ -191,7 +313,7 @@ int main(void)
 	    read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
 
 	    stp_signals_old = STP_PIN >> 6;
-	    akt_half_track = INIT_TRACK << 1;
+            //akt_half_track = INIT_TRACK << 1;
 	    akt_track_pos = 0;
 
 	    start_timer0();
@@ -211,10 +333,10 @@ int8_t init_sd_card()
 	return 1;
 
     // Eine Partition öffnen (die erste)
-    partition = partition_open(sd_raw_read,sd_raw_read_interval,0,0,0);
+    partition = partition_open(sd_raw_read,sd_raw_read_interval,sd_raw_write,sd_raw_write_interval,0);
     if(!partition)
     {
-	partition = partition_open(sd_raw_read,sd_raw_read_interval,0,0,-1);
+        partition = partition_open(sd_raw_read,sd_raw_read_interval,sd_raw_write,sd_raw_write_interval,-1);
 	if(!partition) return 2;
     }
 
@@ -288,13 +410,19 @@ void init_controll_signals()
     // Als Ausgang schalten
     BYTE_READY_DDR |= 1<<BYTE_READY;
     SYNC_DDR |= 1<<SYNC;
-    WPS_DDR |= 1<<WPS;
+
+    //WPS_DDR |= 1<<WPS;
+    //Deaktivieren indem wir es WPS auf Eingang setzen
+    //Manuelles aufheben des Schreibschutzes in dem man PIN3 von CONN4 auf GND legt.
+    //Somit wird WPS HI
+    WPS_DDR &= ~(1<<WPS);
 
     // DATEN Leitungen als Ausgang schalten
     DATA_DDR = 0xff;
 
     // Als Eingang schalten
     SOE_DDR &= ~(1<<SOE);
+    SO_DDR &= ~(1<<SO);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -551,8 +679,8 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
 	    {
 		if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
 		{
-		    fat_read_file(fd, &gcr_track_length, 2);
-		    fat_read_file(fd, track_buffer, gcr_track_length);
+                    fat_read_file(fd, gcr_track_length, 2);
+                    fat_read_file(fd, track_buffer, *gcr_track_length);
 
 		    is_read = 1;
 		}
@@ -642,6 +770,40 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
 
 /////////////////////////////////////////////////////////////////////
 
+void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length)
+{
+    int32_t offset = 0;
+
+    switch(image_type)
+    {
+    ///////////////////////////////////////////////////////////////////////////
+    case G64_IMAGE:	// G64
+        /// Track18 eines G64 einlesen
+
+        offset = (int32_t)track_nr - 1;
+        offset = (offset << 3) + 0x0c;
+
+        if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
+        {
+            if(fat_read_file(fd, &offset, 4))
+            {
+                offset += 2;
+                if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
+                {
+                    fat_write_file(fd, track_buffer, *gcr_track_length);
+                }
+            }
+        }
+        break;
+
+    ///////////////////////////////////////////////////////////////////////////
+    case D64_IMAGE:	// D64
+        break;
+    }
+}
+
+/////////////////////////////////////////////////////////////////////
+
 inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer)
 {
     const uint8_t GCR_TBL[16] = {0x0a, 0x0b, 0x12, 0x13, 0x0e, 0x0f, 0x16, 0x17,0x09, 0x19, 0x1a, 0x1b, 0x0d, 0x1d, 0x1e, 0x15};
@@ -695,47 +857,88 @@ ISR (TIMER0_COMPA_vect)
     static uint8_t old_gcr_byte = 0;
     uint8_t is_sync;
 
-    // Daten aus Ringpuffer senden wenn Motor an
-    if(get_motor_status())
-    {                                                               // Wenn Motor läuft
-        akt_gcr_byte = gcr_track[akt_track_pos++];                  // Nächstes GCR Byte holen
-        if(akt_track_pos == gcr_track_length) akt_track_pos = 0;    // Ist Spurende erreicht? Zurück zum Anfang
+    if(get_so_status())     // Wenn OE HI dann von Prot lesen
+    {
+        // LESE MODUS
+        dbg_led_off();
+
+        // Daten aus Ringpuffer senden wenn Motor an
+        if(get_motor_status())
+        {                                                               // Wenn Motor läuft
+            akt_gcr_byte = gcr_track[akt_track_pos++];                  // Nächstes GCR Byte holen
+            if(akt_track_pos == gcr_track_length) akt_track_pos = 0;    // Ist Spurende erreicht? Zurück zum Anfang
 
 
-        if((akt_gcr_byte == 0xff) && (old_gcr_byte == 0xff))        // Prüfen auf SYNC (mindesten 2 aufeinanderfolgende 0xFF)
-        {                                                           // Wenn SYNC
-            clear_sync();                                           // SYNC Leitung auf Low setzen
-            is_sync = 1;                                            // SYNC Merker auf 1
+            if((akt_gcr_byte == 0xff) && (old_gcr_byte == 0xff))        // Prüfen auf SYNC (mindesten 2 aufeinanderfolgende 0xFF)
+            {                                                           // Wenn SYNC
+                clear_sync();                                           // SYNC Leitung auf Low setzen
+                is_sync = 1;                                            // SYNC Merker auf 1
+            }
+                else
+            {                                                           // Wenn kein SYNC
+                set_sync();                                             // SYNC Leitung auf High setzen
+                is_sync = 0;                                            // SYNC Merker auf 0
+            }
         }
-	    else
-        {                                                           // Wenn kein SYNC
-            set_sync();                                             // SYNC Leitung auf High setzen
-            is_sync = 0;                                            // SYNC Merker auf 0
+        else
+        {                                                               // Wenn Motor nicht läuft
+            akt_gcr_byte = 0x00;                                        // 0 senden wenn Motor aus
+            is_sync = 0;                                                // SYNC Merker auf 0
         }
-	}
-    else
-    {                                                               // Wenn Motor nicht läuft
-        akt_gcr_byte = 0x00;                                        // 0 senden wenn Motor aus
-        is_sync = 0;                                                // SYNC Merker auf 0
-	}
 
-	// SOE
-    // Unabhängig ob der Motor läuft oder nicht
-	if(get_soe_status())
-	{
+        // SOE
+        // Unabhängig ob der Motor läuft oder nicht
+        if(get_soe_status())
+        {
         if(!is_sync)
-	    {
-            out_gcr_byte(akt_gcr_byte);
+            {
+                DATA_DDR = 0xff;
+                out_gcr_byte(akt_gcr_byte);
+
+                if(no_byte_ready_send == 0)
+                {
+                    // BYTE_READY für 3µs löschen
+                    clear_byte_ready();
+                    _delay_us(3);
+                    set_byte_ready();
+                }
+            }
+        // else --> kein Byte senden !!
+        }
+        old_gcr_byte = akt_gcr_byte;
+    }
+    else
+    {
+        // SCHREIB MODUS
+
+        // SOE
+        // Unabhängig ob der Motor läuft oder nicht
+        if(get_soe_status())
+        {
+            DATA_DDR = 0x00;
+            akt_gcr_byte = in_gcr_byte;
 
             // BYTE_READY für 3µs löschen
-            clear_byte_ready();
-            _delay_us(3);
-            set_byte_ready();
-	    }
-        // else --> kein Byte senden !!
-	}
+            if(no_byte_ready_send == 0)
+            {
+                clear_byte_ready();
+                _delay_us(3);
+                set_byte_ready();
+            }
+        }
 
-    old_gcr_byte = akt_gcr_byte;
+        // Daten aus Ringpuffer senden wenn Motor an
+        if(get_motor_status() /*&& akt_half_track == 36*/)
+        {
+            dbg_led_on();
+            // Wenn Motor läuft
+            gcr_track[akt_track_pos++] = akt_gcr_byte;                  // Nächstes GCR Byte schreiben
+            track_is_written = 1;
+            if(akt_track_pos == gcr_track_length) akt_track_pos = 0;    // Ist Spurende erreicht? Zurück zum Anfang
+        }
+        else
+            dbg_led_off();
+    }
 }
 
 ISR (TIMER2_COMPA_vect)

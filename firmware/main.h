@@ -44,7 +44,7 @@
 
 // Zeit die nach der letzten Stepperaktivität vergehen muss, um einen neuen Track von SD Karte zu laden
 // Default 15
-#define STEPPER_DELAY_TIME 7
+#define STEPPER_DELAY_TIME 15
 
 // DEBUG LED (Optional / vorrerst)
 #define DBG_LED_DDR DDRC
@@ -90,6 +90,13 @@
 
 #define get_soe_status() (SOE_PIN & (1<<SOE))
 
+// SO
+#define SO_DDR DDRC
+#define SO_PIN PINC
+#define SO     PINC5
+
+#define get_so_status() (SO_PIN & (1<<SO))
+
 // WPS
 #define WPS_DDR DDRC
 #define WPS_PORT PORTC
@@ -101,8 +108,10 @@
 // Anschluss der Datenleitungen
 #define DATA_DDR   DDRD
 #define DATA_PORT  PORTD
+#define DATA_PIN   PIND
 
 #define out_gcr_byte(gcr_byte) DATA_PORT = gcr_byte
+#define in_gcr_byte DATA_PIN
 
 // Einabetasten
 #define KEY0_DDR DDRB
@@ -153,6 +162,7 @@ void close_disk_image(struct fat_file_struct*);
 int8_t open_g64_image(struct fat_file_struct *fd);
 int8_t open_d64_image(struct fat_file_struct *fd);
 int8_t read_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
+void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
 inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
 
 void send_disk_change();
@@ -173,7 +183,7 @@ uint8_t akt_image_type = 0;	// 0=kein Image, 1=G64, 2=D64
 volatile static uint8_t stp_signals_old = 0;
 
 
-uint16_t gcr_track_length = 7139;
+volatile uint16_t gcr_track_length = 7139;
 volatile uint8_t akt_gcr_byte = 0;
 volatile uint16_t akt_track_pos = 0;
 
@@ -184,6 +194,9 @@ volatile uint16_t wait_key_counter1 = 0;
 volatile uint16_t wait_key_counter2 = 0;
 
 uint8_t akt_half_track;
+uint8_t old_half_track;
+
+volatile uint8_t old_motor_status;
 
 // Bitraten
 //Zone 0: 8000000/26 = 307692 Hz
@@ -224,3 +237,7 @@ volatile uint8_t stepper_signal = 0;
 volatile uint8_t stepper_msg = 0;   // 0-keine Stepperaktivität ; 1=StepperDec ; 2-255=StepperInc
 
 volatile uint8_t gcr_track[8192];
+
+volatile uint8_t track_is_written = 0;
+volatile uint8_t track_is_written_old = 0;
+volatile uint8_t no_byte_ready_send = 0;
