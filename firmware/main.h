@@ -220,8 +220,8 @@ const uint8_t d64_track_zone[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 const uint8_t d64_sector_gap[4] = {1,10,5,2};
 #define HEADER_GAP_BYTES 8	// Early 9
 
-const uint8_t timer0_orca0[4] = {66,71,76,81};	    // Mit "Align the 1541 Drive" an Originaler Floppy angepasst. (321.23 Umdrehungen/min (Programm für NTSC))
-//const uint8_t timer0_orca0[4] = {64,69,74,79};
+//const uint8_t timer0_orca0[4] = {66,71,76,81};	    // Mit "Align the 1541 Drive" an Originaler Floppy angepasst. (321.23 Umdrehungen/min (Programm für NTSC))
+const uint8_t timer0_orca0[4] = {64,69,74,79};
 
 volatile uint8_t *test_addr;
 
