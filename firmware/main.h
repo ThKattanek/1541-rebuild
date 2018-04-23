@@ -165,6 +165,7 @@ int8_t read_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t t
 void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
 inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
 
+void set_write_protection(int8_t wp);   // wp=0 image nicht geschützt wp=1 image schreibgeschützt
 void send_disk_change(void);
 
 /////////////////////////////////////////////////////////////////
@@ -179,6 +180,8 @@ struct fat_dir_entry_struct file_entry;
 struct fat_file_struct* fd;
 
 uint8_t akt_image_type = 0;	// 0=kein Image, 1=G64, 2=D64
+
+int8_t floppy_wp = 0;           // Hier wird der aktuelle WriteProtection Zustand gespeichert / 0=Nicht Schreibgeschützt 1=Schreibgeschützt
 
 volatile static uint8_t stp_signals_old = 0;
 
@@ -199,30 +202,31 @@ uint8_t old_half_track;
 
 volatile uint8_t old_motor_status;
 
-// Bitraten
+const uint32_t d64_track_offset[41] = {0,0x00000,0x01500,0x02A00,0x03F00,0x05400,0x06900,0x07E00,0x09300,0x0A800,0x0BD00,0x0D200,0x0E700,0x0FC00,0x11100,0x12600,0x13B00,0x15000,0x16500,0x17800,0x18B00,
+				 0x19E00,0x1B100,0x1C400,0x1D700,0x1EA00,0x1FC00,0x20E00,0x22000,0x23200,0x24400,0x25600,0x26700,0x27800,0x28900,0x29A00,0x2AB00,0x2BC00,0x2CD00,0x2DE00,0x2EF00};
+
+const uint8_t d64_sector_count[41] = {0,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21, //Spuren 1-17
+                                       19,19,19,19,19,19,19,                                //Spuren 18-24
+                                       18,18,18,18,18,18,                                   //Spuren 25-30
+                                       17,17,17,17,17,17,17,17,17,17};                      //Spuren 31-40
+
+const uint8_t d64_track_zone[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                    //Spuren 1-17
+                               1,1,1,1,1,1,1,                                               //Spuren 18-24
+                               2,2,2,2,2,2,                                                 //Spuren 25-30
+                               3,3,3,3,3,3,3,3,3,3};                                        //Spuren 31-40
+
+// Originale Bitraten
 //Zone 0: 8000000/26 = 307692 Hz
 //Zone 1: 8000000/28 = 285714 Hz
 //Zone 2: 8000000/30 = 266667 Hz
 //Zone 3: 8000000/32 = 250000 Hz
 
-const uint32_t d64_track_offset[41] = {0,0x00000,0x01500,0x02A00,0x03F00,0x05400,0x06900,0x07E00,0x09300,0x0A800,0x0BD00,0x0D200,0x0E700,0x0FC00,0x11100,0x12600,0x13B00,0x15000,0x16500,0x17800,0x18B00,
-				 0x19E00,0x1B100,0x1C400,0x1D700,0x1EA00,0x1FC00,0x20E00,0x22000,0x23200,0x24400,0x25600,0x26700,0x27800,0x28900,0x29A00,0x2AB00,0x2BC00,0x2CD00,0x2DE00,0x2EF00};
-
-const uint8_t d64_sector_count[41] = {0,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,
-				       19,19,19,19,19,19,19,
-				       18,18,18,18,18,18,
-				       17,17,17,17,17,17,17,17,17,17};
-
-const uint8_t d64_track_zone[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-			       1,1,1,1,1,1,1,
-			       2,2,2,2,2,2,
-			       3,3,3,3,3,3,3,3,3,3};
+//Höhere Werte verlangsammen die Bitrate
+//const uint8_t timer0_orca0[4] = {64,69,74,79};            // Diese Werte erzeugen den genausten Bittakt aber nicht 100%
+const uint8_t timer0_orca0[4] = {65,70,75,80};              // Test mit den nächst langsammeren Bitraten für Zone 0-3 23.04.2018
 
 const uint8_t d64_sector_gap[4] = {1,10,5,2};
 #define HEADER_GAP_BYTES 8	// Early 9
-
-//const uint8_t timer0_orca0[4] = {66,71,76,81};	    // Mit "Align the 1541 Drive" an Originaler Floppy angepasst. (321.23 Umdrehungen/min (Programm für NTSC))
-const uint8_t timer0_orca0[4] = {64,69,74,79};
 
 volatile uint8_t *test_addr;
 
@@ -237,7 +241,6 @@ volatile uint8_t stepper_signal = 0;
 
 volatile uint8_t stepper_msg = 0;   // 0-keine Stepperaktivität ; 1=StepperDec ; 2-255=StepperInc
 
-//War Volatile
 uint8_t gcr_track[8192];
 
 volatile uint8_t track_is_written = 0;

@@ -39,12 +39,6 @@ int main(void)
     // Steursignale BYTE_READY, SYNC und SOE Initialisieren
     init_controll_signals();
 
-    // Schreibschutz setzen
-    //clear_wps();
-
-    // Schreibschutz aufheben
-    //set_wps();
-
     // Timer0 --> GCR senden
     init_timer0();
 
@@ -65,6 +59,10 @@ int main(void)
     while(init_sd_card()){}
 
     lcd_clear();
+
+    // Write Potection aktivieren
+    set_write_protection(1);
+
     view_dir_entry(0,&file_entry);
 
     //////////////////////////////////////////////////////////////////////////
@@ -116,6 +114,9 @@ int main(void)
     lcd_setcursor(9,4);
     lcd_string("K:");
 
+    lcd_setcursor(15,4);
+    lcd_string("WP:");
+
     lcd_setcursor(2,4);
     sprintf (byte_str,"%d",akt_half_track >> 1);
     lcd_string(byte_str);
@@ -166,7 +167,6 @@ int main(void)
             {
                 lcd_string(" ");
             }
-
 #endif
 	}
 	else if(stepper_signal && (stepper_signal_time >= STEPPER_DELAY_TIME))
@@ -415,17 +415,10 @@ void init_controll_signals(void)
     // Als Ausgang schalten
     BYTE_READY_DDR |= 1<<BYTE_READY;
     SYNC_DDR |= 1<<SYNC;
-
-    //WPS_DDR |= 1<<WPS;
-    //Deaktivieren indem wir es WPS auf Eingang setzen
-    //Manuelles aufheben des Schreibschutzes in dem man PIN3 von CONN4 auf GND legt.
-    //Somit wird WPS HI
-    WPS_DDR &= ~(1<<WPS);
-
-    // DATEN Leitungen als Ausgang schalten
-    DATA_DDR = 0xff;
+    WPS_DDR |= 1<<WPS;
 
     // Als Eingang schalten
+    DATA_DDR = 0x00;
     SOE_DDR &= ~(1<<SOE);
     SO_DDR &= ~(1<<SO);
 }
@@ -833,11 +826,39 @@ inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer)
 
 /////////////////////////////////////////////////////////////////////
 
+void set_write_protection(int8_t wp)
+{
+    floppy_wp = wp;
+
+    lcd_setcursor(18,4);
+    if(wp == 0)
+    {
+        set_wps();
+        lcd_string(" ");
+    }
+    else
+    {
+        clear_wps();
+        lcd_string("*");
+    }
+}
+
+/////////////////////////////////////////////////////////////////////
+
 void send_disk_change(void)
 {
-    set_wps();
-    _delay_ms(1);
-    clear_wps();
+    if(floppy_wp == 0)
+    {
+        clear_wps();
+        _delay_ms(50);
+        set_wps();
+    }
+    else
+    {
+        set_wps();
+        _delay_ms(50);
+        clear_wps();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -952,5 +973,5 @@ ISR (TIMER2_COMPA_vect)
     if(wait_key_counter1)
 	wait_key_counter1--;
     if(wait_key_counter2)
-	wait_key_counter2--;
+        wait_key_counter2--;
 }
