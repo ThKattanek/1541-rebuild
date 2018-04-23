@@ -138,23 +138,23 @@
 
 enum {UNDEF_IMAGE, G64_IMAGE, D64_IMAGE};
 
-int8_t init_sd_card();
-void show_start_message();
-void init_stepper();
-void stepper_inc();
-void stepper_dec();
-void init_motor();
-void init_controll_signals();
-void init_timer0();
-void start_timer0();
-void stop_timer0();
-void init_timer2();
-void start_timer2();
-void stop_timer2();
-void init_keys();
-void dbg_led_init();
-void dbg_led_on();
-void dbg_led_off();
+int8_t init_sd_card(void);
+void show_start_message(void);
+void init_stepper(void);
+void stepper_inc(void);
+void stepper_dec(void);
+void init_motor(void);
+void init_controll_signals(void);
+void init_timer0(void);
+void start_timer0(void);
+void stop_timer0(void);
+void init_timer2(void);
+void start_timer2(void);
+void stop_timer2(void);
+void init_keys(void);
+void dbg_led_init(void);
+void dbg_led_on(void);
+void dbg_led_off(void);
 
 int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_entry);
 struct fat_file_struct* open_disk_image(struct fat_fs_struct *fs, struct fat_dir_entry_struct* file_entry, uint8_t *image_type);
@@ -165,7 +165,7 @@ int8_t read_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t t
 void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
 inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
 
-void send_disk_change();
+void send_disk_change(void);
 
 /////////////////////////////////////////////////////////////////
 // Globale Variablen
@@ -182,8 +182,9 @@ uint8_t akt_image_type = 0;	// 0=kein Image, 1=G64, 2=D64
 
 volatile static uint8_t stp_signals_old = 0;
 
+//War Volatile
+uint16_t gcr_track_length = 7139;
 
-volatile uint16_t gcr_track_length = 7139;
 volatile uint8_t akt_gcr_byte = 0;
 volatile uint16_t akt_track_pos = 0;
 
@@ -236,7 +237,8 @@ volatile uint8_t stepper_signal = 0;
 
 volatile uint8_t stepper_msg = 0;   // 0-keine Stepperaktivität ; 1=StepperDec ; 2-255=StepperInc
 
-volatile uint8_t gcr_track[8192];
+//War Volatile
+uint8_t gcr_track[8192];
 
 volatile uint8_t track_is_written = 0;
 volatile uint8_t track_is_written_old = 0;

@@ -11,12 +11,15 @@
 #endif
 
 #include "./main.h"
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 
 #define DEBUG_MODE
 
 int main(void)
 {
-    int8_t byte_str[4];	    // Wird benutzt um hier ein Byte als String abzulegen
+    char byte_str[4];	    // Wird benutzt um hier ein Byte als String abzulegen
 
     // Debug LED initialisieren
     dbg_led_init();
@@ -114,7 +117,7 @@ int main(void)
     lcd_string("K:");
 
     lcd_setcursor(2,4);
-    sprintf(byte_str,"%d",akt_half_track >> 1);
+    sprintf (byte_str,"%d",akt_half_track >> 1);
     lcd_string(byte_str);
 #endif
 
@@ -326,7 +329,7 @@ int main(void)
 
 /////////////////////////////////////////////////////////////////////
 
-int8_t init_sd_card()
+int8_t init_sd_card(void)
 {
     set_sleep_mode(SLEEP_MODE_IDLE);
 
@@ -356,7 +359,7 @@ int8_t init_sd_card()
 
 /////////////////////////////////////////////////////////////////////
 
-void show_start_message()
+void show_start_message(void)
 {
     lcd_clear();
     lcd_setcursor( 1, 2);
@@ -370,7 +373,7 @@ void show_start_message()
 
 /////////////////////////////////////////////////////////////////////
 
-void init_stepper()
+void init_stepper(void)
 {
     // Stepper PINs als Eingang schalten
     STP_DDR &= ~(1<<STP0 | 1<<STP1);
@@ -383,7 +386,7 @@ void init_stepper()
 
 /////////////////////////////////////////////////////////////////////
 
-void stepper_inc()
+void stepper_inc(void)
 {            
     if(akt_half_track == 83) return;
     akt_half_track++;
@@ -391,7 +394,7 @@ void stepper_inc()
 
 /////////////////////////////////////////////////////////////////////
 
-void stepper_dec()
+void stepper_dec(void)
 {
     if(akt_half_track == 2) return;
     akt_half_track--;
@@ -407,7 +410,7 @@ void init_motor()
 
 /////////////////////////////////////////////////////////////////////
 
-void init_controll_signals()
+void init_controll_signals(void)
 {
     // Als Ausgang schalten
     BYTE_READY_DDR |= 1<<BYTE_READY;
@@ -429,7 +432,7 @@ void init_controll_signals()
 
 /////////////////////////////////////////////////////////////////////
 
-void init_timer0()
+void init_timer0(void)
 {
     TCCR0A = (1<<WGM01);    // CTC Modus
     TCCR0B |= (1<<CS01);    // Prescaler 8
@@ -440,7 +443,7 @@ void init_timer0()
 
 /////////////////////////////////////////////////////////////////////
 
-void start_timer0()
+void start_timer0(void)
 {
     // Compare Interrupt erlauben
     TIMSK0 |= (1<<OCIE0A);
@@ -448,7 +451,7 @@ void start_timer0()
 
 /////////////////////////////////////////////////////////////////////
 
-void stop_timer0()
+void stop_timer0(void)
 {
     // Compare Interrupt verhindern
     TIMSK0 &= ~(1<<OCIE0A);
@@ -456,7 +459,7 @@ void stop_timer0()
 
 /////////////////////////////////////////////////////////////////////
 
-void init_timer2()
+void init_timer2(void)
 {
     TCCR2A = (1<<WGM21);    // CTC Modus
     TCCR2B |= (1<<CS20) | (1<<CS21) | (1<<CS22);    // Prescaler 1024
@@ -470,7 +473,7 @@ void init_timer2()
 }
 /////////////////////////////////////////////////////////////////////
 
-void start_timer2()
+void start_timer2(void)
 {
     // Compare Interrupt erlauben
     TIMSK2 |= (1<<OCIE2A);
@@ -478,7 +481,7 @@ void start_timer2()
 
 /////////////////////////////////////////////////////////////////////
 
-void stop_timer2()
+void stop_timer2(void)
 {
     // Compare Interrupt verhindern
     TIMSK2 &= ~(1<<OCIE2A);
@@ -486,7 +489,7 @@ void stop_timer2()
 
 /////////////////////////////////////////////////////////////////////
 
-void init_keys()
+void init_keys(void)
 {
     // Entsprechende Ports auf Eingangschalten
     KEY0_DDR &= ~(1<<KEY0);
@@ -501,7 +504,7 @@ void init_keys()
 
 /////////////////////////////////////////////////////////////////////
 
-void dbg_led_init()
+void dbg_led_init(void)
 {
     //DDxn = 0 , PORTxn = 0 --> HiZ
     //DDxn = 1 , PORTxn = 0 --> Output Low (Sink)
@@ -511,14 +514,14 @@ void dbg_led_init()
 
 /////////////////////////////////////////////////////////////////////
 
-void dbg_led_on()
+void dbg_led_on(void)
 {
     DBG_LED_DDR |= 1<<DBG_LED;
 }
 
 /////////////////////////////////////////////////////////////////////
 
-void dbg_led_off()
+void dbg_led_off(void)
 {
     DBG_LED_DDR &= ~(1<<DBG_LED);
 }
@@ -833,7 +836,7 @@ inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer)
 
 /////////////////////////////////////////////////////////////////////
 
-void send_disk_change()
+void send_disk_change(void)
 {
     set_wps();
     _delay_ms(1);
