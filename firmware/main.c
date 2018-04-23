@@ -586,7 +586,7 @@ struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir
     if(strlen(file_entry->long_name) < 4) return NULL;
 
     struct fat_file_struct* fd = NULL;
-    int8_t extension[5];
+    char extension[5];
     int i;
 
     // Extension überprüfen --> g64 oder d64
@@ -633,9 +633,8 @@ struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir
 
 void close_disk_image(struct fat_file_struct* fd)
 {
-    fat_close(fd);
+    fat_close_file(fd);
     fd = NULL;
-    return 0;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -667,8 +666,6 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
     uint8_t sector_nr;
     uint8_t SUM;
 
-    int32_t len;
-
     switch(image_type)
     {
     ///////////////////////////////////////////////////////////////////////////
@@ -680,11 +677,11 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
 
 	if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
 	{
-	    if(fat_read_file(fd, &offset, 4))
+            if(fat_read_file(fd, (uint8_t*)&offset, 4))
 	    {
 		if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
 		{
-                    fat_read_file(fd, gcr_track_length, 2);
+                    fat_read_file(fd, (uint8_t*)gcr_track_length, 2);
                     fat_read_file(fd, track_buffer, *gcr_track_length);
 
 		    is_read = 1;
@@ -790,7 +787,7 @@ void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t tr
 
         if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
         {
-            if(fat_read_file(fd, &offset, 4))
+            if(fat_read_file(fd, (uint8_t*)&offset, 4))
             {
                 offset += 2;
                 if(fat_seek_file(fd,&offset,FAT_SEEK_SET))

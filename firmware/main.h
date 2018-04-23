@@ -188,7 +188,7 @@ uint16_t gcr_track_length = 7139;
 volatile uint8_t akt_gcr_byte = 0;
 volatile uint16_t akt_track_pos = 0;
 
-int8_t lcd_puffer[33]; // Maximal 32 Zeichen
+char lcd_puffer[33]; // Maximal 32 Zeichen
 
 volatile uint16_t wait_key_counter0 = 0;
 volatile uint16_t wait_key_counter1 = 0;
