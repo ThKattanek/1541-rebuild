@@ -850,13 +850,13 @@ void send_disk_change(void)
     if(floppy_wp == 0)
     {
         clear_wps();
-        _delay_ms(50);
+        _delay_ms(3);
         set_wps();
     }
     else
     {
         set_wps();
-        _delay_ms(50);
+        _delay_ms(3);
         clear_wps();
     }
 }
