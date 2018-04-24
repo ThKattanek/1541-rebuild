@@ -216,10 +216,10 @@ const uint8_t d64_track_zone[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,        
                                3,3,3,3,3,3,3,3,3,3};                                        //Spuren 31-40
 
 // Originale Bitraten
-//Zone 0: 8000000/26 = 307692 Hz
-//Zone 1: 8000000/28 = 285714 Hz
-//Zone 2: 8000000/30 = 266667 Hz
-//Zone 3: 8000000/32 = 250000 Hz
+//Zone 0: 8000000/26 = 307692 Hz    (ByteReady 38461.5 Hz)
+//Zone 1: 8000000/28 = 285714 Hz    (ByteReady 35714.25 Hz)
+//Zone 2: 8000000/30 = 266667 Hz    (ByteReady 33333.375 Hz)
+//Zone 3: 8000000/32 = 250000 Hz    (ByteReady 31250 Hz)
 
 //Höhere Werte verlangsammen die Bitrate
 //const uint8_t timer0_orca0[4] = {64,69,74,79};            // Diese Werte erzeugen den genausten Bittakt aber nicht 100%
