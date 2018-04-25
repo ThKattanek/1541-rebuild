@@ -226,7 +226,7 @@ const uint8_t d64_track_zone[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,        
 //const uint8_t timer0_orca0[4] = {64,69,74,79};            // Diese Werte erzeugen den genausten Bittakt aber nicht 100%
 const uint8_t timer0_orca0[4] = {64,69,74,79};              // Test mit den nächst langsammeren Bitraten für Zone 0-3 23.04.2018
 
-const uint8_t d64_sector_gap[4] = {1,10,5,2};
+const uint8_t d64_sector_gap[4] = {12, 21, 16, 13}; // von GPZ Code übermommen imggen
 #define HEADER_GAP_BYTES 9
 
 volatile uint8_t *test_addr;

@@ -177,7 +177,7 @@ int main(void)
 		OCR0A = timer0_orca0[d64_track_zone[akt_half_track>>1]];
 		akt_track_pos = 0;
 
-                //stop_timer0();
+                stop_timer0();
 		if(!(akt_half_track & 0x01))
                 {
                     if(track_is_written == 1)
@@ -198,7 +198,7 @@ int main(void)
                         old_half_track = akt_half_track;    // Merken um evtl. dort zurück zu schreiben
                     }
                 }
-                //start_timer0();
+                start_timer0();
 	}
 
 #ifdef DEBUG_MODE
