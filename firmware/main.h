@@ -43,6 +43,7 @@
 #define PRELL_TIME 200
 
 // Zeit die nach der letzten Stepperaktivität vergehen muss, um einen neuen Track von SD Karte zu laden
+// (1541 Original Rom schaltet STP1 alle 15ms)
 // Default 15
 #define STEPPER_DELAY_TIME 15
 
@@ -223,10 +224,10 @@ const uint8_t d64_track_zone[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,        
 
 //Höhere Werte verlangsammen die Bitrate
 //const uint8_t timer0_orca0[4] = {64,69,74,79};            // Diese Werte erzeugen den genausten Bittakt aber nicht 100%
-const uint8_t timer0_orca0[4] = {65,70,75,80};              // Test mit den nächst langsammeren Bitraten für Zone 0-3 23.04.2018
+const uint8_t timer0_orca0[4] = {64,69,74,79};              // Test mit den nächst langsammeren Bitraten für Zone 0-3 23.04.2018
 
 const uint8_t d64_sector_gap[4] = {1,10,5,2};
-#define HEADER_GAP_BYTES 8	// Early 9
+#define HEADER_GAP_BYTES 9
 
 volatile uint8_t *test_addr;
 
