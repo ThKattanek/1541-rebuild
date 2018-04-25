@@ -15,6 +15,7 @@
 #include <string.h>
 #include <ctype.h>
 
+
 #define DEBUG_MODE
 
 int main(void)
@@ -169,14 +170,14 @@ int main(void)
             }
 #endif
 	}
-	else if(stepper_signal && (stepper_signal_time >= STEPPER_DELAY_TIME))
+        else if(stepper_signal && (stepper_signal_time >= STEPPER_DELAY_TIME))
 	{
 		stepper_signal = 0;
 		// Geschwindigkeit setzen
 		OCR0A = timer0_orca0[d64_track_zone[akt_half_track>>1]];
 		akt_track_pos = 0;
 
-                stop_timer0();
+                //stop_timer0();
 		if(!(akt_half_track & 0x01))
                 {
                     if(track_is_written == 1)
@@ -197,7 +198,7 @@ int main(void)
                         old_half_track = akt_half_track;    // Merken um evtl. dort zurück zu schreiben
                     }
                 }
-                start_timer0();
+                //start_timer0();
 	}
 
 #ifdef DEBUG_MODE
@@ -604,11 +605,13 @@ struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir
 	// Laut Extension ein G64
 	*image_type = G64_IMAGE;
 	open_g64_image(fd);
+        set_write_protection(0);
     }else if(!strcmp(extension,".d64"))
     {
 	// Laut Extensions ein D64
 	*image_type = D64_IMAGE;
 	open_d64_image(fd);
+        set_write_protection(1);
     }else
     {
 	// Nicht unterstützt
@@ -883,8 +886,6 @@ ISR (TIMER0_COMPA_vect)
     if(get_so_status())     // Wenn OE HI dann von Prot lesen
     {
         // LESE MODUS
-        dbg_led_off();
-
         // Daten aus Ringpuffer senden wenn Motor an
         if(get_motor_status())
         {                                                               // Wenn Motor läuft
@@ -951,16 +952,13 @@ ISR (TIMER0_COMPA_vect)
         }
 
         // Daten aus Ringpuffer senden wenn Motor an
-        if(get_motor_status() /*&& akt_half_track == 36*/)
+        if(get_motor_status())
         {
-            dbg_led_on();
             // Wenn Motor läuft
             gcr_track[akt_track_pos++] = akt_gcr_byte;                  // Nächstes GCR Byte schreiben
             track_is_written = 1;
             if(akt_track_pos == gcr_track_length) akt_track_pos = 0;    // Ist Spurende erreicht? Zurück zum Anfang
         }
-        else
-            dbg_led_off();
     }
 }
 
