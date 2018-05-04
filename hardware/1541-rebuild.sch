@@ -48,8 +48,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 4
 Title "1541-rebuid"
-Date "2018-04-21"
-Rev "1.2"
+Date "2018-05-04"
+Rev "1.2.1"
 Comp ""
 Comment1 "Erstellt: von: Thorsten Kattanek"
 Comment2 ""
@@ -74,7 +74,7 @@ L TCXO3-RESCUE-1541-rebuild X1
 U 1 1 55F7CB9E
 P 2700 3050
 F 0 "X1" H 2700 3350 70  0000 C CNN
-F 1 "20Mhz" H 2700 3050 70  0000 C CNN
+F 1 "24Mhz" H 2700 3050 70  0000 C CNN
 F 2 "Oscillators:KXO-200_LargePads" H 2700 3050 60  0001 C CNN
 F 3 "" H 2700 3050 60  0000 C CNN
 	1    2700 3050
