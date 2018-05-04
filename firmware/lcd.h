@@ -9,7 +9,7 @@
 // Hier die verwendete Taktfrequenz in Hz eintragen, wichtig!
  
 #ifndef F_CPU
-#define F_CPU 20000000UL
+#define F_CPU 24000000UL
 #endif
  
 ////////////////////////////////////////////////////////////////////////////////

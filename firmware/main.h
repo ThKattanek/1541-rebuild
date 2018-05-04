@@ -223,8 +223,8 @@ const uint8_t d64_track_zone[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,        
 //Zone 3: 8000000/32 = 250000 Hz    (ByteReady 31250 Hz)
 
 //Höhere Werte verlangsammen die Bitrate
-//const uint8_t timer0_orca0[4] = {64,69,74,79};            // Diese Werte erzeugen den genausten Bittakt aber nicht 100%
-const uint8_t timer0_orca0[4] = {64,69,74,79};              // Test mit den nächst langsammeren Bitraten für Zone 0-3 23.04.2018
+//const uint8_t timer0_orca0[4] = {64,69,74,79};            // Diese Werte erzeugen den genausten Bittakt aber nicht 100% (Bei 20MHz)
+const uint8_t timer0_orca0[4] = {77,83,89,95};            // Diese Werte erzeugen den genausten Bittakt aber nicht 100% (Bei 24MHz)
 
 const uint8_t d64_sector_gap[4] = {12, 21, 16, 13}; // von GPZ Code übermommen imggen
 #define HEADER_GAP_BYTES 9
