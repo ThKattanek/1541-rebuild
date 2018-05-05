@@ -49,7 +49,7 @@ encoding utf-8
 Sheet 4 4
 Title "1541-rebuid"
 Date "2018-05-05"
-Rev "1.3"
+Rev "1.3.1"
 Comp ""
 Comment1 "Erstellt: von: Thorsten Kattanek"
 Comment2 ""
@@ -150,10 +150,10 @@ BRDY
 Text HLabel 7100 2600 1    60   Input ~ 0
 BRDY
 $Comp
-L GND #PWR20
+L GND #PWR19
 U 1 1 55F9667E
 P 6000 2650
-F 0 "#PWR20" H 6000 2400 50  0001 C CNN
+F 0 "#PWR19" H 6000 2400 50  0001 C CNN
 F 1 "GND" H 6000 2500 50  0000 C CNN
 F 2 "" H 6000 2650 60  0000 C CNN
 F 3 "" H 6000 2650 60  0000 C CNN
@@ -161,10 +161,10 @@ F 3 "" H 6000 2650 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L +5V #PWR21
+L +5V #PWR20
 U 1 1 55F96755
 P 6000 5000
-F 0 "#PWR21" H 6000 4850 50  0001 C CNN
+F 0 "#PWR20" H 6000 4850 50  0001 C CNN
 F 1 "+5V" H 6000 5140 50  0000 C CNN
 F 2 "" H 6000 5000 60  0000 C CNN
 F 3 "" H 6000 5000 60  0000 C CNN
