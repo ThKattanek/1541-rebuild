@@ -48,8 +48,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 4 4
 Title "1541-rebuid"
-Date "2018-05-05"
-Rev "1.3.1"
+Date "2018-05-06"
+Rev "1.3.2"
 Comp ""
 Comment1 "Erstellt: von: Thorsten Kattanek"
 Comment2 ""

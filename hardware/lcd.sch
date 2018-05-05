@@ -48,8 +48,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 3 4
 Title "1541-rebuid"
-Date "2018-05-05"
-Rev "1.3.1"
+Date "2018-05-06"
+Rev "1.3.2"
 Comp ""
 Comment1 "Erstellt: von: Thorsten Kattanek"
 Comment2 ""
@@ -93,9 +93,7 @@ EN
 Text HLabel 4950 4150 3    60   Input ~ 0
 RS
 Wire Wire Line
-	5250 2450 5250 2550
-Wire Wire Line
-	5250 2550 5250 3400
+	5250 2450 5250 3400
 Wire Wire Line
 	5150 2900 5150 3400
 Wire Wire Line
@@ -138,9 +136,7 @@ F 3 "" H 5250 4750 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	5250 3900 5250 4550
-Wire Wire Line
-	5250 4550 5250 4750
+	5250 3900 5250 4750
 $Comp
 L POT-RESCUE-1541-rebuild RV1
 U 1 1 5AEE481D

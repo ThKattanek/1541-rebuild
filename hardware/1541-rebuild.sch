@@ -48,8 +48,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 4
 Title "1541-rebuid"
-Date "2018-05-05"
-Rev "1.3.1"
+Date "2018-05-06"
+Rev "1.3.2"
 Comp ""
 Comment1 "Erstellt: von: Thorsten Kattanek"
 Comment2 ""
@@ -253,39 +253,6 @@ F16 "MTR" I R 7700 4300 60
 F17 "WPS" I L 6600 4600 60 
 F18 "~RESET" I R 7700 4900 60 
 $EndSheet
-$Comp
-L SW_PUSH-RESCUE-1541-rebuild SW2
-U 1 1 55FEAE1B
-P 9450 2850
-F 0 "SW2" H 9600 2960 50  0000 C CNN
-F 1 "SW_PUSH" H 9450 2770 50  0000 C CNN
-F 2 "Buttons_Switches_THT:SW_PUSH-12mm" H 9450 2850 60  0001 C CNN
-F 3 "" H 9450 2850 60  0000 C CNN
-	1    9450 2850
-	1    0    0    -1  
-$EndComp
-$Comp
-L SW_PUSH-RESCUE-1541-rebuild SW3
-U 1 1 55FEAF42
-P 9450 3150
-F 0 "SW3" H 9600 3260 50  0000 C CNN
-F 1 "SW_PUSH" H 9450 3070 50  0000 C CNN
-F 2 "Buttons_Switches_THT:SW_PUSH-12mm" H 9450 3150 60  0001 C CNN
-F 3 "" H 9450 3150 60  0000 C CNN
-	1    9450 3150
-	1    0    0    -1  
-$EndComp
-$Comp
-L SW_PUSH-RESCUE-1541-rebuild SW4
-U 1 1 55FECA06
-P 9450 3450
-F 0 "SW4" H 9600 3560 50  0000 C CNN
-F 1 "SW_PUSH" H 9450 3370 50  0000 C CNN
-F 2 "Buttons_Switches_THT:SW_PUSH-12mm" H 9450 3450 60  0001 C CNN
-F 3 "" H 9450 3450 60  0000 C CNN
-	1    9450 3450
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	3400 2900 4100 2900
 Wire Wire Line
@@ -423,30 +390,17 @@ Wire Wire Line
 Wire Wire Line
 	8750 3500 8500 3500
 Wire Wire Line
-	9750 2850 9850 2850
-Wire Wire Line
-	9850 2850 9850 3450
-Wire Wire Line
-	9750 3150 9950 3150
-Connection ~ 9850 3150
-Wire Wire Line
 	6100 3000 6200 3000
 Wire Wire Line
 	6200 3000 6200 2850
 Wire Wire Line
-	6200 2850 9150 2850
+	6200 2850 10000 2850
 Wire Wire Line
 	6100 3100 6300 3100
 Wire Wire Line
 	6300 3100 6300 2950
 Wire Wire Line
-	6300 2950 9050 2950
-Wire Wire Line
-	9050 2950 9050 3150
-Wire Wire Line
-	9050 3150 9150 3150
-Wire Wire Line
-	9850 3450 9750 3450
+	6300 2950 10000 2950
 Wire Wire Line
 	6100 4200 6500 4200
 Wire Wire Line
@@ -454,9 +408,9 @@ Wire Wire Line
 Wire Wire Line
 	6500 3900 9050 3900
 Wire Wire Line
-	9050 3900 9050 3450
+	9050 3900 9050 3050
 Wire Wire Line
-	9050 3450 9150 3450
+	9050 3050 10000 3050
 Wire Wire Line
 	6100 4300 6250 4300
 Wire Wire Line
@@ -473,17 +427,6 @@ Wire Wire Line
 	7850 4600 7700 4600
 Wire Wire Line
 	6200 4400 6100 4400
-$Comp
-L GND #PWR11
-U 1 1 57D3E94E
-P 9950 3150
-F 0 "#PWR11" H 9950 2900 50  0001 C CNN
-F 1 "GND" H 9950 3000 50  0000 C CNN
-F 2 "" H 9950 3150 60  0000 C CNN
-F 3 "" H 9950 3150 60  0000 C CNN
-	1    9950 3150
-	0    -1   -1   0   
-$EndComp
 $Comp
 L CONN_02X03 P1
 U 1 1 5840690C
@@ -508,7 +451,7 @@ Connection ~ 7200 3700
 Wire Wire Line
 	4050 2100 4050 1000
 Wire Wire Line
-	3950 1000 10300 1000
+	3950 1000 10650 1000
 Wire Wire Line
 	7400 1000 7400 1700
 Wire Wire Line
@@ -557,10 +500,8 @@ Wire Wire Line
 	6150 4600 6150 6050
 Wire Wire Line
 	6150 4600 6100 4600
-Text Notes 6450 5850 0    60   ~ 0
-Debug LED (Optional)
 Wire Wire Line
-	10300 1000 10300 4900
+	10650 1000 10650 4900
 Connection ~ 7400 1000
 $Comp
 L Jumper JP1
@@ -574,7 +515,7 @@ F 3 "" H 9450 4900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	10300 4900 9750 4900
+	10650 4900 9750 4900
 Wire Wire Line
 	9150 4900 7700 4900
 Text Notes 9000 5150 0    60   ~ 0
@@ -615,4 +556,30 @@ F 3 "" H 6150 6250 50  0001 C CNN
 	1    6150 6250
 	0    1    1    0   
 $EndComp
+$Comp
+L Conn_01x04 J?
+U 1 1 5AEE499C
+P 10200 2950
+F 0 "J?" H 10200 3150 50  0000 C CNN
+F 1 "KEYS" H 10200 2650 50  0000 C CNN
+F 2 "" H 10200 2950 50  0001 C CNN
+F 3 "" H 10200 2950 50  0001 C CNN
+	1    10200 2950
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 5AEE4F44
+P 9850 3150
+F 0 "#PWR?" H 9850 2900 50  0001 C CNN
+F 1 "GND" H 9850 3000 50  0000 C CNN
+F 2 "" H 9850 3150 60  0000 C CNN
+F 3 "" H 9850 3150 60  0000 C CNN
+	1    9850 3150
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	9850 3150 10000 3150
+Text Notes 9400 3950 0    60   ~ 0
+Pinbelegung für KEYS\n\nPIN1: Taster1\nPIN2: Taster2\nPIN3: Taster3\nPIN4: GND (gemeinsam)
 $EndSCHEMATC
