@@ -45,7 +45,7 @@
 // Zeit die nach der letzten Stepperaktivität vergehen muss, um einen neuen Track von SD Karte zu laden
 // (1541 Original Rom schaltet STP1 alle 15ms)
 // Default 15
-#define STEPPER_DELAY_TIME 15
+#define STEPPER_DELAY_TIME 5
 
 // DEBUG LED (Optional / vorrerst)
 #define DBG_LED_DDR DDRC

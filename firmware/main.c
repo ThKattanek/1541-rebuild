@@ -172,14 +172,16 @@ int main(void)
 	}
         else if(stepper_signal && (stepper_signal_time >= STEPPER_DELAY_TIME))
 	{
-		stepper_signal = 0;
-		// Geschwindigkeit setzen
-		OCR0A = timer0_orca0[d64_track_zone[akt_half_track>>1]];
-		akt_track_pos = 0;
+                stepper_signal = 0;
 
-                stop_timer0();
 		if(!(akt_half_track & 0x01))
                 {
+                    stop_timer0();
+
+                    // Geschwindigkeit setzen
+                    OCR0A = timer0_orca0[d64_track_zone[akt_half_track>>1]];
+                    akt_track_pos = 0;
+
                     if(track_is_written == 1)
                     {
                         no_byte_ready_send = 1;
@@ -197,8 +199,8 @@ int main(void)
                         read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
                         old_half_track = akt_half_track;    // Merken um evtl. dort zurück zu schreiben
                     }
+                    start_timer0();
                 }
-                start_timer0();
 	}
 
 #ifdef DEBUG_MODE
@@ -295,7 +297,7 @@ int main(void)
 	    wait_key_counter2 = PRELL_TIME;
 
 	    stop_timer0();
-            DATA_PORT = 0x00;
+            no_byte_ready_send = 1;
 
             // Sollte der aktuelle Track noch veränderungen haben so wird hier erstmal gesichert.
             /*
@@ -307,8 +309,8 @@ int main(void)
                 no_byte_ready_send = 0;
             }
             */
-
 	    close_disk_image(fd);
+
 	    fd = open_disk_image(fs, &file_entry, &akt_image_type);
 	    if(!fd)
 	    {
@@ -317,13 +319,12 @@ int main(void)
 	    }
 
 	    read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
-
-	    stp_signals_old = STP_PIN >> 6;
-            //akt_half_track = INIT_TRACK << 1;
 	    akt_track_pos = 0;
 
+            no_byte_ready_send = 0;
 	    start_timer0();
-	    send_disk_change();
+
+            send_disk_change();
 	}
     }
 }
@@ -853,13 +854,21 @@ void send_disk_change(void)
     if(floppy_wp == 0)
     {
         clear_wps();
-        _delay_ms(3);
+        _delay_ms(1);
+        set_wps();
+        _delay_ms(1);
+        clear_wps();
+        _delay_ms(1);
         set_wps();
     }
     else
     {
         set_wps();
-        _delay_ms(3);
+        _delay_ms(1);
+        clear_wps();
+        _delay_ms(1);
+        set_wps();
+        _delay_ms(1);
         clear_wps();
     }
 }
