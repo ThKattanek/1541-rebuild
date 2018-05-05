@@ -1,2 +1,4 @@
 *.bak
 *pcb-bak
+*.user
+.directory
