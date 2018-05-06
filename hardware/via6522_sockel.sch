@@ -73,7 +73,7 @@ U 1 1 55F9DAC3
 P 8700 3850
 F 0 "P3" H 8700 4900 50  0000 C CNN
 F 1 "VIA_PIN_21-40" V 8800 3850 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x20" H 8700 3850 60  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x20_Pitch2.54mm" H 8700 3850 60  0001 C CNN
 F 3 "" H 8700 3850 60  0000 C CNN
 	1    8700 3850
 	1    0    0    1   
@@ -84,7 +84,7 @@ U 1 1 55F9DB72
 P 3100 3850
 F 0 "P1" H 3100 4900 50  0000 C CNN
 F 1 "VIA_PIN_1-20" V 3200 3850 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x20" H 3100 3850 60  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x20_Pitch2.54mm" H 3100 3850 60  0001 C CNN
 F 3 "" H 3100 3850 60  0000 C CNN
 	1    3100 3850
 	-1   0    0    -1  

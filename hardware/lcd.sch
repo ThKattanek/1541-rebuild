@@ -62,7 +62,7 @@ U 1 1 5AEE2FA0
 P 5050 3600
 F 0 "J6" H 5100 3900 50  0000 C CNN
 F 1 "LCD Display" H 5100 3300 50  0000 C CNN
-F 2 "" H 5050 3600 50  0001 C CNN
+F 2 "w_conn_strip:vasch_strip_5x2" H 5050 3600 50  0001 C CNN
 F 3 "" H 5050 3600 50  0001 C CNN
 	1    5050 3600
 	0    1    1    0   
@@ -112,7 +112,7 @@ U 1 1 5AEE40E3
 P 4850 3100
 F 0 "R10" V 4930 3100 50  0000 C CNN
 F 1 "150" V 4850 3100 50  0000 C CNN
-F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 4780 3100 30  0001 C CNN
+F 2 "Discret:R4-5" V 4780 3100 30  0001 C CNN
 F 3 "" H 4850 3100 30  0000 C CNN
 	1    4850 3100
 	-1   0    0    1   
@@ -143,7 +143,7 @@ U 1 1 5AEE481D
 P 4850 4550
 F 0 "RV1" H 4850 4450 50  0000 C CNN
 F 1 "10k" H 4850 4550 50  0000 C CNN
-F 2 "Potentiometers:Potentiometer_Bourns_3339P_Angular_ScrewUp" H 4850 4550 60  0001 C CNN
+F 2 "w_pth_resistors:trimmer_vishay_64w" H 4850 4550 60  0001 C CNN
 F 3 "" H 4850 4550 60  0000 C CNN
 	1    4850 4550
 	1    0    0    -1  
