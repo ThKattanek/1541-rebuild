@@ -41,6 +41,7 @@ LIBS:w_relay
 LIBS:w_rtx
 LIBS:w_transistor
 LIBS:w_vacuum
+LIBS:kattanek
 LIBS:1541-rebuild-cache
 EELAYER 25 0
 EELAYER END
@@ -51,7 +52,7 @@ Title "1541-rebuid"
 Date "2018-05-06"
 Rev "1.3.3"
 Comp ""
-Comment1 "Erstellt: von: Thorsten Kattanek"
+Comment1 "Erstellt von: Thorsten Kattanek"
 Comment2 ""
 Comment3 ""
 Comment4 ""

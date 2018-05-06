@@ -11,58 +11,62 @@
     (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 1810)
+    (start_pass_no 2203)
     (layer_rule F.Cu
-      (active on)
-      (preferred_direction horizontal)
-      (preferred_direction_trace_costs 1.0)
-      (against_preferred_direction_trace_costs 2.1)
-    )
-    (layer_rule B.Cu
       (active on)
       (preferred_direction vertical)
       (preferred_direction_trace_costs 1.0)
-      (against_preferred_direction_trace_costs 1.9)
+      (against_preferred_direction_trace_costs 2.3)
+    )
+    (layer_rule B.Cu
+      (active on)
+      (preferred_direction horizontal)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 1.8)
     )
   )
   (rule
-    (width 250.0)
+    (width 300.0)
     (clear 200.2)
-    (clear 125.0 (type smd_to_turn_gap))
+    (clear 150.0 (type smd_to_turn_gap))
+    (clear 300.2 (type default_Power5V))
     (clear 50.0 (type smd_smd))
+    (clear 300.2 (type smd_Power5V))
+    (clear 300.2 (type "kicad_default"_Power5V))
+    (clear 300.2 (type Power5V_Power5V))
   )
-  (padstack "Via[0-1]_800:400_um"
+  (padstack "Via[0-1]_600:400_um"
     (shape
-      (circle F.Cu 800.0 0.0 0.0)
+      (circle F.Cu 600.0 0.0 0.0)
     )
     (shape
-      (circle B.Cu 800.0 0.0 0.0)
+      (circle B.Cu 600.0 0.0 0.0)
     )
     (attach off)
   )
   (via 
-    "Via[0-1]_800:400_um" "Via[0-1]_800:400_um" default
+    "Via[0-1]_600:400_um" "Via[0-1]_600:400_um" default
   )
   (via 
-    "Via[0-1]_800:400_um-kicad_default" "Via[0-1]_800:400_um" "kicad_default"
+    "Via[0-1]_600:400_um-kicad_default" "Via[0-1]_600:400_um" "kicad_default"
   )
   (via 
-    "Via[0-1]_800:400_um-power" "Via[0-1]_800:400_um" power
+    "Via[0-1]_600:400_um-Power5V" "Via[0-1]_600:400_um" Power5V
   )
   (via_rule
-    default "Via[0-1]_800:400_um"
+    default "Via[0-1]_600:400_um"
   )
   (via_rule
-    "kicad_default" "Via[0-1]_800:400_um-kicad_default"
+    "kicad_default" "Via[0-1]_600:400_um-kicad_default"
   )
   (via_rule
-    power "Via[0-1]_800:400_um-power"
+    Power5V "Via[0-1]_600:400_um-Power5V"
   )
   (class default
     (clearance_class default)
     (via_rule default)
     (rule
-      (width 250.0)
+      (width 300.0)
     )
     (circuit 
       (use_layer F.Cu B.Cu)
@@ -70,29 +74,29 @@
   )
   (class "kicad_default"
     "Net-(CON1-Pad9)" "Net-(CON1-Pad1)" "Net-(CON1-Pad2)" "Net-(CON1-Pad4)" "Net-(CON1-Pad5)" "/SD Karte/MISO" "Net-(CON1-Pad8)" "Net-(D1-Pad2)"
-    "Net-(DS1-Pad3)" "/LCD Display/RS" "/LCD Display/EN" "Net-(DS1-Pad7)" "Net-(DS1-Pad8)" "Net-(DS1-Pad9)" "Net-(DS1-Pad10)" "/LCD Display/D0"
-    "/LCD Display/D1" "/LCD Display/D2" "/LCD Display/D3" "Net-(DS1-Pad15)" "Net-(IC1-Pad1)" "Net-(IC1-Pad2)" "/SD Karte/SS" "/SD Karte/MOSI"
-    "/SD Karte/SCK" "Net-(IC1-Pad9)" "Net-(IC1-Pad12)" "Net-(IC1-Pad13)" "/VIA 6522 Sockel/PA0" "/VIA 6522 Sockel/PA1" "/VIA 6522 Sockel/PA2" "/VIA 6522 Sockel/PA3"
-    "/VIA 6522 Sockel/PA4" "/VIA 6522 Sockel/PA5" "/VIA 6522 Sockel/PA6" "/VIA 6522 Sockel/PA7" "/VIA 6522 Sockel/BRDY" "/VIA 6522 Sockel/SYNC" "/VIA 6522 Sockel/MTR" "Net-(IC1-Pad25)"
-    "/VIA 6522 Sockel/WPS" "/VIA 6522 Sockel/OE" "/VIA 6522 Sockel/SOE" "Net-(IC1-Pad29)" "Net-(IC1-Pad32)" "/VIA 6522 Sockel/SPT0" "/VIA 6522 Sockel/STP1" "/VIA 6522 Sockel/ACT"
-    "/VIA 6522 Sockel/DS0" "/VIA 6522 Sockel/DS1" "/VIA 6522 Sockel/NC" "Net-(P3-Pad21)" "Net-(P3-Pad22)" "Net-(P3-Pad23)" "Net-(P3-Pad24)" "Net-(P3-Pad25)"
-    "Net-(P3-Pad26)" "Net-(P3-Pad27)" "Net-(P3-Pad28)" "Net-(P3-Pad29)" "Net-(P3-Pad30)" "Net-(P3-Pad31)" "Net-(P3-Pad32)" "Net-(P3-Pad33)"
-    "Net-(P3-Pad34)" "Net-(P3-Pad35)" "Net-(P3-Pad36)" "Net-(P3-Pad37)" "Net-(P3-Pad38)" "Net-(X1-Pad1)"
+    "Net-(IC1-Pad1)" "Net-(IC1-Pad2)" "/SD Karte/SD_DETECT" "/SD Karte/SD_WP" "/SD Karte/SS" "/SD Karte/MOSI" "/SD Karte/SCK" "Net-(IC1-Pad9)"
+    "Net-(IC1-Pad12)" "Net-(IC1-Pad13)" "/VIA 6522 Sockel/PA0" "/VIA 6522 Sockel/PA1" "/VIA 6522 Sockel/PA2" "/VIA 6522 Sockel/PA3" "/VIA 6522 Sockel/PA4" "/VIA 6522 Sockel/PA5"
+    "/VIA 6522 Sockel/PA6" "/VIA 6522 Sockel/PA7" "/VIA 6522 Sockel/BRDY" "/VIA 6522 Sockel/SYNC" "/VIA 6522 Sockel/MTR" "Net-(IC1-Pad25)" "/VIA 6522 Sockel/WPS" "/VIA 6522 Sockel/OE"
+    "/VIA 6522 Sockel/SOE" "Net-(IC1-Pad29)" "Net-(IC1-Pad32)" "/VIA 6522 Sockel/SPT0" "/VIA 6522 Sockel/STP1" "/LCD Display/EN" "/LCD Display/RS" "/LCD Display/D3"
+    "/LCD Display/D2" "/LCD Display/D1" "/LCD Display/D0" "/VIA 6522 Sockel/~RESET" "Net-(J6-Pad9)" "Net-(J6-Pad10)" "/VIA 6522 Sockel/ACT" "/VIA 6522 Sockel/DS0"
+    "/VIA 6522 Sockel/DS1" "/VIA 6522 Sockel/NC" "Net-(P2-Pad21)" "Net-(P2-Pad22)" "Net-(P2-Pad23)" "Net-(P2-Pad24)" "Net-(P2-Pad25)" "Net-(P2-Pad26)"
+    "Net-(P2-Pad27)" "Net-(P2-Pad28)" "Net-(P2-Pad29)" "Net-(P2-Pad30)" "Net-(P2-Pad31)" "Net-(P2-Pad32)" "Net-(P2-Pad33)" "Net-(P2-Pad35)"
+    "Net-(P2-Pad36)" "Net-(P2-Pad37)" "Net-(P2-Pad38)" "Net-(X1-Pad1)"
     (clearance_class "kicad_default")
     (via_rule kicad_default)
     (rule
-      (width 250.0)
+      (width 300.0)
     )
     (circuit 
       (use_layer F.Cu B.Cu)
     )
   )
-  (class power
+  (class Power5V
     +5V GND
-    (clearance_class power)
-    (via_rule power)
+    (clearance_class Power5V)
+    (via_rule Power5V)
     (rule
-      (width 500.0)
+      (width 600.0)
     )
     (circuit 
       (use_layer F.Cu B.Cu)

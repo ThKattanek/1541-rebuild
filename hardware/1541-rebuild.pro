@@ -1,4 +1,4 @@
-update=So 06 Mai 2018 08:23:43 CEST
+update=So 06 Mai 2018 15:43:00 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -25,9 +25,19 @@ version=1
 NetIExt=net
 [general]
 version=1
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
 [eeschema]
 version=1
-LibDir=/home/thorsten/Elektronik/KiCad Libs_Walter
+LibDir=/home/thorsten/Elektronik/KiCad Libs_Walter;/home/thorsten/Elektronik/KiCAD_librarys
 [eeschema/libraries]
 LibName1=1541-rebuild-rescue
 LibName2=power
@@ -71,13 +81,4 @@ LibName39=w_relay
 LibName40=w_rtx
 LibName41=w_transistor
 LibName42=w_vacuum
-[schematic_editor]
-version=1
-PageLayoutDescrFile=
-PlotDirectoryName=
-SubpartIdSeparator=0
-SubpartFirstId=65
-NetFmtName=
-SpiceForceRefPrefix=0
-SpiceUseNetNumbers=0
-LabSize=60
+LibName43=kattanek

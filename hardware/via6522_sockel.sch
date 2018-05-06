@@ -41,6 +41,7 @@ LIBS:w_relay
 LIBS:w_rtx
 LIBS:w_transistor
 LIBS:w_vacuum
+LIBS:kattanek
 LIBS:1541-rebuild-cache
 EELAYER 25 0
 EELAYER END
@@ -51,7 +52,7 @@ Title "1541-rebuid"
 Date "2018-05-06"
 Rev "1.3.3"
 Comp ""
-Comment1 "Erstellt: von: Thorsten Kattanek"
+Comment1 "Erstellt von: Thorsten Kattanek"
 Comment2 ""
 Comment3 ""
 Comment4 ""
@@ -61,7 +62,7 @@ L DIL40 P2
 U 1 1 55F9CFCC
 P 6400 3850
 F 0 "P2" H 6400 4900 70  0000 C CNN
-F 1 "DIL40" V 6400 3850 60  0000 C CNN
+F 1 "VIA-6522" V 6400 3850 60  0000 C CNN
 F 2 "w_pth_circuits:dil_40-600_socket" H 6400 3850 60  0001 C CNN
 F 3 "" H 6400 3850 60  0000 C CNN
 	1    6400 3850
