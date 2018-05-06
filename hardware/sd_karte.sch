@@ -49,7 +49,7 @@ encoding utf-8
 Sheet 2 4
 Title "1541-rebuid"
 Date "2018-05-06"
-Rev "1.3.2"
+Rev "1.3.3"
 Comp ""
 Comment1 "Erstellt: von: Thorsten Kattanek"
 Comment2 ""
@@ -68,10 +68,10 @@ F 3 "" H 5700 3450 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR14
+L GND #PWR16
 U 1 1 55F7A326
 P 4700 3900
-F 0 "#PWR14" H 4700 3650 50  0001 C CNN
+F 0 "#PWR16" H 4700 3650 50  0001 C CNN
 F 1 "GND" H 4700 3750 50  0000 C CNN
 F 2 "" H 4700 3900 60  0000 C CNN
 F 3 "" H 4700 3900 60  0000 C CNN
@@ -101,10 +101,10 @@ F 3 "" H 4450 4450 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L +5V #PWR13
+L +5V #PWR17
 U 1 1 55F7A887
 P 4450 4700
-F 0 "#PWR13" H 4450 4550 50  0001 C CNN
+F 0 "#PWR17" H 4450 4550 50  0001 C CNN
 F 1 "+5V" H 4450 4840 50  0000 C CNN
 F 2 "" H 4450 4700 60  0000 C CNN
 F 3 "" H 4450 4700 60  0000 C CNN
@@ -124,10 +124,10 @@ Text HLabel 3250 3150 0    60   Input ~ 0
 SS
 NoConn ~ 4800 3050
 $Comp
-L R R2
+L R R7
 U 1 1 55F7B36C
 P 3700 3150
-F 0 "R2" V 3780 3150 50  0000 C CNN
+F 0 "R7" V 3780 3150 50  0000 C CNN
 F 1 "1,8k" V 3700 3150 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 3630 3150 30  0001 C CNN
 F 3 "" H 3700 3150 30  0000 C CNN
@@ -135,10 +135,10 @@ F 3 "" H 3700 3150 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R5
+L R R8
 U 1 1 55F7B401
 P 3900 3250
-F 0 "R5" V 3980 3250 50  0000 C CNN
+F 0 "R8" V 3980 3250 50  0000 C CNN
 F 1 "1,8k" V 3900 3250 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 3830 3250 30  0001 C CNN
 F 3 "" H 3900 3250 30  0000 C CNN
@@ -146,10 +146,10 @@ F 3 "" H 3900 3250 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R3
+L R R9
 U 1 1 55F7B48C
 P 3700 3550
-F 0 "R3" V 3780 3550 50  0000 C CNN
+F 0 "R9" V 3780 3550 50  0000 C CNN
 F 1 "1,8k" V 3700 3550 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 3630 3550 30  0001 C CNN
 F 3 "" H 3700 3550 30  0000 C CNN
@@ -157,10 +157,10 @@ F 3 "" H 3700 3550 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R4
+L R R2
 U 1 1 55F7BA6C
 P 3900 2900
-F 0 "R4" V 3980 2900 50  0000 C CNN
+F 0 "R2" V 3980 2900 50  0000 C CNN
 F 1 "3,3k" V 3900 2900 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 3830 2900 30  0001 C CNN
 F 3 "" H 3900 2900 30  0000 C CNN
@@ -168,10 +168,10 @@ F 3 "" H 3900 2900 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R6
+L R R3
 U 1 1 55F7BC20
 P 4100 2900
-F 0 "R6" V 4180 2900 50  0000 C CNN
+F 0 "R3" V 4180 2900 50  0000 C CNN
 F 1 "3,3k" V 4100 2900 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 4030 2900 30  0001 C CNN
 F 3 "" H 4100 2900 30  0000 C CNN
@@ -179,10 +179,10 @@ F 3 "" H 4100 2900 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R7
+L R R4
 U 1 1 55F7BCCD
 P 4300 2900
-F 0 "R7" V 4380 2900 50  0000 C CNN
+F 0 "R4" V 4380 2900 50  0000 C CNN
 F 1 "3,3k" V 4300 2900 50  0000 C CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM10mm" V 4230 2900 30  0001 C CNN
 F 3 "" H 4300 2900 30  0000 C CNN
@@ -190,10 +190,10 @@ F 3 "" H 4300 2900 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR12
+L GND #PWR14
 U 1 1 55F7BE30
 P 4100 2500
-F 0 "#PWR12" H 4100 2250 50  0001 C CNN
+F 0 "#PWR14" H 4100 2250 50  0001 C CNN
 F 1 "GND" H 4100 2350 50  0000 C CNN
 F 2 "" H 4100 2500 60  0000 C CNN
 F 3 "" H 4100 2500 60  0000 C CNN
@@ -248,10 +248,10 @@ Wire Wire Line
 	4800 3650 4700 3650
 Connection ~ 4700 3650
 $Comp
-L R R8
+L R R5
 U 1 1 5ADB73A5
 P 6750 2950
-F 0 "R8" V 6830 2950 50  0000 C CNN
+F 0 "R5" V 6830 2950 50  0000 C CNN
 F 1 "47k" V 6750 2950 50  0000 C CNN
 F 2 "" V 6680 2950 50  0001 C CNN
 F 3 "" H 6750 2950 50  0001 C CNN
@@ -259,10 +259,10 @@ F 3 "" H 6750 2950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R9
+L R R6
 U 1 1 5ADB753C
 P 7000 2950
-F 0 "R9" V 7080 2950 50  0000 C CNN
+F 0 "R6" V 7080 2950 50  0000 C CNN
 F 1 "47kR" V 7000 2950 50  0000 C CNN
 F 2 "" V 6930 2950 50  0001 C CNN
 F 3 "" H 7000 2950 50  0001 C CNN
@@ -301,6 +301,6 @@ Connection ~ 6750 3250
 Wire Wire Line
 	7000 3100 7000 3350
 Connection ~ 7000 3350
-Text Notes 7300 3050 0    60   ~ 0
-SD_DETECT ist LO wenn eine Karte eingestekt ist\nSD_WP ist LO wenn Schreibschutz aktiv\n(SD_WB muss HI sein damit man schreiben kann)
+Text Notes 650  7650 0    60   ~ 0
+SD_DETECT ist LO wenn eine Karte eingestekt ist\nSD_WP ist LO wenn Schreibschutz aktiv\n(SD_WP muss HI sein damit man schreiben kann)
 $EndSCHEMATC
