@@ -1,6 +1,7 @@
 EESchema Schematic File Version 2
-LIBS:1541-rebuild-rescue
 LIBS:power
+LIBS:ka_library
+LIBS:1541-rebuild-rescue
 LIBS:device
 LIBS:transistors
 LIBS:conn
@@ -41,7 +42,6 @@ LIBS:w_relay
 LIBS:w_rtx
 LIBS:w_transistor
 LIBS:w_vacuum
-LIBS:kattanek
 LIBS:1541-rebuild-cache
 EELAYER 25 0
 EELAYER END
@@ -49,8 +49,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 3 4
 Title "1541-rebuid"
-Date "2018-05-06"
-Rev "1.3.3"
+Date "2018-05-08"
+Rev "1.3.4"
 Comp ""
 Comment1 "Erstellt von: Thorsten Kattanek"
 Comment2 ""
@@ -71,10 +71,10 @@ $EndComp
 Text Notes 5950 4100 0    60   ~ 0
 Steckerbelegung für das LCD Display (20x4)\n\nPIN_01: VDD(2) ... +5V\nPIN_02: VSS(1), R/W(5), LED-/K(16) ... GND\nPIN_03: D4(11)\nPIN_04: D5(12)\nPIN_05: D6(13)\nPIN_06: D7(14)\nPIN_07: E(6)\nPIN_08: RS(4)\nPIN_09: LED+/A(15)\nPIN_10: VO(3)\n
 $Comp
-L +5V #PWR018
+L +5V #PWR020
 U 1 1 5AEE3573
 P 5250 2450
-F 0 "#PWR018" H 5250 2300 50  0001 C CNN
+F 0 "#PWR020" H 5250 2300 50  0001 C CNN
 F 1 "+5V" H 5250 2590 50  0000 C CNN
 F 2 "" H 5250 2450 60  0000 C CNN
 F 3 "" H 5250 2450 60  0000 C CNN
@@ -125,17 +125,6 @@ Wire Wire Line
 Connection ~ 5250 2550
 Wire Wire Line
 	4850 3250 4850 3400
-$Comp
-L GND #PWR019
-U 1 1 5AEE45C6
-P 5250 4750
-F 0 "#PWR019" H 5250 4500 50  0001 C CNN
-F 1 "GND" H 5250 4600 50  0000 C CNN
-F 2 "" H 5250 4750 60  0000 C CNN
-F 3 "" H 5250 4750 60  0000 C CNN
-	1    5250 4750
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	5250 3900 5250 4750
 $Comp
@@ -155,10 +144,10 @@ Connection ~ 5250 4550
 Wire Wire Line
 	4850 3900 4850 4400
 $Comp
-L +5V #PWR020
+L +5V #PWR021
 U 1 1 5AEE4960
 P 4350 4550
-F 0 "#PWR020" H 4350 4400 50  0001 C CNN
+F 0 "#PWR021" H 4350 4400 50  0001 C CNN
 F 1 "+5V" H 4350 4690 50  0000 C CNN
 F 2 "" H 4350 4550 60  0000 C CNN
 F 3 "" H 4350 4550 60  0000 C CNN
@@ -169,4 +158,15 @@ Wire Wire Line
 	4350 4550 4600 4550
 Text Notes 650  7600 0    60   ~ 0
 R10 hängt von der Hintergrundbeleuchtung des LCD Displays ab !
+$Comp
+L GND #PWR022
+U 1 1 5AF0CC1F
+P 5250 4750
+F 0 "#PWR022" H 5250 4500 50  0001 C CNN
+F 1 "GND" H 5250 4600 50  0000 C CNN
+F 2 "" H 5250 4750 50  0001 C CNN
+F 3 "" H 5250 4750 50  0001 C CNN
+	1    5250 4750
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

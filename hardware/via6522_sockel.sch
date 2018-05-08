@@ -1,6 +1,7 @@
 EESchema Schematic File Version 2
-LIBS:1541-rebuild-rescue
 LIBS:power
+LIBS:ka_library
+LIBS:1541-rebuild-rescue
 LIBS:device
 LIBS:transistors
 LIBS:conn
@@ -41,7 +42,6 @@ LIBS:w_relay
 LIBS:w_rtx
 LIBS:w_transistor
 LIBS:w_vacuum
-LIBS:kattanek
 LIBS:1541-rebuild-cache
 EELAYER 25 0
 EELAYER END
@@ -49,8 +49,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 4 4
 Title "1541-rebuid"
-Date "2018-05-06"
-Rev "1.3.3"
+Date "2018-05-08"
+Rev "1.3.4"
 Comp ""
 Comment1 "Erstellt von: Thorsten Kattanek"
 Comment2 ""
@@ -151,21 +151,10 @@ BRDY
 Text HLabel 7100 2600 1    60   Input ~ 0
 BRDY
 $Comp
-L GND #PWR021
-U 1 1 55F9667E
-P 6000 2650
-F 0 "#PWR021" H 6000 2400 50  0001 C CNN
-F 1 "GND" H 6000 2500 50  0000 C CNN
-F 2 "" H 6000 2650 60  0000 C CNN
-F 3 "" H 6000 2650 60  0000 C CNN
-	1    6000 2650
-	-1   0    0    1   
-$EndComp
-$Comp
-L +5V #PWR022
+L +5V #PWR023
 U 1 1 55F96755
 P 6000 5000
-F 0 "#PWR022" H 6000 4850 50  0001 C CNN
+F 0 "#PWR023" H 6000 4850 50  0001 C CNN
 F 1 "+5V" H 6000 5140 50  0000 C CNN
 F 2 "" H 6000 5000 60  0000 C CNN
 F 3 "" H 6000 5000 60  0000 C CNN
@@ -329,4 +318,15 @@ Text Label 6800 3000 0    60   ~ 0
 SOE
 Text Label 6800 3500 0    60   ~ 0
 ~RESET
+$Comp
+L GND #PWR024
+U 1 1 5AF0D624
+P 6000 2650
+F 0 "#PWR024" H 6000 2400 50  0001 C CNN
+F 1 "GND" H 6000 2500 50  0000 C CNN
+F 2 "" H 6000 2650 50  0001 C CNN
+F 3 "" H 6000 2650 50  0001 C CNN
+	1    6000 2650
+	-1   0    0    1   
+$EndComp
 $EndSCHEMATC

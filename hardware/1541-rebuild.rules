@@ -11,7 +11,7 @@
     (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 2203)
+    (start_pass_no 3088)
     (layer_rule F.Cu
       (active on)
       (preferred_direction vertical)
@@ -73,15 +73,15 @@
     )
   )
   (class "kicad_default"
-    "Net-(CON1-Pad9)" "Net-(CON1-Pad1)" "Net-(CON1-Pad2)" "Net-(CON1-Pad4)" "Net-(CON1-Pad5)" "/SD Karte/MISO" "Net-(CON1-Pad8)" "Net-(D1-Pad2)"
-    "Net-(IC1-Pad1)" "Net-(IC1-Pad2)" "/SD Karte/SD_DETECT" "/SD Karte/SD_WP" "/SD Karte/SS" "/SD Karte/MOSI" "/SD Karte/SCK" "Net-(IC1-Pad9)"
-    "Net-(IC1-Pad12)" "Net-(IC1-Pad13)" "/VIA 6522 Sockel/PA0" "/VIA 6522 Sockel/PA1" "/VIA 6522 Sockel/PA2" "/VIA 6522 Sockel/PA3" "/VIA 6522 Sockel/PA4" "/VIA 6522 Sockel/PA5"
-    "/VIA 6522 Sockel/PA6" "/VIA 6522 Sockel/PA7" "/VIA 6522 Sockel/BRDY" "/VIA 6522 Sockel/SYNC" "/VIA 6522 Sockel/MTR" "Net-(IC1-Pad25)" "/VIA 6522 Sockel/WPS" "/VIA 6522 Sockel/OE"
-    "/VIA 6522 Sockel/SOE" "Net-(IC1-Pad29)" "Net-(IC1-Pad32)" "/VIA 6522 Sockel/SPT0" "/VIA 6522 Sockel/STP1" "/LCD Display/EN" "/LCD Display/RS" "/LCD Display/D3"
-    "/LCD Display/D2" "/LCD Display/D1" "/LCD Display/D0" "/VIA 6522 Sockel/~RESET" "Net-(J6-Pad9)" "Net-(J6-Pad10)" "/VIA 6522 Sockel/ACT" "/VIA 6522 Sockel/DS0"
-    "/VIA 6522 Sockel/DS1" "/VIA 6522 Sockel/NC" "Net-(P2-Pad21)" "Net-(P2-Pad22)" "Net-(P2-Pad23)" "Net-(P2-Pad24)" "Net-(P2-Pad25)" "Net-(P2-Pad26)"
-    "Net-(P2-Pad27)" "Net-(P2-Pad28)" "Net-(P2-Pad29)" "Net-(P2-Pad30)" "Net-(P2-Pad31)" "Net-(P2-Pad32)" "Net-(P2-Pad33)" "Net-(P2-Pad35)"
-    "Net-(P2-Pad36)" "Net-(P2-Pad37)" "Net-(P2-Pad38)" "Net-(X1-Pad1)"
+    "/SD Karte/MISO" "Net-(D1-Pad2)" "Net-(IC1-Pad1)" "Net-(IC1-Pad2)" "/SD Karte/SD_DETECT" "/SD Karte/SD_WP" "/SD Karte/SS" "/SD Karte/MOSI"
+    "/SD Karte/SCK" "Net-(IC1-Pad9)" "Net-(IC1-Pad12)" "Net-(IC1-Pad13)" "/VIA 6522 Sockel/PA0" "/VIA 6522 Sockel/PA1" "/VIA 6522 Sockel/PA2" "/VIA 6522 Sockel/PA3"
+    "/VIA 6522 Sockel/PA4" "/VIA 6522 Sockel/PA5" "/VIA 6522 Sockel/PA6" "/VIA 6522 Sockel/PA7" "/VIA 6522 Sockel/BRDY" "/VIA 6522 Sockel/SYNC" "/VIA 6522 Sockel/MTR" "Net-(IC1-Pad25)"
+    "/VIA 6522 Sockel/WPS" "/VIA 6522 Sockel/OE" "/VIA 6522 Sockel/SOE" "Net-(IC1-Pad29)" "Net-(IC1-Pad32)" "/VIA 6522 Sockel/SPT0" "/VIA 6522 Sockel/STP1" "/LCD Display/EN"
+    "/LCD Display/RS" "/LCD Display/D3" "/LCD Display/D2" "/LCD Display/D1" "/LCD Display/D0" "/VIA 6522 Sockel/~RESET" "Net-(J6-Pad9)" "Net-(J6-Pad10)"
+    "/VIA 6522 Sockel/ACT" "/VIA 6522 Sockel/DS0" "/VIA 6522 Sockel/DS1" "/VIA 6522 Sockel/NC" "Net-(P2-Pad21)" "Net-(P2-Pad22)" "Net-(P2-Pad23)" "Net-(P2-Pad24)"
+    "Net-(P2-Pad25)" "Net-(P2-Pad26)" "Net-(P2-Pad27)" "Net-(P2-Pad28)" "Net-(P2-Pad29)" "Net-(P2-Pad30)" "Net-(P2-Pad31)" "Net-(P2-Pad32)"
+    "Net-(P2-Pad33)" "Net-(P2-Pad35)" "Net-(P2-Pad36)" "Net-(P2-Pad37)" "Net-(P2-Pad38)" "Net-(X1-Pad1)" "Net-(D1-Pad1)" "Net-(R4-Pad2)"
+    "Net-(R5-Pad2)" "Net-(R6-Pad2)" "Net-(SD1-Pad9)" "Net-(SD1-Pad8)"
     (clearance_class "kicad_default")
     (via_rule kicad_default)
     (rule
