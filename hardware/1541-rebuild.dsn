@@ -85,11 +85,11 @@
     (component "Oscillators:Oscillator_DIP-14_LargePads"
       (place X1 123190 -124460 front 90 (PN 24Mhz))
     )
-    (component "ka_sd_sockets:SD_Socket_104D-TCA0-R06"
-      (place SD1 161290 -60960 front 90 (PN SD_Socket))
-    )
     (component ka_logos:logo_01_10_7mm_fsilk
       (place G*** 115570 -49530 front 0 (PN LOGO))
+    )
+    (component "ka_sd_sockets:ATTEND_104H-TDA0-R01"
+      (place SD1 175895 -60325 front 90 (PN "ATTEND_104H-TDA0-R01"))
     )
   )
   (library
@@ -374,33 +374,27 @@
       (pin Round[A]Pad_2500_um 8 15240 7620)
       (pin Round[A]Pad_2500_um 7 15240 0)
     )
-    (image "ka_sd_sockets:SD_Socket_104D-TCA0-R06"
-      (outline (path signal 150  -14500 5000  17000 5000))
-      (outline (path signal 150  17000 5000  17000 -22000))
-      (outline (path signal 150  -14500 -22000  17000 -22000))
-      (outline (path signal 150  -14500 -22000  -14500 5000))
-      (pin Rect[T]Pad_1150x2000_um 7 -8050 3500)
-      (pin Rect[T]Pad_1150x2000_um 6 -5650 3500)
-      (pin Rect[T]Pad_1150x2000_um 5 -3150 3500)
-      (pin Rect[T]Pad_1150x2000_um 4 -650 3500)
-      (pin Rect[T]Pad_1150x2000_um 3 1850 3500)
-      (pin Rect[T]Pad_1150x2000_um 2 4350 3500)
-      (pin Rect[T]Pad_1150x2000_um 1 6850 3500)
-      (pin Rect[T]Pad_1150x2000_um 9 9350 3500)
-      (pin Rect[T]Pad_1150x2000_um Sb -12250 3500)
-      (pin Rect[T]Pad_1150x2000_um 8 -9750 3500)
-      (pin Round[A]Pad_1500_um @1 -9200 0)
-      (pin Round[A]Pad_1500_um @2 10800 0)
-      (pin Rect[T]Pad_1500x1500_um Sc -13150 -8500)
-      (pin Rect[T]Pad_1500x1500_um Sa -13150 -20000)
-      (pin Rect[T]Pad_1500x1500_um G 15500 -21000)
-    )
     (image ka_logos:logo_01_10_7mm_fsilk
     )
-    (padstack Round[A]Pad_1500_um
-      (shape (circle F.Cu 1500))
-      (shape (circle B.Cu 1500))
-      (attach off)
+    (image "ka_sd_sockets:ATTEND_104H-TDA0-R01"
+      (outline (path signal 150  -14605 25400  15875 25400))
+      (outline (path signal 150  15875 -7620  -14605 -7620))
+      (outline (path signal 150  15875 25400  15875 -7620))
+      (outline (path signal 150  -14605 -7620  -14605 25400))
+      (pin Rect[T]Pad_1000x1600_um 9 9380 24200)
+      (pin Rect[T]Pad_1000x1600_um 1 6880 24200)
+      (pin Rect[T]Pad_1000x1600_um 2 4380 24200)
+      (pin Rect[T]Pad_1000x1600_um 3 1880 24200)
+      (pin Rect[T]Pad_1000x1600_um 4 -620 24200)
+      (pin Rect[T]Pad_1000x1600_um 5 -3120 24200)
+      (pin Rect[T]Pad_1000x1600_um 6 -5620 24200)
+      (pin Rect[T]Pad_1000x1600_um 7 -8120 24200)
+      (pin Rect[T]Pad_1000x1600_um 8 -9770 24200)
+      (pin Rect[T]Pad_1750x1200_um Cd -13125 12900)
+      (pin Rect[T]Pad_1750x1000_um Wp -13125 4100)
+      (pin Rect[T]Pad_1550x1000_um Sc -13225 2800)
+      (pin Oval[A]Pad_1700x3300_um G 14550 0)
+      (pin Oval[A]Pad_1700x3000_um G@1 -13400 0)
     )
     (padstack Round[A]Pad_1501.14_um
       (shape (circle F.Cu 1501.14))
@@ -447,6 +441,16 @@
       (shape (path B.Cu 1600  0 0  0 0))
       (attach off)
     )
+    (padstack Oval[A]Pad_1700x3000_um
+      (shape (path F.Cu 1700  0 -650  0 650))
+      (shape (path B.Cu 1700  0 -650  0 650))
+      (attach off)
+    )
+    (padstack Oval[A]Pad_1700x3300_um
+      (shape (path F.Cu 1700  0 -800  0 800))
+      (shape (path B.Cu 1700  0 -800  0 800))
+      (attach off)
+    )
     (padstack Oval[A]Pad_1700x1700_um
       (shape (path F.Cu 1700  0 0  0 0))
       (shape (path B.Cu 1700  0 0  0 0))
@@ -457,8 +461,8 @@
       (shape (rect B.Cu -1250 -1250 1250 1250))
       (attach off)
     )
-    (padstack Rect[T]Pad_1150x2000_um
-      (shape (rect F.Cu -575 -1000 575 1000))
+    (padstack Rect[T]Pad_1000x1600_um
+      (shape (rect F.Cu -500 -800 500 800))
       (attach off)
     )
     (padstack "Rect[A][0,-250]Pad_1500x2000_um"
@@ -466,8 +470,8 @@
       (shape (rect B.Cu -750 -1250 750 750))
       (attach off)
     )
-    (padstack Rect[T]Pad_1500x1500_um
-      (shape (rect F.Cu -750 -750 750 750))
+    (padstack Rect[T]Pad_1550x1000_um
+      (shape (rect F.Cu -775 -500 775 500))
       (attach off)
     )
     (padstack Rect[A]Pad_1600x1600_um
@@ -478,6 +482,14 @@
     (padstack Rect[A]Pad_1700x1700_um
       (shape (rect F.Cu -850 -850 850 850))
       (shape (rect B.Cu -850 -850 850 850))
+      (attach off)
+    )
+    (padstack Rect[T]Pad_1750x1000_um
+      (shape (rect F.Cu -875 -500 875 500))
+      (attach off)
+    )
+    (padstack Rect[T]Pad_1750x1200_um
+      (shape (rect F.Cu -875 -600 875 600))
       (attach off)
     )
     (padstack "Via[0-1]_600:400_um"
@@ -500,10 +512,10 @@
       (pins IC1-2 J2-2)
     )
     (net "/SD Karte/SD_DETECT"
-      (pins IC1-3 R3-2 SD1-Sb)
+      (pins IC1-3 R3-2 SD1-Cd)
     )
     (net "/SD Karte/SD_WP"
-      (pins IC1-4 R2-2 SD1-Sa)
+      (pins IC1-4 R2-2 SD1-Wp)
     )
     (net "/SD Karte/SS"
       (pins IC1-5 R7-2)
@@ -679,7 +691,7 @@
     )
     (net GND
       (pins C1-2 C2-2 C3-2 IC1-11 IC1-31 J1-6 J2-4 J3-2 J6-2 P1-1 P2-1 R4-1 R5-1 R6-1
-        RV1-3 SW1-1 SW1-1@1 X1-7 SD1-6 SD1-3 SD1-Sc SD1-G J5-2)
+        RV1-3 SW1-1 SW1-1@1 X1-7 J5-2 SD1-3 SD1-6 SD1-Sc SD1-G SD1-G@1)
     )
     (net "Net-(D1-Pad1)"
       (pins D1-1 SD1-4)

@@ -1,6 +1,5 @@
 EESchema Schematic File Version 2
 LIBS:power
-LIBS:ka_library
 LIBS:1541-rebuild-rescue
 LIBS:device
 LIBS:transistors
@@ -42,6 +41,7 @@ LIBS:w_relay
 LIBS:w_rtx
 LIBS:w_transistor
 LIBS:w_vacuum
+LIBS:ka_sd_sockets
 LIBS:1541-rebuild-cache
 EELAYER 25 0
 EELAYER END
@@ -49,8 +49,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 2 4
 Title "1541-rebuid"
-Date "2018-05-08"
-Rev "1.3.4"
+Date "2018-05-11"
+Rev "1.3.5"
 Comp ""
 Comment1 "Erstellt von: Thorsten Kattanek"
 Comment2 ""
@@ -291,17 +291,6 @@ F 3 "" H 4700 3900 50  0001 C CNN
 	1    4700 3900
 	1    0    0    -1  
 $EndComp
-$Comp
-L SD_Socket SD1
-U 1 1 5AF0A85D
-P 5650 3450
-F 0 "SD1" H 5650 3950 60  0000 C CNN
-F 1 "SD_Socket" H 5700 3250 60  0000 C CNN
-F 2 "ka_sd_sockets:SD_Socket_104D-TCA0-R06" H 3800 2100 60  0001 C CNN
-F 3 "" H 3800 2100 60  0001 C CNN
-	1    5650 3450
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	6500 3250 6550 3250
 Wire Wire Line
@@ -320,4 +309,15 @@ F 3 "" H 6550 3900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Connection ~ 6550 3850
+$Comp
+L ATTEND_104H-TDA0-R01 SD1
+U 1 1 5AF5BDB3
+P 5650 3450
+F 0 "SD1" H 5650 3950 60  0000 C CNN
+F 1 "ATTEND_104H-TDA0-R01" H 5650 2950 60  0000 C CNN
+F 2 "ka_sd_sockets:ATTEND_104H-TDA0-R01" H 3800 2100 60  0001 C CNN
+F 3 "" H 3800 2100 60  0001 C CNN
+	1    5650 3450
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

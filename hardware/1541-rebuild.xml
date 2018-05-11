@@ -2,14 +2,14 @@
 <export version="D">
   <design>
     <source>/home/thorsten/Elektronik/Projekte/1541-rebuild/hardware/1541-rebuild.sch</source>
-    <date>Di 08 Mai 2018 18:39:31 CEST</date>
+    <date>Fr 11 Mai 2018 18:22:38 CEST</date>
     <tool>Eeschema 4.0.7-e2-6376~60~ubuntu17.10.1</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
         <title>1541-rebuid</title>
         <company/>
-        <rev>1.3.4</rev>
-        <date>2018-05-08</date>
+        <rev>1.3.5</rev>
+        <date>2018-05-11</date>
         <source>1541-rebuild.sch</source>
         <comment number="1" value="Erstellt von: Thorsten Kattanek"/>
         <comment number="2" value=""/>
@@ -21,8 +21,8 @@
       <title_block>
         <title>1541-rebuid</title>
         <company/>
-        <rev>1.3.4</rev>
-        <date>2018-05-08</date>
+        <rev>1.3.5</rev>
+        <date>2018-05-11</date>
         <source>sd_karte.sch</source>
         <comment number="1" value="Erstellt von: Thorsten Kattanek"/>
         <comment number="2" value=""/>
@@ -34,8 +34,8 @@
       <title_block>
         <title>1541-rebuid</title>
         <company/>
-        <rev>1.3.4</rev>
-        <date>2018-05-08</date>
+        <rev>1.3.5</rev>
+        <date>2018-05-11</date>
         <source>lcd.sch</source>
         <comment number="1" value="Erstellt von: Thorsten Kattanek"/>
         <comment number="2" value=""/>
@@ -47,8 +47,8 @@
       <title_block>
         <title>1541-rebuid</title>
         <company/>
-        <rev>1.3.4</rev>
-        <date>2018-05-08</date>
+        <rev>1.3.5</rev>
+        <date>2018-05-11</date>
         <source>via6522_sockel.sch</source>
         <comment number="1" value="Erstellt von: Thorsten Kattanek"/>
         <comment number="2" value=""/>
@@ -213,11 +213,11 @@
       <tstamp>5ADB753C</tstamp>
     </comp>
     <comp ref="SD1">
-      <value>SD_Socket</value>
-      <footprint>ka_sd_sockets:SD_Socket_104D-TCA0-R06</footprint>
-      <libsource lib="ka_library" part="SD_Socket"/>
+      <value>ATTEND_104H-TDA0-R01</value>
+      <footprint>ka_sd_sockets:ATTEND_104H-TDA0-R01</footprint>
+      <libsource lib="ka_sd_sockets" part="ATTEND_104H-TDA0-R01"/>
       <sheetpath names="/SD Karte/" tstamps="/55F7A0F9/"/>
-      <tstamp>5AF0A85D</tstamp>
+      <tstamp>5AF5BDB3</tstamp>
     </comp>
     <comp ref="J6">
       <value>LCD Display</value>
@@ -323,6 +323,31 @@
         <pin num="38" name="(PCINT2/ADC2)PA2" type="BiDi"/>
         <pin num="39" name="(PCINT1/ADC1)PA1" type="BiDi"/>
         <pin num="40" name="(PCINT0/ADC0)PA0" type="BiDi"/>
+      </pins>
+    </libpart>
+    <libpart lib="ka_sd_sockets" part="ATTEND_104H-TDA0-R01">
+      <docs>/home/thorsten/Elektronik/Datenblätter/SD_Slot_ATTEND_104H-TDA0-R01.pdf</docs>
+      <footprints>
+        <fp>ATTEND_104H-TDA0-R01</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">SD</field>
+        <field name="Value">ATTEND_104H-TDA0-R01</field>
+      </fields>
+      <pins>
+        <pin num="1" name="DAT3/CS/CD" type="input"/>
+        <pin num="2" name="CMD" type="input"/>
+        <pin num="3" name="VSS1" type="power_in"/>
+        <pin num="4" name="VDD" type="input"/>
+        <pin num="5" name="CLK" type="input"/>
+        <pin num="6" name="VSS2" type="power_in"/>
+        <pin num="7" name="DAT0" type="input"/>
+        <pin num="8" name="DAT1" type="input"/>
+        <pin num="9" name="DAT2" type="input"/>
+        <pin num="Cd" name="Card_Detection" type="output"/>
+        <pin num="G" name="GND" type="power_in"/>
+        <pin num="Sc" name="Common_Pin" type="power_in"/>
+        <pin num="Wp" name="Write_Protection" type="output"/>
       </pins>
     </libpart>
     <libpart lib="device" part="C">
@@ -559,27 +584,6 @@
         <pin num="2" name="~" type="passive"/>
       </pins>
     </libpart>
-    <libpart lib="ka_library" part="SD_Socket">
-      <fields>
-        <field name="Reference">SD</field>
-        <field name="Value">SD_Socket</field>
-      </fields>
-      <pins>
-        <pin num="1" name="DAT3/CS/CD" type="input"/>
-        <pin num="2" name="CMD" type="input"/>
-        <pin num="3" name="VSS1" type="power_in"/>
-        <pin num="4" name="VDD" type="input"/>
-        <pin num="5" name="CLK" type="input"/>
-        <pin num="6" name="VSS2" type="power_in"/>
-        <pin num="7" name="DAT0" type="input"/>
-        <pin num="8" name="DAT1" type="input"/>
-        <pin num="9" name="DAT2" type="input"/>
-        <pin num="G" name="GND" type="power_in"/>
-        <pin num="Sa" name="Write_Protection" type="output"/>
-        <pin num="Sb" name="Card_Detection" type="output"/>
-        <pin num="Sc" name="Common_Switch" type="power_in"/>
-      </pins>
-    </libpart>
     <libpart lib="1541-rebuild-cache" part="SW_PUSH-RESCUE-1541-rebuild">
       <fields>
         <field name="Reference">SW</field>
@@ -604,17 +608,17 @@
     </libpart>
   </libparts>
   <libraries>
-    <library logical="ka_library">
-      <uri>/home/thorsten/Elektronik/KiCad Bauteile/kattanek/library/ka_library.lib</uri>
+    <library logical="ka_sd_sockets">
+      <uri>/home/thorsten/Elektronik/KiCad Bauteile/kattanek/library/ka_sd_sockets.lib</uri>
+    </library>
+    <library logical="1541-rebuild-cache">
+      <uri>/home/thorsten/Elektronik/Projekte/1541-rebuild/hardware/1541-rebuild-cache.lib</uri>
     </library>
     <library logical="device">
       <uri>/usr/share/kicad/library/device.lib</uri>
     </library>
     <library logical="conn">
       <uri>/usr/share/kicad/library/conn.lib</uri>
-    </library>
-    <library logical="1541-rebuild-cache">
-      <uri>/home/thorsten/Elektronik/Projekte/1541-rebuild/hardware/1541-rebuild-cache.lib</uri>
     </library>
   </libraries>
   <nets>
@@ -715,12 +719,12 @@
     </net>
     <net code="18" name="/SD Karte/SD_WP">
       <node ref="R2" pin="2"/>
-      <node ref="SD1" pin="Sa"/>
+      <node ref="SD1" pin="Wp"/>
       <node ref="IC1" pin="4"/>
     </net>
     <net code="19" name="/SD Karte/SD_DETECT">
       <node ref="R3" pin="2"/>
-      <node ref="SD1" pin="Sb"/>
+      <node ref="SD1" pin="Cd"/>
       <node ref="IC1" pin="3"/>
     </net>
     <net code="20" name="Net-(IC1-Pad13)">
@@ -775,13 +779,13 @@
       <node ref="J5" pin="2"/>
       <node ref="SW1" pin="1"/>
       <node ref="J2" pin="4"/>
-      <node ref="R4" pin="1"/>
+      <node ref="SD1" pin="3"/>
+      <node ref="SD1" pin="6"/>
       <node ref="RV1" pin="3"/>
-      <node ref="SD1" pin="Sc"/>
+      <node ref="R4" pin="1"/>
       <node ref="R5" pin="1"/>
       <node ref="SD1" pin="G"/>
-      <node ref="SD1" pin="6"/>
-      <node ref="SD1" pin="3"/>
+      <node ref="SD1" pin="Sc"/>
       <node ref="R6" pin="1"/>
     </net>
     <net code="30" name="Net-(IC1-Pad9)">
@@ -792,13 +796,13 @@
       <node ref="IC1" pin="9"/>
     </net>
     <net code="31" name="/LCD Display/D0">
-      <node ref="J6" pin="3"/>
       <node ref="IC1" pin="40"/>
+      <node ref="J6" pin="3"/>
     </net>
     <net code="32" name="/VIA 6522 Sockel/PA0">
+      <node ref="IC1" pin="14"/>
       <node ref="P1" pin="2"/>
       <node ref="P2" pin="2"/>
-      <node ref="IC1" pin="14"/>
     </net>
     <net code="33" name="/VIA 6522 Sockel/PA1">
       <node ref="IC1" pin="15"/>
@@ -816,8 +820,8 @@
       <node ref="IC1" pin="17"/>
     </net>
     <net code="36" name="/LCD Display/D1">
-      <node ref="J6" pin="4"/>
       <node ref="IC1" pin="39"/>
+      <node ref="J6" pin="4"/>
     </net>
     <net code="37" name="/LCD Display/D2">
       <node ref="J6" pin="5"/>
@@ -828,8 +832,8 @@
       <node ref="IC1" pin="37"/>
     </net>
     <net code="39" name="/LCD Display/RS">
-      <node ref="IC1" pin="36"/>
       <node ref="J6" pin="8"/>
+      <node ref="IC1" pin="36"/>
     </net>
     <net code="40" name="/LCD Display/EN">
       <node ref="J6" pin="7"/>
@@ -840,11 +844,11 @@
       <node ref="R6" pin="2"/>
       <node ref="SD1" pin="5"/>
     </net>
-    <net code="42" name="Net-(SD1-Pad8)">
-      <node ref="SD1" pin="8"/>
-    </net>
-    <net code="43" name="Net-(SD1-Pad9)">
+    <net code="42" name="Net-(SD1-Pad9)">
       <node ref="SD1" pin="9"/>
+    </net>
+    <net code="43" name="Net-(SD1-Pad8)">
+      <node ref="SD1" pin="8"/>
     </net>
     <net code="44" name="Net-(D1-Pad1)">
       <node ref="SD1" pin="4"/>
@@ -856,17 +860,17 @@
     </net>
     <net code="46" name="Net-(R5-Pad2)">
       <node ref="SD1" pin="2"/>
-      <node ref="R8" pin="1"/>
       <node ref="R5" pin="2"/>
+      <node ref="R8" pin="1"/>
     </net>
     <net code="47" name="Net-(R4-Pad2)">
+      <node ref="R7" pin="1"/>
       <node ref="R4" pin="2"/>
       <node ref="SD1" pin="1"/>
-      <node ref="R7" pin="1"/>
     </net>
     <net code="48" name="Net-(J6-Pad9)">
-      <node ref="J6" pin="9"/>
       <node ref="R10" pin="1"/>
+      <node ref="J6" pin="9"/>
     </net>
     <net code="49" name="Net-(J6-Pad10)">
       <node ref="RV1" pin="2"/>
@@ -877,32 +881,32 @@
       <node ref="P2" pin="27"/>
     </net>
     <net code="51" name="Net-(P2-Pad38)">
-      <node ref="P2" pin="38"/>
       <node ref="P3" pin="18"/>
+      <node ref="P2" pin="38"/>
     </net>
     <net code="52" name="Net-(P2-Pad37)">
-      <node ref="P2" pin="37"/>
       <node ref="P3" pin="17"/>
+      <node ref="P2" pin="37"/>
     </net>
     <net code="53" name="Net-(P2-Pad36)">
       <node ref="P3" pin="16"/>
       <node ref="P2" pin="36"/>
     </net>
     <net code="54" name="Net-(P2-Pad35)">
-      <node ref="P3" pin="15"/>
       <node ref="P2" pin="35"/>
+      <node ref="P3" pin="15"/>
     </net>
     <net code="55" name="Net-(P2-Pad33)">
-      <node ref="P3" pin="13"/>
       <node ref="P2" pin="33"/>
+      <node ref="P3" pin="13"/>
     </net>
     <net code="56" name="Net-(P2-Pad32)">
       <node ref="P2" pin="32"/>
       <node ref="P3" pin="12"/>
     </net>
     <net code="57" name="Net-(P2-Pad31)">
-      <node ref="P3" pin="11"/>
       <node ref="P2" pin="31"/>
+      <node ref="P3" pin="11"/>
     </net>
     <net code="58" name="Net-(P2-Pad30)">
       <node ref="P3" pin="10"/>
@@ -925,36 +929,36 @@
       <node ref="P2" pin="16"/>
     </net>
     <net code="63" name="/VIA 6522 Sockel/NC">
-      <node ref="P1" pin="18"/>
       <node ref="P2" pin="18"/>
+      <node ref="P1" pin="18"/>
     </net>
     <net code="64" name="Net-(P2-Pad25)">
       <node ref="P2" pin="25"/>
       <node ref="P3" pin="5"/>
     </net>
     <net code="65" name="Net-(P2-Pad24)">
-      <node ref="P2" pin="24"/>
       <node ref="P3" pin="4"/>
+      <node ref="P2" pin="24"/>
     </net>
     <net code="66" name="Net-(P2-Pad23)">
-      <node ref="P2" pin="23"/>
       <node ref="P3" pin="3"/>
+      <node ref="P2" pin="23"/>
     </net>
     <net code="67" name="Net-(P2-Pad22)">
-      <node ref="P2" pin="22"/>
       <node ref="P3" pin="2"/>
+      <node ref="P2" pin="22"/>
     </net>
     <net code="68" name="Net-(P2-Pad21)">
-      <node ref="P2" pin="21"/>
       <node ref="P3" pin="1"/>
+      <node ref="P2" pin="21"/>
     </net>
     <net code="69" name="Net-(P2-Pad26)">
-      <node ref="P3" pin="6"/>
       <node ref="P2" pin="26"/>
+      <node ref="P3" pin="6"/>
     </net>
     <net code="70" name="/VIA 6522 Sockel/ACT">
-      <node ref="P1" pin="13"/>
       <node ref="P2" pin="13"/>
+      <node ref="P1" pin="13"/>
     </net>
   </nets>
 </export>

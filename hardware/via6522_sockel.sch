@@ -1,6 +1,5 @@
 EESchema Schematic File Version 2
 LIBS:power
-LIBS:ka_library
 LIBS:1541-rebuild-rescue
 LIBS:device
 LIBS:transistors
@@ -42,6 +41,7 @@ LIBS:w_relay
 LIBS:w_rtx
 LIBS:w_transistor
 LIBS:w_vacuum
+LIBS:ka_sd_sockets
 LIBS:1541-rebuild-cache
 EELAYER 25 0
 EELAYER END
@@ -49,8 +49,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 4 4
 Title "1541-rebuid"
-Date "2018-05-08"
-Rev "1.3.4"
+Date "2018-05-11"
+Rev "1.3.5"
 Comp ""
 Comment1 "Erstellt von: Thorsten Kattanek"
 Comment2 ""
