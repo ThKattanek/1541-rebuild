@@ -15,9 +15,7 @@ https://www.youtube.com/watch?v=MlbUPTzcQGI&t=36s
 
 https://www.youtube.com/watch?v=gKM73VpHdTw&t=256s
 
-###Verwendete Libs
-LCD Ansteuerung von Mikrokontroller.net
-http://www.mikrocontroller.net/articles/AVR-GCC-Tutorial/LCD-Ansteuerung
+### Verwendete Libs
+LCD Ansteuerung von Mikrokontroller.net: http://www.mikrocontroller.net/articles/AVR-GCC-Tutorial/LCD-Ansteuerung
 
-SD/FAT System von Roland Riegel
-http://www.roland-riegel.de/sd-reader/
+SD/FAT System von Roland Riegel: http://www.roland-riegel.de/sd-reader/
