@@ -49,7 +49,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 4
 Title "1541-rebuid"
-Date "2018-05-11"
+Date "2018-05-16"
 Rev "1.3.5"
 Comp ""
 Comment1 "Erstellt von: Thorsten Kattanek"
@@ -645,4 +645,6 @@ Wire Wire Line
 	6050 5950 6150 5950
 Wire Wire Line
 	6150 5950 6150 6000
+Text Notes 7000 6500 0    60   ~ 0
+Bezugsquellen für den SD Slot von ATTEND: 104H-TDA0-R01\nhttps://www.tme.eu\nhttps://www.pollin.de\n
 $EndSCHEMATC

@@ -1,4 +1,4 @@
-update=Fr 11 Mai 2018 18:13:53 CEST
+update=Mi 16 Mai 2018 18:31:24 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -23,8 +23,6 @@ ModuleOutlineThickness=0.150000000000
 [cvpcb]
 version=1
 NetIExt=net
-[general]
-version=1
 [eeschema]
 version=1
 LibDir=/home/thorsten/Elektronik/KiCad Bauteile/walter/library;/home/thorsten/Elektronik/KiCad Bauteile/kattanek/library
@@ -82,3 +80,5 @@ NetFmtName=Pcbnew
 SpiceForceRefPrefix=0
 SpiceUseNetNumbers=0
 LabSize=60
+[general]
+version=1
