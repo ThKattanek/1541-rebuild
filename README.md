@@ -6,7 +6,7 @@ Derzeit ist es möglich aus einem Root Verzeichnis einer SD Karte, D64 sowie G64
 Die Hardware wurde mit KiCad entwickelt. Version 4.0.7 unter Ubuntu.
 
 
-![Screenshot](/hardware/1541-rebuild1.png)
+![Screenshot](/hardware/1541-rebuild.png)
 
 ### Einige Videos von der 1541-rebuild in aktion
 https://youtu.be/EGB8lYKcW-g
