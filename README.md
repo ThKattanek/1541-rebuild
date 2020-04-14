@@ -5,7 +5,7 @@ Ersetzt den Analogteil einer Floppy 1541 II durch ein µC der Disk Images per SD
 Derzeit ist es möglich aus einem Root Verzeichnis einer SD Karte, D64 sowie G64 Images auszuwählen. Diese werden dann wie eine eingelgte Diskette erkannt und der C64 kann diese lesen. Als Anzeige kommt ein 4-Zeiliges LCD (20x4) zum Einsatz.
 
 ### Hardware / Schaltplan
-Die Hardware wurde mit KiCad entwickelt. Version 4.0.7 unter Ubuntu.
+Die Hardware wird mit KiCad entwickelt. Version 5.1.4 unter Ubuntu.
 
 
 ![Screenshot](/doc/fotos/1541-rebuild.png)
