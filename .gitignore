@@ -5,3 +5,9 @@
 *-bak
 *.bck
 fp-info-cache
+*.bin
+*.dsn
+*.rules
+*.xml
+*.ses
+
