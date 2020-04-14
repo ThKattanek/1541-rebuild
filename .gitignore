@@ -2,3 +2,6 @@
 *pcb-bak
 *.user
 .directory
+*-bak
+*.bck
+fp-info-cache
