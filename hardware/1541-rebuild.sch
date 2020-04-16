@@ -4,7 +4,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 4
+Sheet 1 3
 Title "1541-rebuid"
 Date "2020-04-14"
 Rev "1.4.0"
@@ -25,8 +25,8 @@ F 3 "" H 4950 3800 60  0000 C CNN
 	1    4950 3800
 	1    0    0    -1  
 $EndComp
-Text Notes 650  7450 0    60   ~ 0
-Am meiner 1541II Platine (ASSY NO 345003 REV 9) habe ich folgende modifiktionen durchgeführt:\n- PIN 42 von U10 (Gate Array 251828) von Platine getrennt (BYTE READY)\n- U8 (VIA 6522) ausgelötet und gesockelt\n- Dauerläufer behoben durch trennen einer Leiterbahn zwischen R/W Amp Pin 32 (Power On) und den 220 Ohm Widerstand
+Text Notes 600  7700 0    60   ~ 0
+Am meiner 1541II Platine (ASSY NO 345003 REV 9) habe ich folgende modifiktionen durchgeführt:\n- PIN 42 von U10 (Gate Array 251828) von Platine getrennt (BYTE READY) -- WIRD NOCH GEPRÜFT !!!\n- U8 (VIA 6522) ausgelötet und gesockelt\n- Dauerläufer behoben durch trennen einer Leiterbahn zwischen R/W Amp Pin 32 (Power On) und den 220 Ohm Widerstand
 $Comp
 L Oscillator:TCXO-14 X1
 U 1 1 55F7CB9E
@@ -130,18 +130,6 @@ F 3 "" H 1500 1050 60  0000 C CNN
 $EndComp
 Text Notes 750  750  0    60   ~ 0
 Stützkondensatoren für IC1
-$Sheet
-S 7550 3300 950  450 
-U 55F7A0F9
-F0 "SD Karte" 60
-F1 "sd_karte.sch" 60
-F2 "MISO" I L 7550 3600 60 
-F3 "SCK" I L 7550 3700 60 
-F4 "MOSI" I L 7550 3500 60 
-F5 "SS" I L 7550 3400 60 
-F6 "SD_DETECT" I R 8500 3500 60 
-F7 "SD_WP" I R 8500 3400 60 
-$EndSheet
 $Sheet
 S 6400 1400 600  500 
 U 55F9179B
@@ -269,7 +257,7 @@ Wire Wire Line
 Wire Wire Line
 	7850 4300 7700 4300
 Wire Wire Line
-	5550 3400 7550 3400
+	5550 3400 7700 3400
 Wire Wire Line
 	5550 3500 7350 3500
 Wire Wire Line
@@ -277,25 +265,9 @@ Wire Wire Line
 Wire Wire Line
 	5550 3700 7250 3700
 Wire Wire Line
-	5550 3300 6550 3300
+	5550 3300 7700 3300
 Wire Wire Line
-	6550 3300 6550 3150
-Wire Wire Line
-	6550 3150 8650 3150
-Wire Wire Line
-	8650 3150 8650 3400
-Wire Wire Line
-	8650 3400 8500 3400
-Wire Wire Line
-	5550 3200 6450 3200
-Wire Wire Line
-	6450 3200 6450 3050
-Wire Wire Line
-	6450 3050 8750 3050
-Wire Wire Line
-	8750 3050 8750 3500
-Wire Wire Line
-	8750 3500 8500 3500
+	5550 3200 7700 3200
 Wire Wire Line
 	5550 3000 6200 3000
 Wire Wire Line
@@ -306,8 +278,6 @@ Wire Wire Line
 	5550 3100 6300 3100
 Wire Wire Line
 	6300 3100 6300 2950
-Wire Wire Line
-	6300 2950 10000 2950
 Wire Wire Line
 	5550 4200 6550 4200
 Wire Wire Line
@@ -450,34 +420,34 @@ Wire Wire Line
 $Comp
 L Connector_Generic:Conn_01x02 J3
 U 1 1 5AEF69AF
-P 1350 4350
-F 0 "J3" H 1350 4450 50  0000 C CNN
-F 1 "EXT_5V" H 1350 4150 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 1350 4350 50  0001 C CNN
-F 3 "" H 1350 4350 50  0001 C CNN
-	1    1350 4350
+P 9400 5950
+F 0 "J3" H 9400 6050 50  0000 C CNN
+F 1 "EXT_5V" H 9400 5750 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 9400 5950 50  0001 C CNN
+F 3 "" H 9400 5950 50  0001 C CNN
+	1    9400 5950
 	0    -1   -1   0   
 $EndComp
 $Comp
 L power:+5V #PWR06
 U 1 1 5AEF757D
-P 1250 4700
-F 0 "#PWR06" H 1250 4550 50  0001 C CNN
-F 1 "+5V" H 1250 4840 50  0000 C CNN
-F 2 "" H 1250 4700 60  0000 C CNN
-F 3 "" H 1250 4700 60  0000 C CNN
-	1    1250 4700
+P 9300 6300
+F 0 "#PWR06" H 9300 6150 50  0001 C CNN
+F 1 "+5V" H 9300 6440 50  0000 C CNN
+F 2 "" H 9300 6300 60  0000 C CNN
+F 3 "" H 9300 6300 60  0000 C CNN
+	1    9300 6300
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
-	1350 4550 1350 4700
+	9400 6150 9400 6300
 Wire Wire Line
-	1450 4700 1450 4550
+	9500 6300 9500 6150
 Wire Wire Line
-	1350 4700 1250 4700
+	9400 6300 9300 6300
 Wire Wire Line
-	1450 4700 1550 4700
-Text Notes 650  4100 0    60   ~ 0
+	9500 6300 9600 6300
+Text Notes 8700 5700 0    60   ~ 0
 Externe Spannungsversorgung,\nnur verwenden wenn kein Floppy-Netzteil\nangeschlossen wird !
 Wire Wire Line
 	3800 2300 4350 2300
@@ -517,12 +487,12 @@ $EndComp
 $Comp
 L power:GND #PWR010
 U 1 1 5AF0A9E7
-P 1550 4700
-F 0 "#PWR010" H 1550 4450 50  0001 C CNN
-F 1 "GND" H 1550 4550 50  0000 C CNN
-F 2 "" H 1550 4700 50  0001 C CNN
-F 3 "" H 1550 4700 50  0001 C CNN
-	1    1550 4700
+P 9600 6300
+F 0 "#PWR010" H 9600 6050 50  0001 C CNN
+F 1 "GND" H 9600 6150 50  0000 C CNN
+F 2 "" H 9600 6300 50  0001 C CNN
+F 3 "" H 9600 6300 50  0001 C CNN
+	1    9600 6300
 	0    -1   -1   0   
 $EndComp
 $Comp
@@ -586,8 +556,6 @@ Wire Wire Line
 	6050 5950 6150 5950
 Wire Wire Line
 	6150 5950 6150 6000
-Text Notes 7000 6500 0    60   ~ 0
-Bezugsquellen für den SD Slot von ATTEND: 104H-TDA0-R01\nhttps://www.tme.eu\nhttps://www.pollin.de\n
 Wire Wire Line
 	5000 1600 5050 1600
 Wire Wire Line
@@ -595,13 +563,13 @@ Wire Wire Line
 Wire Wire Line
 	1500 1250 1500 1550
 Wire Wire Line
-	7150 3600 7550 3600
+	7150 3600 7700 3600
 Wire Wire Line
-	7250 3700 7550 3700
+	7250 3700 7700 3700
 Wire Wire Line
 	4050 2100 4350 2100
 Wire Wire Line
-	7350 3500 7550 3500
+	7350 3500 7700 3500
 Wire Wire Line
 	7400 1000 10650 1000
 Wire Wire Line
@@ -630,4 +598,143 @@ Wire Wire Line
 Connection ~ 2250 3250
 Wire Wire Line
 	2250 3250 3000 3250
+Wire Wire Line
+	6300 2950 10000 2950
+$Comp
+L Connector_Generic:Conn_02x08_Odd_Even J7
+U 1 1 5E991479
+P 2200 4700
+F 0 "J7" H 2250 5250 50  0000 C CNN
+F 1 "SD Card Modul Connector" H 2200 5150 50  0000 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_2x08_P2.54mm_Vertical" H 2200 4700 50  0001 C CNN
+F 3 "~" H 2200 4700 50  0001 C CNN
+	1    2200 4700
+	1    0    0    -1  
+$EndComp
+Text GLabel 1650 4500 0    60   Input ~ 0
+MISO
+Text GLabel 2850 4500 2    60   Input ~ 0
+MISO
+Wire Wire Line
+	1650 4500 2000 4500
+Wire Wire Line
+	2500 4500 2850 4500
+$Comp
+L power:GND #PWR0106
+U 1 1 5E9BBC13
+P 2600 5100
+F 0 "#PWR0106" H 2600 4850 50  0001 C CNN
+F 1 "GND" V 2605 4972 50  0000 R CNN
+F 2 "" H 2600 5100 50  0001 C CNN
+F 3 "" H 2600 5100 50  0001 C CNN
+	1    2600 5100
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:GND #PWR0107
+U 1 1 5E9BC3F8
+P 1900 5100
+F 0 "#PWR0107" H 1900 4850 50  0001 C CNN
+F 1 "GND" V 1905 4972 50  0000 R CNN
+F 2 "" H 1900 5100 50  0001 C CNN
+F 3 "" H 1900 5100 50  0001 C CNN
+	1    1900 5100
+	0    1    1    0   
+$EndComp
+$Comp
+L power:GND #PWR0108
+U 1 1 5E9BC951
+P 1900 4400
+F 0 "#PWR0108" H 1900 4150 50  0001 C CNN
+F 1 "GND" V 1905 4272 50  0000 R CNN
+F 2 "" H 1900 4400 50  0001 C CNN
+F 3 "" H 1900 4400 50  0001 C CNN
+	1    1900 4400
+	0    1    1    0   
+$EndComp
+$Comp
+L power:GND #PWR0109
+U 1 1 5E9BCBA4
+P 2600 4400
+F 0 "#PWR0109" H 2600 4150 50  0001 C CNN
+F 1 "GND" V 2605 4272 50  0000 R CNN
+F 2 "" H 2600 4400 50  0001 C CNN
+F 3 "" H 2600 4400 50  0001 C CNN
+	1    2600 4400
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	1900 4400 2000 4400
+Wire Wire Line
+	2500 4400 2600 4400
+Wire Wire Line
+	2500 5100 2600 5100
+Wire Wire Line
+	1900 5100 2000 5100
+Text GLabel 1650 4600 0    60   Input ~ 0
+SCK
+Text GLabel 2850 4600 2    60   Input ~ 0
+SCK
+Text GLabel 1650 4700 0    60   Input ~ 0
+MOSI
+Text GLabel 2850 4700 2    60   Input ~ 0
+MOSI
+Text GLabel 1650 4800 0    60   Input ~ 0
+CS
+Text GLabel 2850 4800 2    60   Input ~ 0
+CS
+$Comp
+L power:+5V #PWR0110
+U 1 1 5E9D1262
+P 1900 4900
+F 0 "#PWR0110" H 1900 4750 50  0001 C CNN
+F 1 "+5V" V 1900 5100 50  0000 C CNN
+F 2 "" H 1900 4900 60  0000 C CNN
+F 3 "" H 1900 4900 60  0000 C CNN
+	1    1900 4900
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:+5V #PWR0111
+U 1 1 5E9D1A0B
+P 2600 4900
+F 0 "#PWR0111" H 2600 4750 50  0001 C CNN
+F 1 "+5V" V 2600 5100 50  0000 C CNN
+F 2 "" H 2600 4900 60  0000 C CNN
+F 3 "" H 2600 4900 60  0000 C CNN
+	1    2600 4900
+	0    1    1    0   
+$EndComp
+NoConn ~ 2500 5000
+NoConn ~ 2000 5000
+Wire Wire Line
+	2500 4900 2600 4900
+Wire Wire Line
+	1900 4900 2000 4900
+Wire Wire Line
+	1650 4800 2000 4800
+Wire Wire Line
+	2500 4800 2850 4800
+Wire Wire Line
+	2500 4600 2850 4600
+Wire Wire Line
+	2850 4700 2500 4700
+Wire Wire Line
+	2000 4600 1650 4600
+Wire Wire Line
+	2000 4700 1650 4700
+Text GLabel 7700 3700 2    60   Input ~ 0
+SCK
+Text GLabel 7700 3600 2    60   Input ~ 0
+MISO
+Text GLabel 7700 3500 2    60   Input ~ 0
+MOSI
+Text GLabel 7700 3400 2    60   Input ~ 0
+CS
+Text Label 5550 3200 0    60   ~ 0
+SD_DETECT
+Text Label 5550 3300 0    60   ~ 0
+SD_WP
+NoConn ~ 7700 3200
+NoConn ~ 7700 3300
 $EndSCHEMATC
