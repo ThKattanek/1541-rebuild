@@ -6,7 +6,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 3
 Title "1541-rebuid"
-Date "2020-04-14"
+Date "2020-04-17"
 Rev "1.4.0"
 Comp ""
 Comment1 "Erstellt von: Thorsten Kattanek"
@@ -55,7 +55,7 @@ U 1 1 55F7D642
 P 2250 2900
 F 0 "C3" H 2275 3000 50  0000 L CNN
 F 1 "100n" H 2275 2800 50  0000 L CNN
-F 2 "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm" H 2288 2750 30  0001 C CNN
+F 2 "Capacitor_THT:C_Disc_D3.4mm_W2.1mm_P2.50mm" H 2288 2750 30  0001 C CNN
 F 3 "" H 2250 2900 60  0000 C CNN
 	1    2250 2900
 	1    0    0    -1  
@@ -101,7 +101,7 @@ U 1 1 55F7F83D
 P 1350 1250
 F 0 "C1" H 1375 1350 50  0000 L CNN
 F 1 "100n" H 1375 1150 50  0000 L CNN
-F 2 "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm" H 1388 1100 30  0001 C CNN
+F 2 "Capacitor_THT:C_Disc_D3.4mm_W2.1mm_P2.50mm" H 1388 1100 30  0001 C CNN
 F 3 "" H 1350 1250 60  0000 C CNN
 	1    1350 1250
 	0    1    1    0   
@@ -112,7 +112,7 @@ U 1 1 55F7FBA4
 P 1350 1550
 F 0 "C2" H 1375 1650 50  0000 L CNN
 F 1 "100n" H 1375 1450 50  0000 L CNN
-F 2 "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm" H 1388 1400 30  0001 C CNN
+F 2 "Capacitor_THT:C_Disc_D3.4mm_W2.1mm_P2.50mm" H 1388 1400 30  0001 C CNN
 F 3 "" H 1350 1550 60  0000 C CNN
 	1    1350 1550
 	0    1    1    0   
