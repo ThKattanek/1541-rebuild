@@ -1,4 +1,4 @@
-### Achtung: Ich bin gerade dabei hier alles zu überarbeiten und zu erneuern. Gerade habe ich die Platine neu layoutet damit sie in allen 1541 Versionen passen sollte. Bitte warten für einen Nachbau auf ein fertiges offizelles Release hier. Ich werde in den nächsten Tagen Platinen fertigen lassen und sie dann selber testen und auch testen lassen.
+### Achtung: Ich bin gerade dabei hier alles zu überarbeiten und zu erneuern. Gerade habe ich die Platine neu layoutet damit sie in allen 1541 Versionen passen sollte. Bitte wartet für einen Nachbau auf ein fertiges offizelles Release hier. Ich werde in den nächsten Tagen Platinen fertigen lassen und sie dann selber testen und auch testen lassen.
 ### Stand: 18.04.2020
 
 # 1541-rebuild
