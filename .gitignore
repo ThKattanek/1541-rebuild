@@ -10,4 +10,4 @@ fp-info-cache
 *.rules
 *.xml
 *.ses
-
+_autosave-*
