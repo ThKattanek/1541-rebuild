@@ -6,7 +6,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 3
 Title "1541-rebuid"
-Date "2020-04-17"
+Date "2020-04-18"
 Rev "1.4.0"
 Comp ""
 Comment1 "Erstellt von: Thorsten Kattanek"
@@ -26,7 +26,7 @@ F 3 "" H 4950 3800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Text Notes 600  7700 0    60   ~ 0
-Am meiner 1541II Platine (ASSY NO 345003 REV 9) habe ich folgende modifiktionen durchgeführt:\n- PIN 42 von U10 (Gate Array 251828) von Platine getrennt (BYTE READY) -- WIRD NOCH GEPRÜFT !!!\n- U8 (VIA 6522) ausgelötet und gesockelt\n- Dauerläufer behoben durch trennen einer Leiterbahn zwischen R/W Amp Pin 32 (Power On) und den 220 Ohm Widerstand
+Am meiner 1541II Platine (ASSY NO 345003 REV 9) habe ich folgende modifiktionen durchgeführt:\n- U8 (VIA 6522) ausgelötet und gesockelt\n- Dauerläufer behoben durch trennen einer Leiterbahn zwischen R/W Amp Pin 32 (Power On) und den 220 Ohm Widerstand
 $Comp
 L Oscillator:TCXO-14 X1
 U 1 1 55F7CB9E
@@ -164,6 +164,7 @@ F15 "SOE" I L 6600 4500 60
 F16 "MTR" I R 7700 4300 60 
 F17 "WPS" I L 6600 4600 60 
 F18 "~RESET" I R 7700 4900 60 
+F19 "SOE_GA" I L 6600 4700 60 
 $EndSheet
 Wire Wire Line
 	4950 1800 4950 1600
@@ -712,29 +713,14 @@ Text Label 5550 3200 0    60   ~ 0
 SD_DETECT
 Text Label 5550 3300 0    60   ~ 0
 SD_WP
-$Comp
-L Connector_Generic:Conn_01x04 J6
-U 1 1 5E9A72BA
-P 2250 6550
-F 0 "J6" H 2250 6750 50  0000 C CNN
-F 1 "IO" V 2350 6500 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical" H 2250 6550 50  0001 C CNN
-F 3 "" H 2250 6550 50  0001 C CNN
-	1    2250 6550
-	0    1    1    0   
-$EndComp
 Wire Wire Line
 	6300 2950 10000 2950
 Text GLabel 7700 3300 2    60   Input ~ 0
 PB3
 Text GLabel 7700 3200 2    60   Input ~ 0
 PB2
-Text GLabel 5750 4600 2    60   Input ~ 0
-PC7
 Wire Wire Line
-	5550 4600 5750 4600
-Text GLabel 2050 6100 1    60   Input ~ 0
-PC7
+	5550 4600 5950 4600
 Text GLabel 2250 6100 1    60   Input ~ 0
 PB2
 Text GLabel 2150 6100 1    60   Input ~ 0
@@ -743,8 +729,6 @@ Wire Wire Line
 	2150 6100 2150 6350
 Wire Wire Line
 	2250 6350 2250 6100
-Wire Wire Line
-	2050 6100 2050 6350
 Text Notes 1750 5800 0    60   ~ 0
 Nicht benutzte IO Pins\nFür evtl. Erweiterungen
 Wire Wire Line
@@ -761,4 +745,19 @@ Wire Wire Line
 	9900 2750 10000 2750
 Wire Wire Line
 	9900 2750 9900 2650
+Wire Wire Line
+	5950 4600 5950 4700
+Wire Wire Line
+	5950 4700 6600 4700
+$Comp
+L Connector_Generic:Conn_01x03 J6
+U 1 1 5E9CAC1A
+P 2250 6550
+F 0 "J6" V 2250 6750 50  0000 L CNN
+F 1 "IO" V 2350 6550 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 2250 6550 50  0001 C CNN
+F 3 "~" H 2250 6550 50  0001 C CNN
+	1    2250 6550
+	0    1    1    0   
+$EndComp
 $EndSCHEMATC

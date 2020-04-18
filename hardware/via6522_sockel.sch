@@ -6,7 +6,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 3 3
 Title "1541-rebuid"
-Date "2020-04-17"
+Date "2020-04-18"
 Rev "1.4.0"
 Comp ""
 Comment1 "Erstellt von: Thorsten Kattanek"
@@ -228,7 +228,6 @@ Wire Wire Line
 Connection ~ 5400 4500
 Wire Wire Line
 	7450 2400 7450 2800
-Connection ~ 7450 2800
 Wire Wire Line
 	4950 2450 4950 3800
 Connection ~ 4950 3800
@@ -306,8 +305,6 @@ Wire Wire Line
 Wire Wire Line
 	5400 4500 5850 4500
 Wire Wire Line
-	7450 2800 8750 2800
-Wire Wire Line
 	4950 3800 5850 3800
 Wire Wire Line
 	5050 4000 3100 4000
@@ -324,4 +321,10 @@ F 3 "${TK_DATASHEETS}/mos_6522_preliminary_nov_1977.pdf" H 7850 3650 60  0001 C 
 	1    6450 3650
 	1    0    0    -1  
 $EndComp
+Text HLabel 8150 2400 1    60   Input ~ 0
+SOE_GA
+Wire Wire Line
+	8150 2400 8150 2800
+Wire Wire Line
+	8150 2800 8750 2800
 $EndSCHEMATC
