@@ -1,7 +1,7 @@
 /* Name: main.h
 * Project: 1541-rebuild
 * Author: Thorsten Kattanek
-* Copyright: (c) 2018 by Thorsten Kattanek <thorsten.kattanek@gmx.de>
+* Copyright: (c) 2020 by Thorsten Kattanek <thorsten.kattanek@gmx.de>
 * License: GPL 2
 */
 
@@ -47,10 +47,11 @@
 // Default 15
 #define STEPPER_DELAY_TIME 5
 
-// DEBUG LED (Optional / vorrerst)
-#define DBG_LED_DDR DDRC
-#define DBG_LED_PORT PORTC
-#define DBG_LED PC7
+// SOE GATEWAY --> Ausgang
+// LO wenn SD Karte laufen soll damit ByteReady High bleibt
+#define SOE_GATEARRAY_DDR DDRC
+#define SOE_GATEARRAY_PORT PORTC
+#define SOE_GATEARRAY PC7
 
 // Anschluss der Stepper Signale
 // Zwingend diese PINs wegen Extern Interrupts PCINT6/7
@@ -73,8 +74,11 @@
 #define BYTE_READY_PORT PORTC
 #define BYTE_READY  PC0
 
-#define set_byte_ready() BYTE_READY_PORT |= 1 << BYTE_READY
-#define clear_byte_ready() BYTE_READY_PORT &= ~(1 << BYTE_READY)
+//DDxn = 0 , PORTxn = 0 --> HiZ
+//DDxn = 1 , PORTxn = 0 --> Output Low (Sink)
+
+#define set_byte_ready() BYTE_READY_DDR &= ~(1 << BYTE_READY)   // HiZ
+#define clear_byte_ready() BYTE_READY_DDR |= (1 << BYTE_READY)  // auf Ground ziehen
 
 // SYNC
 #define SYNC_DDR DDRC
@@ -153,9 +157,9 @@ void init_timer2(void);
 void start_timer2(void);
 void stop_timer2(void);
 void init_keys(void);
-void dbg_led_init(void);
-void dbg_led_on(void);
-void dbg_led_off(void);
+void soe_gatearry_init(void);
+void soe_gatearry_lo(void);
+void soe_gatearry_hi(void);
 
 int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_entry);
 struct fat_file_struct* open_disk_image(struct fat_fs_struct *fs, struct fat_dir_entry_struct* file_entry, uint8_t *image_type);

@@ -1,7 +1,7 @@
 /* Name: main.c
 * Project: 1541-rebuild
 * Author: Thorsten Kattanek
-* Copyright: (c) 2018 by Thorsten Kattanek <thorsten.kattanek@gmx.de>
+* Copyright: (c) 2020 by Thorsten Kattanek <thorsten.kattanek@gmx.de>
 * License: GPL 2
 */
 
@@ -22,8 +22,11 @@ int main(void)
 {
     char byte_str[4];	    // Wird benutzt um hier ein Byte als String abzulegen
 
-    // Debug LED initialisieren
-    dbg_led_init();
+    // SOE GateArray initialisieren
+    soe_gatearry_init();
+    soe_gatearry_lo();      // Damit die GateArray das Signal Byte_Ready auf Hi setzt
+                            // Somit stört mich das Signal nicht mehr und ich muss Byte_Ready
+                            // Nur auf Lo ziehen (hi = hiz und lo = gnd)
 
     // LCD Display intialisieren
     lcd_init();
@@ -415,7 +418,11 @@ void init_motor()
 void init_controll_signals(void)
 {
     // Als Ausgang schalten
-    BYTE_READY_DDR |= 1<<BYTE_READY;
+    //DDxn = 0 , PORTxn = 0 --> HiZ
+    //DDxn = 1 , PORTxn = 0 --> Output Low (Sink)
+    BYTE_READY_DDR &= ~(1<<BYTE_READY);             // Byte Ready auf HiZ
+    BYTE_READY_PORT &= ~(1<<BYTE_READY);
+
     SYNC_DDR |= 1<<SYNC;
     WPS_DDR |= 1<<WPS;
 
@@ -499,26 +506,27 @@ void init_keys(void)
 
 /////////////////////////////////////////////////////////////////////
 
-void dbg_led_init(void)
+void soe_gatearry_init(void)
 {
-    //DDxn = 0 , PORTxn = 0 --> HiZ
-    //DDxn = 1 , PORTxn = 0 --> Output Low (Sink)
-    DBG_LED_DDR &= ~(1<<DBG_LED);
-    DBG_LED_PORT &= ~(1<<DBG_LED);
+    //DDxn = 1 , PORTxn = 0 --> Lo
+    //DDxn = 1 , PORTxn = 1 --> Hi
+
+    SOE_GATEARRAY_DDR |= 1<<SOE_GATEARRAY;
+    soe_gatearry_lo();
 }
 
 /////////////////////////////////////////////////////////////////////
 
-void dbg_led_on(void)
+void soe_gatearry_hi(void)
 {
-    DBG_LED_DDR |= 1<<DBG_LED;
+    SOE_GATEARRAY_PORT |= 1<<SOE_GATEARRAY;
 }
 
 /////////////////////////////////////////////////////////////////////
 
-void dbg_led_off(void)
+void soe_gatearry_lo(void)
 {
-    DBG_LED_DDR &= ~(1<<DBG_LED);
+    SOE_GATEARRAY_PORT &= ~(1<<SOE_GATEARRAY);
 }
 
 /////////////////////////////////////////////////////////////////////
