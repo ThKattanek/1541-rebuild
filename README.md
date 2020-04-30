@@ -1,4 +1,4 @@
-### Achtung: Ich bin gerade dabei hier alles zu überarbeiten und zu erneuern. Die neuen Platinen (Rev.1.4.0) sind angekommen und ich habe diese auch schon aufgebaut und getestet. Soweit laufen die neuen Platinen gut. Muss noch prüfen wie sie auf den 1541 Boards passen. Bin jetzt dabei die Dokumentation auf den neusten Stand zu bringen, und dann geht es weiter mit der Firmware. Bitte wartet mit einem Nachbau bis ein offizelles Release hier online geht !!!
+### Achtung: Ich bin gerade dabei hier alles zu überarbeiten und zu erneuern. Die neuen Platinen (Rev.: 1.4.0) sind angekommen und ich habe diese auch schon aufgebaut und getestet. Soweit laufen die neuen Platinen gut. Ich muss noch prüfen wie sie auf den 1541 Boards passen. Bin jetzt dabei die Dokumentation auf den neusten Stand zu bringen, und dann geht es weiter mit der Firmware. Bitte wartet mit einem Nachbau bis ein offizelles Release hier online geht !!!
 ### Stand: 01.05.2020
 
 # 1541-rebuild
