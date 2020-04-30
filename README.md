@@ -9,6 +9,7 @@ Die Hardware wird mit KiCad entwickelt. Version 5.1.4 unter Ubuntu.
 
 
 ![Screenshot](/doc/fotos/1541-rebuild_raytraced.png)
+![image1](/doc/fotos/platine_rev_1.4.0/IMG_20200430_231529.jpg) 
 
 ### Einige Videos von der 1541-rebuild in aktion
 https://youtu.be/EGB8lYKcW-g
