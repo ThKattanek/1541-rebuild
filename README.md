@@ -8,8 +8,12 @@ Ersetzt den Analogteil einer Floppy 1541 durch ein Micro Controller der Disk Ima
 Die Hardware wird mit KiCad entwickelt. Version 5.1.4 unter Ubuntu.
 
 
-![Screenshot](/doc/fotos/1541-rebuild_raytraced.png)
-![image1](/doc/fotos/platine_rev_1.4.0/IMG_20200430_231529.jpg) 
+![image1](/doc/fotos/1541-rebuild_raytraced.png)
+![image2](/doc/fotos/platine_rev_1.4.0/IMG_20200430_231529.jpg)
+![image3](/doc/fotos/platine_rev_1.4.0/IMG_20200430_232355.jpg) 
+
+### Hier der Thread dazu im Forum64
+https://www.forum64.de/index.php?thread/59884-laufwerk-der-1541-emulieren
 
 ### Einige Videos von der 1541-rebuild in aktion
 https://youtu.be/EGB8lYKcW-g
