@@ -12,3 +12,4 @@ fp-info-cache
 *.ses
 _autosave-*
 firmware/firmware_1541_rebuild.*
+/tests
