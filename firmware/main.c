@@ -25,8 +25,8 @@ int main(void)
                             // Somit stört mich das Signal nicht mehr und ich muss Byte_Ready
                             // Nur auf Lo ziehen (hi = hiz und lo = gnd)
 
-    // WPS PIN Disable (Eingang HiZ)
-    endable_wps_port(0);
+    // WPS PIN Enable
+    endable_wps_port(1);
 
     // LCD Display intialisieren
     lcd_init();
