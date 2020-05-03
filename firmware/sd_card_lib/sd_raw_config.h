@@ -111,11 +111,21 @@ extern "C"
     #error "no sd/mmc pin mapping available!"
 #endif
 
+/*
+// with Card-Detect and/or Card-Lock switches
 #define configure_pin_available() DDRB &= ~(1 << DDB2)
 #define configure_pin_locked() DDRB &= ~(1 << DDB3)
 
 #define get_pin_available() (PINB & (1 << PINB2))
 #define get_pin_locked() (PINB & (1 << PINB3))
+*/
+
+// no Card-Detect and/or Card-Lock switches
+#define configure_pin_available() /* nothing */
+#define configure_pin_locked() /* nothing */
+
+#define get_pin_available() 0
+#define get_pin_locked() 1
 
 #if SD_RAW_SDHC
     typedef uint64_t offset_t;
