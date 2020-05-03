@@ -25,6 +25,9 @@ int main(void)
                             // Somit stört mich das Signal nicht mehr und ich muss Byte_Ready
                             // Nur auf Lo ziehen (hi = hiz und lo = gnd)
 
+    // WPS PIN Disable (Eingang HiZ)
+    endable_wps_port(0);
+
     // LCD Display intialisieren
     lcd_init();
 
@@ -63,9 +66,6 @@ int main(void)
     }
 
     lcd_clear();
-
-    // Write Potection aktivieren
-    set_write_protection(1);
 
     view_dir_entry(0,&file_entry);
 
@@ -331,7 +331,6 @@ void init_controll_signals(void)
     BYTE_READY_PORT &= ~(1<<BYTE_READY);
 
     SYNC_DDR |= 1<<SYNC;
-    WPS_DDR |= 1<<WPS;
 
     // Als Eingang schalten
     DATA_DDR = 0x00;
@@ -745,11 +744,38 @@ inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer)
 
 /////////////////////////////////////////////////////////////////////
 
+///
+/// \brief endable_wps_port
+/// \param enable 0 == disable (WPS PIN wird auf Eingang HiZ gestellt)
+///               0 != enable  (WPS PIN wird auf Ausgang gestellt, WP wird aktiviert)
+///
+void endable_wps_port(uint8_t enable)
+{
+    if(enable == 0)
+    {
+        // Pin auf HiZ
+        is_wps_pin_enable = 0;
+        WPS_DDR &= ~(1<<WPS);
+        WPS_PORT &= ~(1<<WPS);
+    }
+    else
+    {
+        is_wps_pin_enable = 1;
+        WPS_DDR |= 1<<WPS;
+        set_write_protection(1);
+    }
+}
+
+/////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////
+
 void set_write_protection(int8_t wp)
 {
+    if(is_wps_pin_enable == 0) return;
+
     floppy_wp = wp;
 
-    lcd_setcursor(18,4);
     if(wp == 0)
     {
         set_wps();

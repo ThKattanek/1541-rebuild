@@ -110,8 +110,8 @@
 #define WPS_PORT PORTC
 #define WPS  PC4
 
-#define set_wps() WPS_PORT |= 1 << WPS          // 0V Level =  WritePotect / 5V Level = Writetable
-#define clear_wps() WPS_PORT &= ~(1 << WPS)
+#define set_wps() WPS_PORT |= 1 << WPS          // 5V Level = WritePotect
+#define clear_wps() WPS_PORT &= ~(1 << WPS)     // 0V Level = Writetable
 
 // Anschluss der Datenleitungen
 #define DATA_DDR   DDRD
@@ -173,6 +173,7 @@ int8_t read_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t t
 void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
 inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
 
+void endable_wps_port(uint8_t enable);  // 0 = WPS PIN HiZ (set_write_protection() ohne Wirkung) / 1 = WPS PIN als Ausgang
 void set_write_protection(int8_t wp);   // wp=0 image nicht geschützt wp=1 image schreibgeschützt
 void send_disk_change(void);
 
@@ -189,7 +190,8 @@ struct fat_file_struct* fd;
 
 uint8_t akt_image_type = 0;	// 0=kein Image, 1=G64, 2=D64
 
-int8_t floppy_wp = 0;           // Hier wird der aktuelle WriteProtection Zustand gespeichert / 0=Nicht Schreibgeschützt 1=Schreibgeschützt
+uint8_t is_wps_pin_enable = 0; // 0=WPS PIN=HiZ / 1=WPS Output
+int8_t floppy_wp = 0;       // Hier wird der aktuelle WriteProtection Zustand gespeichert / 0=Nicht Schreibgeschützt 1=Schreibgeschützt
 
 volatile static uint8_t stp_signals_old = 0;
 
