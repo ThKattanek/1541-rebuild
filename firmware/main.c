@@ -60,7 +60,10 @@ int main(void)
     // SD Karte initialisieren
     // Partition und Filesystem öffnen
     // Warten bis alles O.K. ist
-    while(init_sd_card()){}
+    while(init_sd_card())
+    {
+        _delay_ms(1000);
+    }
 
     lcd_clear();
 
@@ -336,28 +339,58 @@ int main(void)
 
 int8_t init_sd_card(void)
 {
+    // LCD Fehlermeldung löschen
+    lcd_setcursor( 0, 4);
+    lcd_string("                    ");
+    lcd_setcursor( 0, 4);
+
     set_sleep_mode(SLEEP_MODE_IDLE);
 
     // SD Karte initialisieren
     if(!sd_raw_init())
-	return 1;
+    {
+        lcd_setcursor( 0, 4);
+        lcd_string("err: sd_raw_init");
+        return 1;
+    }
 
     // Eine Partition öffnen (die erste)
     partition = partition_open(sd_raw_read,sd_raw_read_interval,sd_raw_write,sd_raw_write_interval,0);
     if(!partition)
     {
         partition = partition_open(sd_raw_read,sd_raw_read_interval,sd_raw_write,sd_raw_write_interval,-1);
-	if(!partition) return 2;
+        if(!partition)
+        {
+            lcd_setcursor( 0, 4);
+            lcd_string("err: partition_open");
+            return 2;
+        }
     }
 
     // FAT16/32 Filesystem versuchen zu öffnen
+
+    lcd_string("*");
+
     fs = fat_open(partition);
-    if(!fs) return 3;
+
+    lcd_string("*");
+
+    if(!fs)
+    {
+        lcd_setcursor( 0, 4);
+        lcd_string("err: fat_open");
+        return 3;
+    }
 
     // Root Verzeichnis öffnen
     fat_get_dir_entry_of_path(fs, "/", &directory);
     dd = fat_open_dir(fs, &directory);
-    if(!dd) return 4;
+    if(!dd)
+    {
+        lcd_setcursor( 0, 4);
+        lcd_string("err: fat_open_root");
+        return 4;
+    }
 
     return 0;
 }
