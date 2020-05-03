@@ -15,9 +15,6 @@
 #include <string.h>
 #include <ctype.h>
 
-
-#define DEBUG_MODE
-
 int main(void)
 {
     char byte_str[4];	    // Wird benutzt um hier ein Byte als String abzulegen
@@ -72,63 +69,6 @@ int main(void)
 
     view_dir_entry(0,&file_entry);
 
-    //////////////////////////////////////////////////////////////////////////
-
-    /*
-    lcd_setcursor(0,1);
-    lcd_string("- File Write Test -");
-
-    lcd_setcursor(0,2);
-
-    uint8_t ret = fat_create_file(dd,"rebuild.g64",&file_entry);
-    if(ret == 0)
-    {
-        lcd_string("Err: No Created File");
-    }
-    else if(ret == 2)
-    {
-        ret = fat_delete_file(fs,&file_entry);
-        if(ret == 0)
-        {
-            lcd_setcursor(0,2);
-            lcd_string("File not deleted.");
-        }
-        else
-        {
-            ret = fat_create_file(dd,"rebuild.d64",&file_entry);
-            if(ret == 0)
-                lcd_string("Err: No Created File");
-        }
-    }
-
-    fd = open_disk_image(fs, &file_entry, &akt_image_type);
-    if(!fd)
-    {
-        lcd_setcursor( 0, 2);
-        lcd_string("Image not open!");
-    }
-    */
-
-    //////////////////////////////////////////////////////////////////////////
-
-#ifdef DEBUG_MODE
-    lcd_setcursor(0,4);
-    lcd_string("T:");
-
-    lcd_setcursor(5,4);
-    lcd_string("M:");
-
-    lcd_setcursor(9,4);
-    lcd_string("K:");
-
-    lcd_setcursor(15,4);
-    lcd_string("WP:");
-
-    lcd_setcursor(2,4);
-    sprintf (byte_str,"%d",akt_half_track >> 1);
-    lcd_string(byte_str);
-#endif
-
     // Interrupts erlauben
     sei();
 
@@ -158,23 +98,7 @@ int main(void)
 		    stepper_signal = 1;
 		break;
 	    }
-#ifdef DEBUG_MODE
-	    lcd_setcursor(2,4);
-	    lcd_string("   ");
-	    lcd_setcursor(2,4);
-	    sprintf(byte_str,"%d",akt_half_track >> 1);
-	    lcd_string(byte_str);
 
-            lcd_setcursor(0,3);
-            if(track_is_written == 1)
-            {
-                lcd_string("*");
-            }
-            else
-            {
-                lcd_string(" ");
-            }
-#endif
 	}
         else if(stepper_signal && (stepper_signal_time >= STEPPER_DELAY_TIME))
 	{
@@ -209,55 +133,6 @@ int main(void)
                 }
 	}
 
-#ifdef DEBUG_MODE
-        // KEY STATUS
-	lcd_setcursor(11,4);
-	if(get_key0_status())
-	    lcd_string("1");
-	else
-	    lcd_string("0");
-
-	lcd_setcursor(12,4);
-	if(get_key1_status())
-	    lcd_string("1");
-	else
-	    lcd_string("0");
-
-	lcd_setcursor(13,4);
-	if(get_key2_status())
-	    lcd_string("1");
-	else
-	    lcd_string("0");	
-
-        if(track_is_written != track_is_written_old)
-        {
-            track_is_written_old = track_is_written;
-            lcd_setcursor(0,3);
-            if(track_is_written == 1)
-            {
-                lcd_string("*");
-            }
-            else
-            {
-                lcd_string(" ");
-            }
-        }
-
-        if(old_motor_status != get_motor_status())
-        {
-            old_motor_status = get_motor_status();
-            lcd_setcursor(7,4);
-            if(get_motor_status())
-            {
-                lcd_string("*");
-            }
-            else
-            {
-                lcd_string(" ");
-            }
-        }
-#endif
-
         if(!get_motor_status())
         {
             // Sollte der aktuelle Track noch veränderungen haben so wird hier erstmal gesichert.
@@ -271,7 +146,6 @@ int main(void)
                 start_timer0();
             }
         }
-
 
 	static uint16_t dir_pos = 0;
 
@@ -879,12 +753,10 @@ void set_write_protection(int8_t wp)
     if(wp == 0)
     {
         set_wps();
-        lcd_string(" ");
     }
     else
     {
         clear_wps();
-        lcd_string("*");
     }
 }
 

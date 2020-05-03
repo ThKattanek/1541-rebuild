@@ -102,12 +102,15 @@
 
 #define get_so_status() (SO_PIN & (1<<SO))
 
-// WPS
+// WPS (Write Protection)
+// PIN ist mit PIN14 U8 VIA6522 (Input) verbunden
+// PIN ist mit PIN14 (A) GateArray (Input) verbunden
+// PIN ist mit PIN8 LS04 DM74LS04N (Output) verbunden -> Einganag PIN9 hängt auf einen PullUp (47k)
 #define WPS_DDR DDRC
 #define WPS_PORT PORTC
 #define WPS  PC4
 
-#define set_wps() WPS_PORT |= 1 << WPS
+#define set_wps() WPS_PORT |= 1 << WPS          // 0V Level =  WritePotect / 5V Level = Writetable
 #define clear_wps() WPS_PORT &= ~(1 << WPS)
 
 // Anschluss der Datenleitungen
