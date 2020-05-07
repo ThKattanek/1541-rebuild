@@ -20,3 +20,6 @@
   - [New]
   - [Save]
 - [Settings]
+- [Info]
+  - [Version] - Anzeige der Versionsnummer
+  
