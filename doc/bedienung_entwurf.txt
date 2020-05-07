@@ -1,0 +1,12 @@
+// 1541-rebuild kann 3 Tasten auswerten
+- Button1 - hoch
+- Button2 - runter
+- Button3 - enter 
+
+// Grundlegende Sachen //
+- Nach Start befindet sich die 1541-rebuild immer im Info Screen
+- Durch längerers drücken (1,5 sek) wechselt man immer zwischen Menü und Info Screen
+
+// Info Screen //
+- Anzeige aktuelle Spur
+- Anzeige aktuelles Images (Dateiname länger als 20 Zeichen soll gescrollt werden)
