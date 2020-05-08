@@ -32,6 +32,9 @@ int main(void)
 
 void reset()
 {
+    // Debug LED initisalieren
+    init_debug_led1();
+
     // SOE GateArray initialisieren
     soe_gatearry_init();
     soe_gatearry_lo();      // Damit die GateArray das Signal Byte_Ready auf Hi setzt
@@ -84,6 +87,8 @@ void reset()
 
     // Interrupts erlauben
     sei();
+
+    debug_led1_off();
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -169,9 +174,16 @@ void check_motor_signal()
 
 /////////////////////////////////////////////////////////////////////
 
-void update_keys()
+uint8_t get_key_from_buffer()
 {
-
+    if(key_buffer_r_pos != key_buffer_w_pos)
+    {
+        uint8_t val = key_buffer[key_buffer_r_pos++];
+        key_buffer_r_pos &= 0x0f;
+        return  val;
+    }
+    else
+        return NO_KEY;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -183,30 +195,20 @@ void select_image()
 
     static uint16_t dir_pos = 0;
 
-    // Runter
-    if(get_key0_status() && !wait_key_counter0)
+    switch (get_key_from_buffer())
     {
-        wait_key_counter0 = PRELL_TIME;
+    case KEY0_DOWN:
         if(dir_pos > 0)
         {
-        dir_pos--;
+            dir_pos--;
         }
         view_dir_entry(dir_pos,&file_entry);
-    }
-
-    // Hoch
-    if(get_key1_status() && !wait_key_counter1)
-    {
-        wait_key_counter1 = PRELL_TIME;
+        break;
+    case KEY1_DOWN:
         dir_pos++;
         if(!view_dir_entry(dir_pos,&file_entry)) dir_pos--;
-    }
-
-    // Enter
-    if(get_key2_status() && !wait_key_counter2)
-    {
-        wait_key_counter2 = PRELL_TIME;
-
+        break;
+    case KEY2_DOWN:
         stop_timer0();
         no_byte_ready_send = 1;
 
@@ -226,7 +228,18 @@ void select_image()
         start_timer0();
 
         send_disk_change();
+        break;
+    default:
+        break;
     }
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void init_debug_led1()
+{
+    DEBUG_LED1_DDR |= 1 << PB2;
+    debug_led1_on();
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -392,10 +405,10 @@ void init_timer2(void)
     TCCR2A = (1<<WGM21);    // CTC Modus
     TCCR2B |= (1<<CS20) | (1<<CS21) | (1<<CS22);    // Prescaler 1024
 
-    // jede ms aufrufen --> 1KHz
-    // ((20000000/1024)/1000) = 20
+    // alle 10 ms aufrufen --> 100Hz
+    // ((24000000/1024)/100) = 234
 
-    OCR2A = 20-1;
+    OCR2A = 234-1;
 
     start_timer2();
 }
@@ -936,10 +949,43 @@ ISR (TIMER0_COMPA_vect)
 
 ISR (TIMER2_COMPA_vect)
 {
-    if(wait_key_counter0)
-        wait_key_counter0--;
-    if(wait_key_counter1)
-        wait_key_counter1--;
-    if(wait_key_counter2)
-        wait_key_counter2--;
+    // ISR wird alle 10ms (100Hz) aufgerufen
+    volatile static uint8_t old_key0 = 0;
+    volatile static uint8_t old_key1 = 0;
+    volatile static uint8_t old_key2 = 0;
+
+    uint8_t key0 = get_key0();
+    uint8_t key1 = get_key1();
+    uint8_t key2 = get_key2();
+
+    if(key0 != old_key0)
+    {
+        if(key0)
+            key_buffer[key_buffer_w_pos++] = KEY0_DOWN;
+        else
+            key_buffer[key_buffer_w_pos++] = KEY0_UP;
+    }
+    key_buffer_w_pos &= 0x0f;
+
+    if(key1 != old_key1)
+    {
+        if(key1)
+            key_buffer[key_buffer_w_pos++] = KEY1_DOWN;
+        else
+            key_buffer[key_buffer_w_pos++] = KEY1_UP;
+    }
+    key_buffer_w_pos &= 0x0f;
+
+    if(key2 != old_key2)
+    {
+        if(key2)
+            key_buffer[key_buffer_w_pos++] = KEY2_DOWN;
+        else
+            key_buffer[key_buffer_w_pos++] = KEY2_UP;
+    }
+    key_buffer_w_pos &= 0x0f;
+
+    old_key0 = key0;
+    old_key1 = key1;
+    old_key2 = key2;
 }

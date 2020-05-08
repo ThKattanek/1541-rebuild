@@ -39,9 +39,6 @@
 // Track 18 --> Directory
 #define INIT_TRACK 18
 
-// Prellzeit der Taster in ms
-#define PRELL_TIME 100
-
 // Zeit die nach der letzten Stepperaktivität vergehen muss, um einen neuen Track von SD Karte zu laden
 // (1541 Original Rom schaltet STP1 alle 15ms)
 // Default 15
@@ -137,9 +134,19 @@
 #define KEY2_PIN PINC
 #define KEY2	 PINC3
 
-#define get_key0_status() (~KEY0_PIN & (1<<KEY0))
-#define get_key1_status() (~KEY1_PIN & (1<<KEY1))
-#define get_key2_status() (~KEY2_PIN & (1<<KEY2))
+#define get_key0() (~KEY0_PIN & (1<<KEY0))
+#define get_key1() (~KEY1_PIN & (1<<KEY1))
+#define get_key2() (~KEY2_PIN & (1<<KEY2))
+
+// DEBUG LED1
+#define DEBUG_LED1_DDR DDRB
+#define DEBUG_LED1_PORT PORTB
+#define DEBUG_LED1 PB2
+
+#define debug_led1_on() DEBUG_LED1_PORT |= 1<<PB2
+#define debug_led1_off() DEBUG_LED1_PORT &= ~(1<<PB2)
+
+enum KEY_CODES{KEY0_DOWN, KEY0_UP, KEY1_DOWN, KEY1_UP, KEY2_DOWN, KEY2_UP, NO_KEY};
 
 //////////////////////////////////////////////////////////////////
 // #define __AVR_ATmega128__
@@ -149,8 +156,9 @@ enum {UNDEF_IMAGE, G64_IMAGE, D64_IMAGE};
 void reset();
 void check_stepper_signals();
 void check_motor_signal();
-void update_keys();
+uint8_t get_key_from_buffer();
 void select_image();
+void init_debug_led1();
 int8_t init_sd_card(void);
 void show_start_message(void);
 void init_stepper(void);
@@ -208,9 +216,9 @@ volatile uint16_t akt_track_pos = 0;
 
 char lcd_puffer[33]; // Maximal 32 Zeichen
 
-volatile uint16_t wait_key_counter0 = 0;
-volatile uint16_t wait_key_counter1 = 0;
-volatile uint16_t wait_key_counter2 = 0;
+volatile uint8_t key_buffer[16];
+volatile uint8_t key_buffer_r_pos = 0;
+volatile uint8_t key_buffer_w_pos = 0;
 
 uint8_t akt_half_track;
 uint8_t old_half_track;
