@@ -24,7 +24,7 @@ int main(void)
     {
         check_stepper_signals();
         check_motor_signal();
-        select_image();
+        update_gui();
     }
 }
 
@@ -81,9 +81,8 @@ void reset()
         _delay_ms(1000);
     }
 
-    lcd_clear();
-
-    // view_dir_entry(0,&file_entry);
+    // GUI Mode festlegen
+    set_gui_mode(GUI_INFO_MODE);
 
     // Interrupts erlauben
     sei();
@@ -188,14 +187,99 @@ uint8_t get_key_from_buffer()
 
 /////////////////////////////////////////////////////////////////////
 
-void select_image()
+void update_gui()
+{
+    static uint8_t old_half_track = 0;
+    static uint8_t old_motor_status = 0;
+
+    uint8_t key_code = get_key_from_buffer();
+
+    switch (current_gui_mode)
+    {
+    case GUI_INFO_MODE:
+
+        if(key_code == KEY2_DOWN)
+            set_gui_mode(GUI_MENU_MODE);
+
+        if(old_half_track != akt_half_track)
+        {
+            lcd_setcursor(7,1);
+            lcd_string("   ");
+            lcd_setcursor(7,1);
+            sprintf (byte_str,"%d",akt_half_track >> 1);
+            lcd_string(byte_str);
+        }
+        old_half_track = akt_half_track;
+
+        if(old_motor_status != get_motor_status())
+        {
+            lcd_setcursor(7,2);
+            if(get_motor_status())
+                lcd_string("On ");
+            else
+                lcd_string("Off");
+        }
+        old_motor_status = get_motor_status();
+
+        break;
+
+    case GUI_MENU_MODE:
+        select_image(key_code);
+        break;
+
+    default:
+        break;
+    }
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void set_gui_mode(uint8_t gui_mode)
+{
+    current_gui_mode = gui_mode;
+    switch(gui_mode)
+    {
+    case GUI_INFO_MODE:
+        lcd_clear();
+
+        lcd_setcursor(0,1);
+        lcd_string("Track:");
+
+        lcd_setcursor(7,1);
+        sprintf (byte_str,"%d",akt_half_track >> 1);
+        lcd_string(byte_str);
+
+        lcd_setcursor(0,2);
+        lcd_string("Motor:");
+
+        lcd_setcursor(7,2);
+        if(get_motor_status())
+            lcd_string("On ");
+        else
+            lcd_string("Off");
+
+        lcd_setcursor(1,4);
+        if(!is_image_mount)
+            lcd_string("Not Image Mounting");
+
+        break;
+    case GUI_MENU_MODE:
+        lcd_clear();
+        view_dir_entry(dir_pos,&file_entry);
+        break;
+    default:
+        break;
+    }
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void select_image(uint8_t key)
 {
     /////////////////////////////////////////////////////////////////////////////////////////
     //// Image Auswahl
 
-    static uint16_t dir_pos = 0;
-
-    switch (get_key_from_buffer())
+    switch (key)
     {
     case KEY0_DOWN:
         if(dir_pos > 0)
@@ -215,10 +299,11 @@ void select_image()
         close_disk_image(fd);
 
         fd = open_disk_image(fs, &file_entry, &akt_image_type);
+
         if(!fd)
         {
-            lcd_setcursor( 0, 2);
-            lcd_string("Image not open!");
+            is_image_mount = 0;
+            return ;
         }
 
         read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
@@ -228,6 +313,11 @@ void select_image()
         start_timer0();
 
         send_disk_change();
+
+        is_image_mount = 1;
+
+        set_gui_mode(GUI_INFO_MODE);
+
         break;
     default:
         break;
@@ -537,37 +627,39 @@ struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir
     i=0;
     while(extension[i] != 0)
     {
-	extension[i] = tolower(extension[i]);
-	i++;
+        extension[i] = tolower(extension[i]);
+        i++;
     }
 
     fd = fat_open_file(fs, file_entry);
     if(!fd)
     {
-	*image_type = UNDEF_IMAGE;
-	return fd;
+        *image_type = UNDEF_IMAGE;
+        return fd;
     }
 
     if(!strcmp(extension,".g64"))
     {
-	// Laut Extension ein G64
-	*image_type = G64_IMAGE;
-	open_g64_image(fd);
+        // Laut Extension ein G64
+        *image_type = G64_IMAGE;
+        open_g64_image(fd);
         set_write_protection(0);
-    }else if(!strcmp(extension,".d64"))
+    }
+    else if(!strcmp(extension,".d64"))
     {
-	// Laut Extensions ein D64
-	*image_type = D64_IMAGE;
-	open_d64_image(fd);
+        // Laut Extensions ein D64
+        *image_type = D64_IMAGE;
+        open_d64_image(fd);
         set_write_protection(1);
-    }else
+    }
+    else
     {
-	// Nicht unterstützt
-	lcd_setcursor( 0, 3);
-	lcd_string("Not Supported");
-	fat_close_file(fd);
-	fd = NULL;
-	*image_type = UNDEF_IMAGE;
+        // Nicht unterstützt
+        lcd_setcursor( 0, 3);
+        lcd_string("Not Supported");
+        fat_close_file(fd);
+        fd = NULL;
+        *image_type = UNDEF_IMAGE;
     }
 
     return fd;

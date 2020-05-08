@@ -148,6 +148,8 @@
 
 enum KEY_CODES{KEY0_DOWN, KEY0_UP, KEY1_DOWN, KEY1_UP, KEY2_DOWN, KEY2_UP, NO_KEY};
 
+enum GUI_MODE{GUI_INFO_MODE, GUI_MENU_MODE};
+
 //////////////////////////////////////////////////////////////////
 // #define __AVR_ATmega128__
 
@@ -157,7 +159,9 @@ void reset();
 void check_stepper_signals();
 void check_motor_signal();
 uint8_t get_key_from_buffer();
-void select_image();
+void update_gui();
+void set_gui_mode(uint8_t gui_mode);
+void select_image(uint8_t key);
 void init_debug_led1();
 int8_t init_sd_card(void);
 void show_start_message(void);
@@ -193,6 +197,19 @@ void send_disk_change(void);
 /////////////////////////////////////////////////////////////////
 // Globale Variablen
 
+// gui
+char lcd_puffer[33]; // Maximal 32 Zeichen
+
+volatile uint8_t key_buffer[16];
+volatile uint8_t key_buffer_r_pos = 0;
+volatile uint8_t key_buffer_w_pos = 0;
+
+uint8_t current_gui_mode;
+int8_t byte_str[16];
+
+uint16_t dir_pos = 0;
+
+// filesystem
 struct partition_struct* partition = NULL;
 struct fat_fs_struct* fs = NULL;
 struct fat_dir_entry_struct directory;
@@ -201,24 +218,19 @@ struct fat_dir_struct* dd = NULL;
 struct fat_dir_entry_struct file_entry;
 struct fat_file_struct* fd;
 
-uint8_t akt_image_type = 0;	// 0=kein Image, 1=G64, 2=D64
+// floppydisk emulation
+uint8_t akt_image_type = 0;     // 0=kein Image, 1=G64, 2=D64
+uint8_t is_image_mount = 0;
 
 uint8_t is_wps_pin_enable = 0; // 0=WPS PIN=HiZ / 1=WPS Output
 int8_t floppy_wp = 0;       // Hier wird der aktuelle WriteProtection Zustand gespeichert / 0=Nicht Schreibgeschützt 1=Schreibgeschützt
 
 volatile static uint8_t stp_signals_old = 0;
 
-//War Volatile
 uint16_t gcr_track_length = 7139;
 
 volatile uint8_t akt_gcr_byte = 0;
 volatile uint16_t akt_track_pos = 0;
-
-char lcd_puffer[33]; // Maximal 32 Zeichen
-
-volatile uint8_t key_buffer[16];
-volatile uint8_t key_buffer_r_pos = 0;
-volatile uint8_t key_buffer_w_pos = 0;
 
 uint8_t akt_half_track;
 uint8_t old_half_track;
@@ -246,12 +258,10 @@ const uint8_t d64_track_zone[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,        
 
 //Höhere Werte verlangsammen die Bitrate
 //const uint8_t timer0_orca0[4] = {64,69,74,79};            // Diese Werte erzeugen den genausten Bittakt aber nicht 100% (Bei 20MHz)
-const uint8_t timer0_orca0[4] = {77,83,89,95};            // Diese Werte erzeugen den genausten Bittakt aber nicht 100% (Bei 24MHz)
+const uint8_t timer0_orca0[4] = {77,83,89,95};              // Diese Werte erzeugen den genausten Bittakt aber nicht 100% (Bei 24MHz)
 
 const uint8_t d64_sector_gap[4] = {12, 21, 16, 13}; // von GPZ Code übermommen imggen
 #define HEADER_GAP_BYTES 9
-
-volatile uint8_t *test_addr;
 
 #define D64_SECTOR_SIZE 256
 
@@ -261,8 +271,6 @@ volatile uint8_t stepper_signal_r_pos = 0;
 volatile uint8_t stepper_signal_w_pos = 0;
 volatile uint8_t stepper_signal_time = 0;
 volatile uint8_t stepper_signal = 0;
-
-volatile uint8_t stepper_msg = 0;   // 0-keine Stepperaktivität ; 1=StepperDec ; 2-255=StepperInc
 
 uint8_t gcr_track[8192];
 
