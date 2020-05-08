@@ -92,7 +92,7 @@ void check_stepper_signals()
 {
     // Auf Steppermotor aktivität prüfen
     // und auswerten
-    if(stepper_signal_r_pos != stepper_signal_w_pos)
+    if(stepper_signal_r_pos != stepper_signal_w_pos)    // Prüfen ob sich was neues im Ringpuffer für die Steppersignale befindet
     {
             uint8_t stepper = stepper_signal_puffer[stepper_signal_r_pos]>>2 | stepper_signal_puffer[stepper_signal_r_pos-1];
             stepper_signal_r_pos++;
@@ -169,6 +169,13 @@ void check_motor_signal()
 
 /////////////////////////////////////////////////////////////////////
 
+void update_keys()
+{
+
+}
+
+/////////////////////////////////////////////////////////////////////
+
 void select_image()
 {
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -202,17 +209,6 @@ void select_image()
 
         stop_timer0();
         no_byte_ready_send = 1;
-
-        // Sollte der aktuelle Track noch veränderungen haben so wird hier erstmal gesichert.
-        /*
-        if(track_is_written == 1)
-        {
-            no_byte_ready_send = 1;
-            track_is_written = 0;
-            write_disk_track(fd,akt_image_type,old_half_track>>1,gcr_track, &gcr_track_length);
-            no_byte_ready_send = 0;
-        }
-        */
 
         close_disk_image(fd);
 
@@ -852,6 +848,8 @@ ISR (TIMER0_COMPA_vect)
     // ISR wird alle 26,28,30 oder 32µs ausfgrufen
     // Je nach dem welche Spur gerade aktiv ist
 
+    stepper_signal_time++;
+
     static uint8_t old_gcr_byte = 0;
     uint8_t is_sync;
 
@@ -938,8 +936,6 @@ ISR (TIMER0_COMPA_vect)
 
 ISR (TIMER2_COMPA_vect)
 {
-    stepper_signal_time++;
-
     if(wait_key_counter0)
         wait_key_counter0--;
     if(wait_key_counter1)
