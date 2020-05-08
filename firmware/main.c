@@ -17,8 +17,21 @@
 
 int main(void)
 {
-    char byte_str[4];	    // Wird benutzt um hier ein Byte als String abzulegen
+    reset();                // Alles initialisieren
 
+    //// MAIN LOOP /////
+    while(1)
+    {
+        check_stepper_signals();
+        check_motor_signal();
+        select_image();
+    }
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void reset()
+{
     // SOE GateArray initialisieren
     soe_gatearry_init();
     soe_gatearry_lo();      // Damit die GateArray das Signal Byte_Ready auf Hi setzt
@@ -67,144 +80,156 @@ int main(void)
 
     lcd_clear();
 
-    view_dir_entry(0,&file_entry);
+    // view_dir_entry(0,&file_entry);
 
     // Interrupts erlauben
     sei();
+}
 
-    while(1)
+/////////////////////////////////////////////////////////////////////
+
+void check_stepper_signals()
+{
+    // Auf Steppermotor aktivität prüfen
+    // und auswerten
+    if(stepper_signal_r_pos != stepper_signal_w_pos)
     {
-        // Auf Steppermotor aktivität prüfen
-        // und auswerten
-        if(stepper_signal_r_pos != stepper_signal_w_pos)
+            uint8_t stepper = stepper_signal_puffer[stepper_signal_r_pos]>>2 | stepper_signal_puffer[stepper_signal_r_pos-1];
+            stepper_signal_r_pos++;
+
+        switch(stepper)
         {
-                uint8_t stepper = stepper_signal_puffer[stepper_signal_r_pos]>>2 | stepper_signal_puffer[stepper_signal_r_pos-1];
-                stepper_signal_r_pos++;
+        case 0x30: case 0x40: case 0x90: case 0xE0:
+        // DEC
+        stepper_dec();
+            stepper_signal_time = 0;
+            stepper_signal = 1;
+        break;
 
-            switch(stepper)
-            {
-            case 0x30: case 0x40: case 0x90: case 0xE0:
-            // DEC
-            stepper_dec();
-                stepper_signal_time = 0;
-                stepper_signal = 1;
-            break;
-
-            case 0x10: case 0x60: case 0xB0: case 0xC0:
-            // INC
-            stepper_inc();
-                stepper_signal_time = 0;
-                stepper_signal = 1;
-            break;
-            }
+        case 0x10: case 0x60: case 0xB0: case 0xC0:
+        // INC
+        stepper_inc();
+            stepper_signal_time = 0;
+            stepper_signal = 1;
+        break;
         }
-        else if(stepper_signal && (stepper_signal_time >= STEPPER_DELAY_TIME))
+    }
+    else if(stepper_signal && (stepper_signal_time >= STEPPER_DELAY_TIME))
+    {
+        stepper_signal = 0;
+
+        if(!(akt_half_track & 0x01))
         {
-            stepper_signal = 0;
-
-            if(!(akt_half_track & 0x01))
-            {
-                stop_timer0();
-
-                // Geschwindigkeit setzen
-                OCR0A = timer0_orca0[d64_track_zone[akt_half_track>>1]];
-                akt_track_pos = 0;
-
-                if(track_is_written == 1)
-                {
-                    no_byte_ready_send = 1;
-
-                    track_is_written = 0;
-                    write_disk_track(fd,akt_image_type,old_half_track>>1,gcr_track, &gcr_track_length);
-
-                    read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
-                    old_half_track = akt_half_track;    // Merken um evtl. dort zurück zu schreiben
-
-                    no_byte_ready_send = 0;
-                }
-                else
-                {
-                    read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
-                    old_half_track = akt_half_track;    // Merken um evtl. dort zurück zu schreiben
-                }
-                start_timer0();
-            }
-        }
-
-        if(!get_motor_status())
-        {
-            // Sollte der aktuelle Track noch veränderungen haben so wird hier erstmal gesichert.
-            if(track_is_written == 1)
-            {
-                stop_timer0();
-                no_byte_ready_send = 1;
-                track_is_written = 0;
-                write_disk_track(fd,akt_image_type,old_half_track>>1,gcr_track, &gcr_track_length);
-                no_byte_ready_send = 0;
-                start_timer0();
-            }
-        }
-
-        static uint16_t dir_pos = 0;
-
-        /////////////////////////////////////////////////////////////////////////////////////////
-        //// Image Auswahl
-
-        // Runter
-        if(get_key0_status() && !wait_key_counter0)
-        {
-            wait_key_counter0 = PRELL_TIME;
-            if(dir_pos > 0)
-            {
-            dir_pos--;
-            }
-            view_dir_entry(dir_pos,&file_entry);
-        }
-
-        // Hoch
-        if(get_key1_status() && !wait_key_counter1)
-        {
-            wait_key_counter1 = PRELL_TIME;
-            dir_pos++;
-            if(!view_dir_entry(dir_pos,&file_entry)) dir_pos--;
-        }
-
-        // Enter
-        if(get_key2_status() && !wait_key_counter2)
-        {
-            wait_key_counter2 = PRELL_TIME;
-
             stop_timer0();
-            no_byte_ready_send = 1;
 
-            // Sollte der aktuelle Track noch veränderungen haben so wird hier erstmal gesichert.
-            /*
-            if(track_is_written == 1)
-            {
-                no_byte_ready_send = 1;
-                track_is_written = 0;
-                write_disk_track(fd,akt_image_type,old_half_track>>1,gcr_track, &gcr_track_length);
-                no_byte_ready_send = 0;
-            }
-            */
-
-            close_disk_image(fd);
-
-            fd = open_disk_image(fs, &file_entry, &akt_image_type);
-            if(!fd)
-            {
-                lcd_setcursor( 0, 2);
-                lcd_string("Image not open!");
-            }
-
-            read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
+            // Geschwindigkeit setzen
+            OCR0A = timer0_orca0[d64_track_zone[akt_half_track>>1]];
             akt_track_pos = 0;
 
+            if(track_is_written == 1)
+            {
+                no_byte_ready_send = 1;
+
+                track_is_written = 0;
+                write_disk_track(fd,akt_image_type,old_half_track>>1,gcr_track, &gcr_track_length);
+
+                read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
+                old_half_track = akt_half_track;    // Merken um evtl. dort zurück zu schreiben
+
+                no_byte_ready_send = 0;
+            }
+            else
+            {
+                read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
+                old_half_track = akt_half_track;    // Merken um evtl. dort zurück zu schreiben
+            }
+            start_timer0();
+        }
+    }
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void check_motor_signal()
+{
+    if(!get_motor_status())
+    {
+        // Sollte der aktuelle Track noch veränderungen haben so wird hier erstmal gesichert.
+        if(track_is_written == 1)
+        {
+            stop_timer0();
+            no_byte_ready_send = 1;
+            track_is_written = 0;
+            write_disk_track(fd,akt_image_type,old_half_track>>1,gcr_track, &gcr_track_length);
             no_byte_ready_send = 0;
             start_timer0();
-
-            send_disk_change();
         }
+    }
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void select_image()
+{
+    /////////////////////////////////////////////////////////////////////////////////////////
+    //// Image Auswahl
+
+    static uint16_t dir_pos = 0;
+
+    // Runter
+    if(get_key0_status() && !wait_key_counter0)
+    {
+        wait_key_counter0 = PRELL_TIME;
+        if(dir_pos > 0)
+        {
+        dir_pos--;
+        }
+        view_dir_entry(dir_pos,&file_entry);
+    }
+
+    // Hoch
+    if(get_key1_status() && !wait_key_counter1)
+    {
+        wait_key_counter1 = PRELL_TIME;
+        dir_pos++;
+        if(!view_dir_entry(dir_pos,&file_entry)) dir_pos--;
+    }
+
+    // Enter
+    if(get_key2_status() && !wait_key_counter2)
+    {
+        wait_key_counter2 = PRELL_TIME;
+
+        stop_timer0();
+        no_byte_ready_send = 1;
+
+        // Sollte der aktuelle Track noch veränderungen haben so wird hier erstmal gesichert.
+        /*
+        if(track_is_written == 1)
+        {
+            no_byte_ready_send = 1;
+            track_is_written = 0;
+            write_disk_track(fd,akt_image_type,old_half_track>>1,gcr_track, &gcr_track_length);
+            no_byte_ready_send = 0;
+        }
+        */
+
+        close_disk_image(fd);
+
+        fd = open_disk_image(fs, &file_entry, &akt_image_type);
+        if(!fd)
+        {
+            lcd_setcursor( 0, 2);
+            lcd_string("Image not open!");
+        }
+
+        read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
+        akt_track_pos = 0;
+
+        no_byte_ready_send = 0;
+        start_timer0();
+
+        send_disk_change();
     }
 }
 
@@ -908,6 +933,8 @@ ISR (TIMER0_COMPA_vect)
         }
     }
 }
+
+/////////////////////////////////////////////////////////////////////
 
 ISR (TIMER2_COMPA_vect)
 {

@@ -40,7 +40,7 @@
 #define INIT_TRACK 18
 
 // Prellzeit der Taster in ms
-#define PRELL_TIME 200
+#define PRELL_TIME 100
 
 // Zeit die nach der letzten Stepperaktivität vergehen muss, um einen neuen Track von SD Karte zu laden
 // (1541 Original Rom schaltet STP1 alle 15ms)
@@ -146,6 +146,10 @@
 
 enum {UNDEF_IMAGE, G64_IMAGE, D64_IMAGE};
 
+void reset();
+void check_stepper_signals();
+void check_motor_signal();
+void select_image();
 int8_t init_sd_card(void);
 void show_start_message(void);
 void init_stepper(void);
