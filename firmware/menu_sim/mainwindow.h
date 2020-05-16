@@ -16,14 +16,13 @@ public:
     ~MainWindow();
 
 private slots:
+
+    void StartMenue();
+
     void on_actionSave_Image_triggered();
-
     void on_action_Exit_triggered();
-
     void on_button1_clicked();
-
     void on_button2_clicked();
-
     void on_button3_clicked();
 
 private:
