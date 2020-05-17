@@ -18,11 +18,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     lcd_widget.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    ../menu.c
 
 HEADERS += \
     lcd_widget.h \
-    mainwindow.h
+    mainwindow.h \
+    ../menu.h
 
 FORMS += \
     mainwindow.ui

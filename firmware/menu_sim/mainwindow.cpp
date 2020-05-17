@@ -4,6 +4,7 @@
 #include "../version.h"
 
 #include <QTimer>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -37,7 +38,12 @@ void MainWindow::StartMenue()
 
 void MainWindow::on_actionSave_Image_triggered()
 {
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),QDir::homePath(),tr("Images (*.png *.xpm *.xbm *.jpg *.jpeg *.bmp *.ppm)"));
 
+    if(fileName != "")
+    {
+       ui->lcd->SaveImage(fileName);
+    }
 }
 
 void MainWindow::on_action_Exit_triggered()
