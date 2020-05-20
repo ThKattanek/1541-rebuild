@@ -2,7 +2,6 @@
 #define MENUE_H
 
 #include <stdint.h>
-#include <iostream>
 
 #ifdef MENU_SIMULATION_QT
     #include "../menu_sim/lcd_widget.h"
