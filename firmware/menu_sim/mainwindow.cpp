@@ -3,7 +3,6 @@
 
 #include "../version.h"
 
-#include <QTimer>
 #include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -23,16 +22,26 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lcd->String(VERSION);
 
     QTimer::singleShot(2000, this,SLOT(StartMenue()));
+
+    timer1.setInterval(20);
+    connect(&timer1, SIGNAL(timeout()), this, SLOT(MainLoopSimulation()));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+
 }
 
 void MainWindow::StartMenue()
 {
     ui->lcd->Clear();
+    timer1.start();
+}
+
+void MainWindow::MainLoopSimulation()
+{
+    MenuUpdate(ui->lcd);
 }
 
 

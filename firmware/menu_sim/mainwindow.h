@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTimer>
+
+#include "../menu.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,6 +21,7 @@ public:
 private slots:
 
     void StartMenue();
+    void MainLoopSimulation();
 
     void on_actionSave_Image_triggered();
     void on_action_Exit_triggered();
@@ -27,5 +31,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    QTimer timer1;
 };
 #endif // MAINWINDOW_H
