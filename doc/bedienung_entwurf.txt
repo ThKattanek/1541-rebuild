@@ -1,5 +1,5 @@
-// 1541-rebuild kann 3 Tasten auswerten
-- Button1 - Hoch
+﻿// 1541-rebuild kann 3 Tasten auswerten
+- Button1 - Hoch	
 - Button2 - Runter
 - Button3 - Enter 
 
@@ -16,10 +16,15 @@
 
 // Menü //
 - [Image]
-  - [Open]
+  - [Mount]
+  - [UnMount]
   - [New]
   - [Save]
 - [Settings]
+  - Track auswählen (+/- 1-35)
+  - Rotation Speed (Speedzonen Geschwindigkeiten)
+  - Export to SD
+  - Import from SD
 - [Info]
   - [Version] - Anzeige der Versionsnummer
   
