@@ -77,12 +77,13 @@ AVRDUDE_ISP_SPEED = 0.1666  # (1/24000000Hz)*4 = 1.666µs
 # List C source files here. (C dependencies are automatically generated.)
 SRC = main.c
 SRC += lcd.c
+SRC += menu.c
+
 # Sourcen der SD Card Lib von Roland Riegel hinzufügen
 SRC += sd_card_lib/byteordering.c
 SRC += sd_card_lib/fat.c
 SRC += sd_card_lib/partition.c
 SRC += sd_card_lib/sd_raw.c
-#SRC += sd_card_lib/uart.c
 
 # List Assembler source files here.
 # Make them always end in a capital .S.  Files ending in a lowercase .s
