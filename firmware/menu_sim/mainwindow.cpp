@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     current_keycode = NO_KEY;
 
-    menu_init(&menu1, (MENU_ENTRY*) &menu_entrys01, 4);
+    menu_init(&menu1, (MENU_ENTRY*) &menu_entrys01, 10, 4);
 
     QTimer::singleShot(2000, this,SLOT(StartMenue()));
 
@@ -52,6 +52,7 @@ void MainWindow::StartMenue()
 void MainWindow::MainLoopSimulation()
 {
     menu_update(ui->lcd, &menu1,current_keycode);
+    current_keycode = NO_KEY;
 }
 
 

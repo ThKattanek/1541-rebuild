@@ -22,7 +22,7 @@ int main(void)
 {
     reset();                // Alles initialisieren
 
-    menu_init(&menu1, menu_entrys01, 4);
+    menu_init(&menu1, menu_entrys01, 10,4);
 
     //// MAIN LOOP /////
     while(1)
@@ -1048,6 +1048,15 @@ ISR (TIMER0_COMPA_vect)
 
 ISR (TIMER2_COMPA_vect)
 {
+    volatile static uint8_t counter = 0;
+    if(counter < 5)
+    {
+        counter++;
+        return 0;
+    }
+
+    counter = 0;
+
     // ISR wird alle 10ms (100Hz) aufgerufen
     volatile static uint8_t old_key0 = 0;
     volatile static uint8_t old_key1 = 0;

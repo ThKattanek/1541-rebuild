@@ -1,15 +1,22 @@
 #include "./menu.h"
 #include "./gui_constants.h"
 
-void menu_init(MENU_STRUCT *menu, MENU_ENTRY *menu_entrys, uint8_t lcd_row_count)
+uint8_t arrow_char[] = {0,4,6,31,6,4,0,0};
+
+void menu_init(MENU_STRUCT *menu, MENU_ENTRY *menu_entrys, uint8_t menu_entry_count, uint8_t lcd_row_count)
 {
-    menu->lcd_row_count = lcd_row_count;
     menu->entry_list = menu_entrys;
+    menu->entry_count = menu_entry_count;
+    menu->lcd_row_count = lcd_row_count;
 
     menu->pos = 0;
-    menu->entry_count = 10;
+    menu->lcd_cursor_pos = 0;
+    menu->lcd_window_pos = 0;
 
     menu->view_obsolete = 1;
+
+
+    lcd_generatechar( 0, arrow_char);
 }
 
 #ifdef MENU_SIMULATION_QT
@@ -21,12 +28,39 @@ void menu_init(MENU_STRUCT *menu, MENU_ENTRY *menu_entrys, uint8_t lcd_row_count
     switch(key_code)
     {
     case KEY0_DOWN:
+        if(menu->lcd_cursor_pos > 0)
+        {
+            menu->lcd_cursor_pos--;
+            menu->view_obsolete = 1;
+        }
+        else
+        {
+            if(menu->lcd_window_pos > 0)
+            {
+                menu->lcd_window_pos--;
+                menu->view_obsolete = 1;
+            }
+        }
         break;
 
     case KEY1_DOWN:
+        if(menu->lcd_cursor_pos < menu->lcd_row_count-1)
+        {
+            menu->lcd_cursor_pos++;
+            menu->view_obsolete = 1;
+        }
+        else
+        {
+            if(menu->lcd_window_pos < menu->entry_count - menu->lcd_row_count)
+            {
+                menu->lcd_window_pos++;
+                menu->view_obsolete = 1;
+            }
+        }
         break;
 
     case KEY2_DOWN:
+        // menu->lcd_window_pos + menu->lcd_cursor_pos = index in MenuEntryList
         break;
     }
 
@@ -40,8 +74,11 @@ void menu_init(MENU_STRUCT *menu, MENU_ENTRY *menu_entrys, uint8_t lcd_row_count
         for(int i=0; i<menu->lcd_row_count; i++)
         {
             lcd_setcursor(1,i+1);
-            lcd_string(menu->entry_list[i].name);
+            lcd_string(menu->entry_list[i+menu->lcd_window_pos].name);
         }
+
+        lcd_setcursor(0,menu->lcd_cursor_pos+1);
+        lcd_data(0);
     }
 
     return 0;
