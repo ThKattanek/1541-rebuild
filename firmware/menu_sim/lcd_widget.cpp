@@ -175,7 +175,14 @@ void LCDWidget::SetUserChar(uint8_t char_nr, uint8_t *pixel_buffer)
 {
     char_nr &= 0x0f;
     for(int i=0; i<LCD_CHAR_W; i++)
-        char_ram[char_nr][i] = pixel_buffer[i];
+    {
+        uint8_t byte = 0;
+        for(int j=0; j<8; j++)
+        {
+            byte |= ((pixel_buffer[j] >> i) & 1) << (7-j);
+        }
+        char_ram[char_nr][4-i] = byte;
+    }
 }
 
 bool LCDWidget::SaveImage(QString filename)
@@ -238,7 +245,7 @@ void LCDWidget::CopyCharRomToRam()
 {
     for(int i=0; i<ROM_FONT_CHARS; i++)
         for(int j=0; j<LCD_CHAR_W; j++)
-            char_ram[i+CGRAM_STORAGE_CHARS][j] = fontA02[i][j];
+            char_ram[i+CGRAM_STORAGE_CHARS][j] = fontA00[i][j];
 }
 
 // A00 (Japanese) character set.

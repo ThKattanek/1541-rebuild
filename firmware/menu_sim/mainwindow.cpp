@@ -29,6 +29,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     current_keycode = NO_KEY;
 
+    // Zeichen für Menü Position setzen
+    uint8_t arrow_char[] = {0,4,6,31,6,4,0,0};
+    ui->lcd_generatechar(15, arrow_char);
+    menu1.lcd_cursor_char = 15;
+
     menu_init(&menu1, (MENU_ENTRY*) &menu_entrys01, 10, 4);
 
     QTimer::singleShot(2000, this,SLOT(StartMenue()));

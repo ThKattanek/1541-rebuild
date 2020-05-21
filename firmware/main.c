@@ -22,6 +22,11 @@ int main(void)
 {
     reset();                // Alles initialisieren
 
+    // Zeichen für Menü Position setzen
+    uint8_t arrow_char[] = {0,4,6,31,6,4,0,0};
+    lcd_generatechar(15, arrow_char);
+    menu1.lcd_cursor_char = 15;
+
     menu_init(&menu1, menu_entrys01, 10,4);
 
     //// MAIN LOOP /////

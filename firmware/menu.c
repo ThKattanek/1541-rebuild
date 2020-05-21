@@ -1,8 +1,6 @@
 #include "./menu.h"
 #include "./gui_constants.h"
 
-uint8_t arrow_char[] = {0,4,6,31,6,4,0,0};
-
 void menu_init(MENU_STRUCT *menu, MENU_ENTRY *menu_entrys, uint8_t menu_entry_count, uint8_t lcd_row_count)
 {
     menu->entry_list = menu_entrys;
@@ -14,9 +12,6 @@ void menu_init(MENU_STRUCT *menu, MENU_ENTRY *menu_entrys, uint8_t menu_entry_co
     menu->lcd_window_pos = 0;
 
     menu->view_obsolete = 1;
-
-
-    lcd_generatechar( 0, arrow_char);
 }
 
 #ifdef MENU_SIMULATION_QT
@@ -78,7 +73,7 @@ void menu_init(MENU_STRUCT *menu, MENU_ENTRY *menu_entrys, uint8_t menu_entry_co
         }
 
         lcd_setcursor(0,menu->lcd_cursor_pos+1);
-        lcd_data(0);
+        lcd_data(menu->lcd_cursor_char);
     }
 
     return 0;

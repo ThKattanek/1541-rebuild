@@ -23,6 +23,7 @@ typedef struct MENU_ENTRY MENU_ENTRY;
 struct MENU_STRUCT
 {
     uint8_t lcd_row_count;      // Anzahl der Zeilen des LCD Displays
+    uint8_t lcd_cursor_char;    // Linkes Zeichen für die Auswahl
     MENU_ENTRY *entry_list;     // Zeiger auf Array vom TYPE MENU_ENTRY
     uint8_t entry_count;        // Anzahl von UMemüs
     uint8_t pos;                // Was ist gerade ausgewählt
