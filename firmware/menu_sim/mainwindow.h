@@ -25,17 +25,11 @@ private slots:
 
     void on_actionSave_Image_triggered();
     void on_action_Exit_triggered();
-
     void on_button1_pressed();
-
     void on_button1_released();
-
     void on_button2_pressed();
-
     void on_button2_released();
-
     void on_button3_pressed();
-
     void on_button3_released();
 
 private:

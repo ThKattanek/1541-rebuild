@@ -15,9 +15,14 @@
 #include <string.h>
 #include <ctype.h>
 
+static MENU_ENTRY menu_entrys01[] = {{"Punkt1",0},{"Punkt2",1},{"Punkt3",2},{"Punkt4",3},{"Punkt5",4},{"Punkt6",5},{"Punkt7",6},{"Punkt8",7},{"Punkt9",8},{"Punkt10",9}};
+static MENU_STRUCT menu1;
+
 int main(void)
 {
     reset();                // Alles initialisieren
+
+    menu_init(&menu1, menu_entrys01, 4);
 
     //// MAIN LOOP /////
     while(1)
@@ -224,7 +229,7 @@ void update_gui()
         break;
 
     case GUI_MENU_MODE:
-        if(menu_update(key_code) == 1)
+        if(menu_update(&menu1, key_code) == 1)
             set_gui_mode(GUI_INFO_MODE);
         //select_image(key_code);
         break;

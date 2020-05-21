@@ -20,18 +20,23 @@ struct MENU_ENTRY
 };
 typedef struct MENU_ENTRY MENU_ENTRY;
 
-struct MENU
+struct MENU_STRUCT
 {
+    uint8_t lcd_row_count;      // Anzahl der Zeilen des LCD Displays
     MENU_ENTRY *entry_list;     // Zeiger auf Array vom TYPE MENU_ENTRY
-    unsigned char entry_count;	// Anzahl von UMemüs
-    unsigned char pos;          // Was ist gerade ausgewählt
+    uint8_t entry_count;        // Anzahl von UMemüs
+    uint8_t pos;                // Was ist gerade ausgewählt
+    uint8_t view_obsolete;      // 0=Anzeige ist noch aktuelle, 1=Anzeige muss neu aufgebaut werden
 };
-typedef struct MENU MENU;
+typedef struct MENU_STRUCT MENU_STRUCT;
+
+void menu_init(MENU_STRUCT* menu, MENU_ENTRY *menu_entrys, uint8_t lcd_row_count);
 
 #ifdef MENU_SIMULATION_QT
-    uint16_t menu_update(LCDWidget *lcd, uint8_t key_code);
+    uint16_t menu_update(LCDWidget *lcd, MENU_STRUCT *menu, uint8_t key_code);
 #else
-    uint16_t menu_update(uint8_t key_code);
+
+    uint16_t menu_update(MENU_STRUCT *menu, uint8_t key_code);
 #endif
 
 #endif // MENUE_H

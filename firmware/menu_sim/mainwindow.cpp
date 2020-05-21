@@ -5,6 +5,11 @@
 #include "../gui_constants.h"
 
 #include <QFileDialog>
+#include <QDebug>
+
+
+static MENU_ENTRY menu_entrys01[] = {{"Punkt1",0},{"Punkt2",1},{"Punkt3",2},{"Punkt4",3},{"Punkt5",4},{"Punkt6",5},{"Punkt7",6},{"Punkt8",7},{"Punkt9",8},{"Punkt10",9}};
+static MENU_STRUCT menu1;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -23,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lcd->String(VERSION);
 
     current_keycode = NO_KEY;
+
+    menu_init(&menu1, (MENU_ENTRY*) &menu_entrys01, 4);
 
     QTimer::singleShot(2000, this,SLOT(StartMenue()));
 
@@ -44,7 +51,7 @@ void MainWindow::StartMenue()
 
 void MainWindow::MainLoopSimulation()
 {
-    menu_update(ui->lcd, current_keycode);
+    menu_update(ui->lcd, &menu1,current_keycode);
 }
 
 
