@@ -224,7 +224,9 @@ void update_gui()
         break;
 
     case GUI_MENU_MODE:
-        select_image(key_code);
+        if(menu_update(key_code) == 1)
+            set_gui_mode(GUI_INFO_MODE);
+        //select_image(key_code);
         break;
 
     default:

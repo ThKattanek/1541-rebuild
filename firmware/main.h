@@ -21,6 +21,10 @@
 #include "./sd_card_lib/sd_raw.h"
 #include "./sd_card_lib/sd_raw_config.h"
 
+// Gui _ Menu
+#include "./gui_constants.h"
+#include "./menu.h"
+
 // Enthält nur die Versionsnummer als String
 #include "./version.h"
 
@@ -145,10 +149,6 @@
 
 #define debug_led1_on() DEBUG_LED1_PORT |= 1<<PB2
 #define debug_led1_off() DEBUG_LED1_PORT &= ~(1<<PB2)
-
-enum KEY_CODES{KEY0_DOWN, KEY0_UP, KEY1_DOWN, KEY1_UP, KEY2_DOWN, KEY2_UP, NO_KEY};
-
-enum GUI_MODE{GUI_INFO_MODE, GUI_MENU_MODE};
 
 //////////////////////////////////////////////////////////////////
 // #define __AVR_ATmega128__
