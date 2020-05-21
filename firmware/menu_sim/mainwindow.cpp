@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include "../version.h"
+#include "../gui_constants.h"
 
 #include <QFileDialog>
 
@@ -20,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lcd->SetCursor( 2,3);
     ui->lcd->String("Firmware:  ");
     ui->lcd->String(VERSION);
+
+    current_keycode = NO_KEY;
 
     QTimer::singleShot(2000, this,SLOT(StartMenue()));
 
@@ -41,7 +44,7 @@ void MainWindow::StartMenue()
 
 void MainWindow::MainLoopSimulation()
 {
-    MenuUpdate(ui->lcd);
+    menu_update(ui->lcd, current_keycode);
 }
 
 
@@ -60,17 +63,32 @@ void MainWindow::on_action_Exit_triggered()
     this->close();
 }
 
-void MainWindow::on_button1_clicked()
+void MainWindow::on_button1_pressed()
 {
-
+    current_keycode = KEY0_DOWN;
 }
 
-void MainWindow::on_button2_clicked()
+void MainWindow::on_button1_released()
 {
-
+    current_keycode = KEY0_UP;
 }
 
-void MainWindow::on_button3_clicked()
+void MainWindow::on_button2_pressed()
 {
+    current_keycode = KEY1_DOWN;
+}
 
+void MainWindow::on_button2_released()
+{
+    current_keycode = KEY1_UP;
+}
+
+void MainWindow::on_button3_pressed()
+{
+    current_keycode = KEY2_DOWN;
+}
+
+void MainWindow::on_button3_released()
+{
+    current_keycode = KEY2_UP;
 }

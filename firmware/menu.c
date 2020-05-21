@@ -2,7 +2,7 @@
 #include "./gui_constants.h"
 
 #ifdef MENU_SIMULATION_QT
-    void MenuUpdate(LCDWidget *lcd)
+    uint16_t menu_update(LCDWidget *lcd, uint8_t key_code)
 #else
     uint16_t menu_update(uint8_t key_code)
 #endif
