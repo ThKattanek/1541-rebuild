@@ -34,20 +34,16 @@ int main(void)
     /// Setting Menü
     MENU_ENTRY settings_menu_entrys[] = {{"Back",M_BACK_IMAGE}, {"Debug LED",M_DEBUG_LED,ENTRY_ONOFF,0}};
 
-    main_menu.lcd_cursor_char = 126;
+    main_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
     menu_init(&main_menu, main_menu_entrys, 4,4);
 
-    image_menu.lcd_cursor_char = 126;
+    image_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
     menu_init(&image_menu, image_menu_entrys, 6,4);
 
-    settings_menu.lcd_cursor_char = 126;
+    settings_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
     menu_init(&settings_menu, settings_menu_entrys, 2,4);
 
     current_menu = &main_menu;
-
-    // Zeichen für Menü Position setzen
-    //uint8_t arrow_char[] = {0,4,6,31,6,4,0,0};
-    //lcd_generatechar(15, arrow_char);
 
     // Zeichen für Menü More Top setzen
     uint8_t char00[] = {4,14,31,0,0,0,0,0};
@@ -56,6 +52,10 @@ int main(void)
     // Zeichen für Menü More Down setzen
     uint8_t char01[] = {0,0,0,0,31,14,4,0};
     lcd_generatechar(1, char01);
+
+    // Zeichen für Menü Position setzen
+    uint8_t arrow_char[] = {0,4,6,31,6,4,0,0};
+    lcd_generatechar(2, arrow_char);
 
     //// MAIN LOOP /////
     while(1)
