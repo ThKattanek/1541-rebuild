@@ -33,6 +33,10 @@ private slots:
     void on_button3_released();
 
 private:
+    void CheckMMenuEvents(uint16_t menu_event);
+
+    MENU_STRUCT *current_menu;
+
     Ui::MainWindow *ui;
 
     QTimer timer1;
