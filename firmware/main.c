@@ -310,6 +310,9 @@ void check_menu_events(uint16_t menu_event)
             set_gui_mode(GUI_INFO_MODE);
             break;
         case M_WP_IMAGE:
+            if(akt_image_type != G64_IMAGE)
+                menu_set_entry_var1(&image_menu, M_WP_IMAGE, 1);
+
             if(menu_get_entry_var1(&image_menu, M_WP_IMAGE))
                 set_write_protection(1);
             else
@@ -956,6 +959,7 @@ void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t tr
 void remove_image()
 {
     is_image_mount = 0;
+    akt_image_type = UNDEF_IMAGE;
     set_write_protection(1);
     menu_set_entry_var1(&image_menu, M_WP_IMAGE, 1);
     send_disk_change();
