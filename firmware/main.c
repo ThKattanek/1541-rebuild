@@ -15,7 +15,7 @@
 #include <string.h>
 #include <ctype.h>
 
-enum  MENU_IDS{M_BACK, M_IMAGE, M_SETTINGS, M_INFO, M_BACK_IMAGE, M_INSERT_IMAGE, M_REMOVE_IMAGE, M_NEW_IMAGE, M_SAVE_IMAGE};
+enum  MENU_IDS{M_BACK, M_IMAGE, M_SETTINGS, M_INFO, M_BACK_IMAGE, M_INSERT_IMAGE, M_REMOVE_IMAGE, M_WP_IMAGE, M_NEW_IMAGE, M_SAVE_IMAGE};
 
 MENU_STRUCT main_menu;
 MENU_STRUCT image_menu;
@@ -26,15 +26,15 @@ int main(void)
 
     /// Menüs einrichten
     /// Hauptmenü
-    MENU_ENTRY main_menu_entrys[] = {{"Back",M_BACK},{"Image",M_IMAGE},{"Settings",M_SETTINGS},{"Info",M_INFO}};
+    MENU_ENTRY main_menu_entrys[] = {{"Back",M_BACK},{"Disk Image",M_IMAGE},{"Settings",M_SETTINGS},{"Info",M_INFO}};
     /// Image Menü
-    MENU_ENTRY image_menu_entrys[] = {{"Back",M_BACK_IMAGE},{"Instert Image",M_INSERT_IMAGE},{"Remove Image",M_REMOVE_IMAGE},{"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
+    MENU_ENTRY image_menu_entrys[] = {{"Back",M_BACK_IMAGE}, {"Insert Image",M_INSERT_IMAGE}, {"Remove Image",M_REMOVE_IMAGE}, {"Write Protect",M_WP_IMAGE,ENTRY_ONOFF,1}, {"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
 
     main_menu.lcd_cursor_char = 126;
     menu_init(&main_menu, main_menu_entrys, 4,4);
 
     image_menu.lcd_cursor_char = 126;
-    menu_init(&image_menu, image_menu_entrys, 5,4);
+    menu_init(&image_menu, image_menu_entrys, 6,4);
 
     current_menu = &main_menu;
 
@@ -89,6 +89,9 @@ void reset()
 
     // Steursignale BYTE_READY, SYNC und SOE Initialisieren
     init_controll_signals();
+
+    // Image Remove
+    remove_image();
 
     // Timer0 --> GCR senden
     init_timer0();
@@ -302,6 +305,17 @@ void check_menu_events(uint16_t menu_event)
         case M_INSERT_IMAGE:
             set_gui_mode(GUI_FILE_BROWSER);
             break;
+        case M_REMOVE_IMAGE:
+            remove_image();
+            set_gui_mode(GUI_INFO_MODE);
+            break;
+        case M_WP_IMAGE:
+            if(menu_get_entry_var1(&image_menu, M_WP_IMAGE))
+                set_write_protection(1);
+            else
+                set_write_protection(0);
+            menu_refresh(&image_menu);
+            break;
         }
         break;
     }
@@ -327,15 +341,28 @@ void set_gui_mode(uint8_t gui_mode)
         lcd_setcursor(0,2);
         lcd_string("Motor:");
 
-        lcd_setcursor(7,2);
         if(get_motor_status())
-            lcd_string("On ");
+            lcd_string(" On ");
         else
-            lcd_string("Off");
+            lcd_string(" Off");
 
-        lcd_setcursor(1,4);
+        lcd_setcursor(12,1);
+        lcd_string("WP:");
+
+        if(floppy_wp)
+            lcd_string(" On");
+        else
+            lcd_string(" Off");
+
+        if(is_image_mount)
+        {
+            lcd_setcursor(0,4);
+            lcd_string(image_filename);
+        }
+
+        lcd_setcursor(2,4);
         if(!is_image_mount)
-            lcd_string("Not Image Mounting");
+            lcd_string("No Image Mounted");
 
         break;
     case GUI_MENU_MODE:
@@ -390,9 +417,13 @@ void select_image(uint8_t key)
         no_byte_ready_send = 0;
         start_timer0();
 
+        is_image_mount = 1;
         send_disk_change();
 
-        is_image_mount = 1;
+        if(floppy_wp)
+            menu_set_entry_var1(&image_menu, M_WP_IMAGE, 1);
+        else
+            menu_set_entry_var1(&image_menu, M_WP_IMAGE, 0);
 
         set_gui_mode(GUI_INFO_MODE);
 
@@ -654,36 +685,36 @@ int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_ent
     {
 	if(dir_entry->attributes == FAT_ATTRIB_DIR)
 	{
-	    lcd_puffer[0] = '*';
-	    strcpy(lcd_puffer+1, dir_entry->long_name);
-	    uint8_t len = strlen(lcd_puffer);
+        image_filename[0] = '*';
+        strcpy(image_filename+1, dir_entry->long_name);
+        uint8_t len = strlen(image_filename);
 	    if(len > 19)
-		lcd_puffer[20] = 0;
+        image_filename[32] = 0;
 	    else
 	    {
 		for(int i=len; i<20; i++)
-		    lcd_puffer[i] = ' ';
-		lcd_puffer[20] = 0;
+            image_filename[i] = ' ';
+        image_filename[32] = 0;
 	    }
 
 	    lcd_setcursor(0,1);
-	    lcd_string(lcd_puffer);
+        lcd_string(image_filename);
 	}
 	else
 	{
-	    strcpy(lcd_puffer, dir_entry->long_name);
-	    uint8_t len = strlen(lcd_puffer);
+        strcpy(image_filename, dir_entry->long_name);
+        uint8_t len = strlen(image_filename);
 	    if(len > 20)
-		lcd_puffer[20] = 0;
+        image_filename[32] = 0;
 	    else
 	    {
 		for(int i=len; i<20; i++)
-		    lcd_puffer[i] = ' ';
-		lcd_puffer[20] = 0;
+            image_filename[i] = ' ';
+        image_filename[32] = 0;
 	    }
 
 	    lcd_setcursor(0,1);
-	    lcd_string(lcd_puffer);
+        lcd_string(image_filename);
 	}
 	    return 1;
 
@@ -723,7 +754,7 @@ struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir
         // Laut Extension ein G64
         *image_type = G64_IMAGE;
         open_g64_image(fd);
-        set_write_protection(0);
+        set_write_protection(1);
     }
     else if(!strcmp(extension,".d64"))
     {
@@ -922,6 +953,16 @@ void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t tr
 
 /////////////////////////////////////////////////////////////////////
 
+void remove_image()
+{
+    is_image_mount = 0;
+    set_write_protection(1);
+    menu_set_entry_var1(&image_menu, M_WP_IMAGE, 1);
+    send_disk_change();
+}
+
+/////////////////////////////////////////////////////////////////////
+
 inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer)
 {
     const static uint8_t GCR_TBL[16] = {0x0a, 0x0b, 0x12, 0x13, 0x0e, 0x0f, 0x16, 0x17,0x09, 0x19, 0x1a, 0x1b, 0x0d, 0x1d, 0x1e, 0x15};
@@ -1041,8 +1082,8 @@ ISR (TIMER0_COMPA_vect)
     if(get_so_status())     // Wenn OE HI dann von Prot lesen
     {
         // LESE MODUS
-        // Daten aus Ringpuffer senden wenn Motor an
-        if(get_motor_status())
+        // Daten aus Ringpuffer senden wenn Motor an und ein Image gemountet ist
+        if(get_motor_status() && is_image_mount)
         {                                                               // Wenn Motor läuft
             akt_gcr_byte = gcr_track[akt_track_pos++];                  // Nächstes GCR Byte holen
             if(akt_track_pos == gcr_track_length) akt_track_pos = 0;    // Ist Spurende erreicht? Zurück zum Anfang

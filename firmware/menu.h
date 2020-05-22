@@ -14,6 +14,7 @@
 #endif
 
 enum MenuCommands {MC_NO_COMMAND, MC_SELECT_ENTRY, MC_CHANGE_ENTRY};
+enum MenuTypes {EN_NORMAL, ENTRY_ONOFF, ENTRY_BOOL, ENTRY_BIN, ENTRY_8BIT_DEC};
 
 // MENU COMMANDS
 // NO_COMMAND       -> Nicht ist passiert
@@ -24,6 +25,8 @@ struct MENU_ENTRY
 {
     char *name;      // Name Menue Entry
     uint8_t id;      // Menu Entry ID
+    uint8_t type;    // Menu Entry Type
+    uint8_t var1;    // Menu Variable1
 };
 typedef struct MENU_ENTRY MENU_ENTRY;
 
@@ -51,6 +54,9 @@ void menu_init(MENU_STRUCT* menu, MENU_ENTRY *menu_entrys, uint8_t menu_entry_co
     uint16_t menu_update(MENU_STRUCT *menu, uint8_t key_code);
     void menu_refresh(MENU_STRUCT *menu);
 #endif
+
+    void menu_set_entry_var1(MENU_STRUCT *menu, uint8_t id, uint8_t var1);
+    uint8_t menu_get_entry_var1(MENU_STRUCT *menu, uint8_t id);
 
 #endif // MENUE_H
 

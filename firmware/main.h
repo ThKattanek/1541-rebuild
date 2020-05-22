@@ -189,6 +189,9 @@ int8_t open_g64_image(struct fat_file_struct *fd);
 int8_t open_d64_image(struct fat_file_struct *fd);
 int8_t read_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
 void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
+
+void remove_image();
+
 inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
 
 void endable_wps_port(uint8_t enable);  // 0 = WPS PIN HiZ (set_write_protection() ohne Wirkung) / 1 = WPS PIN als Ausgang
@@ -199,7 +202,8 @@ void send_disk_change(void);
 // Globale Variablen
 
 // gui
-char lcd_puffer[33]; // Maximal 32 Zeichen
+char image_filename[33]; //Maximal 32 Zeichen
+
 
 volatile uint8_t key_buffer[16];
 volatile uint8_t key_buffer_r_pos = 0;
@@ -223,10 +227,10 @@ struct fat_file_struct* fd;
 
 // floppydisk emulation
 uint8_t akt_image_type = 0;     // 0=kein Image, 1=G64, 2=D64
-uint8_t is_image_mount = 0;
+uint8_t is_image_mount;
 
 uint8_t is_wps_pin_enable = 0; // 0=WPS PIN=HiZ / 1=WPS Output
-int8_t floppy_wp = 0;       // Hier wird der aktuelle WriteProtection Zustand gespeichert / 0=Nicht Schreibgeschützt 1=Schreibgeschützt
+int8_t floppy_wp = 0;          // Hier wird der aktuelle WriteProtection Zustand gespeichert / 0=Nicht Schreibgeschützt 1=Schreibgeschützt
 
 volatile static uint8_t stp_signals_old = 0;
 

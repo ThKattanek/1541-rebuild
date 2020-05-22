@@ -72,6 +72,16 @@ uint16_t menu_update(MENU_STRUCT *menu, uint8_t key_code)
         // menu->lcd_window_pos + menu->lcd_cursor_pos = index in MenuEntryList
         command = MC_SELECT_ENTRY;
         value = menu->entry_list[menu->lcd_window_pos + menu->lcd_cursor_pos].id;
+
+        switch (menu->entry_list[menu->lcd_window_pos + menu->lcd_cursor_pos].type)
+        {
+            case ENTRY_ONOFF:
+            case ENTRY_BOOL:
+            case ENTRY_BIN:
+                menu->entry_list[menu->lcd_window_pos + menu->lcd_cursor_pos].var1 ^= 1;
+                break;
+        }
+
         break;
     }
 
@@ -97,6 +107,29 @@ void menu_refresh(MENU_STRUCT *menu)
     {
         lcd_setcursor(1,i+1);
         lcd_string(menu->entry_list[i+menu->lcd_window_pos].name);
+
+        switch(menu->entry_list[i+menu->lcd_window_pos].type)
+        {
+        case ENTRY_ONOFF:
+                if(menu->entry_list[i+menu->lcd_window_pos].var1)
+                    lcd_string(" On");
+                else
+                    lcd_string(" Off");
+            break;
+        case ENTRY_BIN:
+                if(menu->entry_list[i+menu->lcd_window_pos].var1)
+                    lcd_string(" 0");
+                else
+                    lcd_string(" 1");
+            break;
+       case ENTRY_BOOL:
+                if(menu->entry_list[i+menu->lcd_window_pos].var1)
+                    lcd_string(" true");
+                else
+                    lcd_string(" false");
+            break;
+        }
+
     }
 
     lcd_setcursor(0,menu->lcd_cursor_pos+1);
@@ -113,4 +146,29 @@ void menu_refresh(MENU_STRUCT *menu)
         lcd_setcursor(19,menu->lcd_row_count);
         lcd_data(menu->lcd_more_down_char);
     }
+}
+
+void menu_set_entry_var1(MENU_STRUCT *menu, uint8_t id, uint8_t var1)
+{
+    for(int i=0; i<menu->entry_count; i++)
+    {
+        if(menu->entry_list[i].id == id)
+        {
+            menu->entry_list[i].var1 = var1;
+            break;
+        }
+    }
+}
+
+uint8_t menu_get_entry_var1(MENU_STRUCT *menu, uint8_t id)
+{
+    for(int i=0; i<menu->entry_count; i++)
+    {
+        if(menu->entry_list[i].id == id)
+        {
+            return menu->entry_list[i].var1;
+            break;
+        }
+    }
+    return 0;
 }
