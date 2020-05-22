@@ -15,10 +15,12 @@
 #include <string.h>
 #include <ctype.h>
 
-enum  MENU_IDS{M_BACK, M_IMAGE, M_SETTINGS, M_INFO, M_BACK_IMAGE, M_INSERT_IMAGE, M_REMOVE_IMAGE, M_WP_IMAGE, M_NEW_IMAGE, M_SAVE_IMAGE};
+enum  MENU_IDS{M_BACK, M_IMAGE, M_SETTINGS, M_INFO, M_BACK_IMAGE, M_INSERT_IMAGE, M_REMOVE_IMAGE, M_WP_IMAGE, M_NEW_IMAGE, M_SAVE_IMAGE, \
+               M_DEBUG_LED};
 
 MENU_STRUCT main_menu;
 MENU_STRUCT image_menu;
+MENU_STRUCT settings_menu;
 
 int main(void)
 {
@@ -29,12 +31,17 @@ int main(void)
     MENU_ENTRY main_menu_entrys[] = {{"Back",M_BACK},{"Disk Image",M_IMAGE},{"Settings",M_SETTINGS},{"Info",M_INFO}};
     /// Image Menü
     MENU_ENTRY image_menu_entrys[] = {{"Back",M_BACK_IMAGE}, {"Insert Image",M_INSERT_IMAGE}, {"Remove Image",M_REMOVE_IMAGE}, {"Write Protect",M_WP_IMAGE,ENTRY_ONOFF,1}, {"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
+    /// Setting Menü
+    MENU_ENTRY settings_menu_entrys[] = {{"Back",M_BACK_IMAGE}, {"Debug LED",M_DEBUG_LED,ENTRY_ONOFF,0}};
 
     main_menu.lcd_cursor_char = 126;
     menu_init(&main_menu, main_menu_entrys, 4,4);
 
     image_menu.lcd_cursor_char = 126;
     menu_init(&image_menu, image_menu_entrys, 6,4);
+
+    settings_menu.lcd_cursor_char = 126;
+    menu_init(&settings_menu, settings_menu_entrys, 2,4);
 
     current_menu = &main_menu;
 
@@ -291,10 +298,21 @@ void check_menu_events(uint16_t menu_event)
             menu_refresh(&image_menu);
             break;
         case M_SETTINGS:
+            current_menu = &settings_menu;
+            menu_refresh(&settings_menu);
             break;
         case M_INFO:
             show_start_message();
             menu_refresh(&main_menu);
+            break;
+
+        /// Settings Menü
+        case M_DEBUG_LED:
+            if(menu_get_entry_var1(&settings_menu, M_DEBUG_LED))
+                debug_led1_on();
+            else
+                debug_led1_off();
+            menu_refresh(&settings_menu);
             break;
 
         /// Image Menü
