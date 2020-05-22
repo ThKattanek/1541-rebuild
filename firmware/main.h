@@ -214,6 +214,8 @@ int8_t byte_str[16];
 
 MENU_STRUCT *current_menu;
 
+uint8_t lcd_dir_char;       // Char Nummer für Directory Symbol
+uint8_t lcd_disk_char;      // Char Nummer für Diskimage Symbol
 uint16_t dir_pos = 0;
 
 // filesystem

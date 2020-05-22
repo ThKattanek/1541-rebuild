@@ -57,6 +57,16 @@ int main(void)
     uint8_t arrow_char[] = {0,4,6,31,6,4,0,0};
     lcd_generatechar(2, arrow_char);
 
+    // Zeichen für Directory
+    uint8_t dir_char[] = {0,28,31,17,17,31,0,0};
+    lcd_generatechar(3, dir_char);
+    lcd_dir_char = 3;
+
+    // Zeichen für Diskimage
+    uint8_t diskimage_char[] = {15,27,17,27,31,27,27,31};
+    lcd_generatechar(4, diskimage_char);
+    lcd_disk_char = 4;
+
     //// MAIN LOOP /////
     while(1)
     {
@@ -706,7 +716,7 @@ int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_ent
     {
 	if(dir_entry->attributes == FAT_ATTRIB_DIR)
 	{
-        image_filename[0] = '*';
+        image_filename[0] = lcd_dir_char;
         strcpy(image_filename+1, dir_entry->long_name);
         uint8_t len = strlen(image_filename);
 	    if(len > 19)
