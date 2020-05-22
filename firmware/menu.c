@@ -88,7 +88,12 @@ uint16_t menu_update(MENU_STRUCT *menu, uint8_t key_code)
     if(menu->view_obsolete)
     {
         menu->view_obsolete = 0;
+
+        #ifdef MENU_SIMULATION_QT
+        menu_refresh(lcd, menu);
+        #else
         menu_refresh(menu);
+        #endif
     }
 
     return command << 8 | value;
