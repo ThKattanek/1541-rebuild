@@ -160,6 +160,7 @@ void check_stepper_signals();
 void check_motor_signal();
 uint8_t get_key_from_buffer();
 void update_gui();
+void check_menu_events(uint16_t menu_event);
 void set_gui_mode(uint8_t gui_mode);
 void select_image(uint8_t key);
 void init_debug_led1();
@@ -206,6 +207,8 @@ volatile uint8_t key_buffer_w_pos = 0;
 
 uint8_t current_gui_mode;
 int8_t byte_str[16];
+
+MENU_STRUCT *current_menu;
 
 uint16_t dir_pos = 0;
 
@@ -272,8 +275,8 @@ volatile uint8_t stepper_signal_w_pos = 0;
 volatile uint8_t stepper_signal_time = 0;
 volatile uint8_t stepper_signal = 0;
 
-uint8_t gcr_track[8192];
-
 volatile uint8_t track_is_written = 0;
 volatile uint8_t track_is_written_old = 0;
 volatile uint8_t no_byte_ready_send = 0;
+
+uint8_t gcr_track[8192];

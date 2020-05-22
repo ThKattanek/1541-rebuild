@@ -15,19 +15,40 @@
 #include <string.h>
 #include <ctype.h>
 
-static MENU_ENTRY menu_entrys01[] = {{"Punkt1",0},{"Punkt2",1},{"Punkt3",2},{"Punkt4",3},{"Punkt5",4},{"Punkt6",5},{"Punkt7",6},{"Punkt8",7},{"Punkt9",8},{"Punkt10",9}};
-static MENU_STRUCT menu1;
+enum  MENU_IDS{M_BACK, M_IMAGE, M_SETTINGS, M_INFO, M_BACK_IMAGE, M_INSERT_IMAGE, M_REMOVE_IMAGE, M_NEW_IMAGE, M_SAVE_IMAGE};
+
+MENU_STRUCT main_menu;
+MENU_STRUCT image_menu;
 
 int main(void)
 {
     reset();                // Alles initialisieren
 
-    // Zeichen für Menü Position setzen
-    uint8_t arrow_char[] = {0,4,6,31,6,4,0,0};
-    lcd_generatechar(15, arrow_char);
-    menu1.lcd_cursor_char = 15;
+    /// Menüs einrichten
+    /// Hauptmenü
+    MENU_ENTRY main_menu_entrys[] = {{"Back",M_BACK},{"Image",M_IMAGE},{"Settings",M_SETTINGS},{"Info",M_INFO}};
+    /// Image Menü
+    MENU_ENTRY image_menu_entrys[] = {{"Back",M_BACK_IMAGE},{"Instert Image",M_INSERT_IMAGE},{"Remove Image",M_REMOVE_IMAGE},{"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
 
-    menu_init(&menu1, menu_entrys01, 10,4);
+    main_menu.lcd_cursor_char = 126;
+    menu_init(&main_menu, main_menu_entrys, 4,4);
+
+    image_menu.lcd_cursor_char = 126;
+    menu_init(&image_menu, image_menu_entrys, 5,4);
+
+    current_menu = &main_menu;
+
+    // Zeichen für Menü Position setzen
+    //uint8_t arrow_char[] = {0,4,6,31,6,4,0,0};
+    //lcd_generatechar(15, arrow_char);
+
+    // Zeichen für Menü More Top setzen
+    uint8_t char00[] = {4,14,31,0,0,0,0,0};
+    lcd_generatechar(0, char00);
+
+    // Zeichen für Menü More Down setzen
+    uint8_t char01[] = {0,0,0,0,31,14,4,0};
+    lcd_generatechar(1, char01);
 
     //// MAIN LOOP /////
     while(1)
@@ -234,12 +255,54 @@ void update_gui()
         break;
 
     case GUI_MENU_MODE:
-        if(menu_update(&menu1, key_code) == 1)
-            set_gui_mode(GUI_INFO_MODE);
-        //select_image(key_code);
+        check_menu_events(menu_update(current_menu, key_code));
+        break;
+
+    case GUI_FILE_BROWSER:
+        select_image(key_code);
         break;
 
     default:
+        break;
+    }
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void check_menu_events(uint16_t menu_event)
+{
+    uint8_t command = menu_event >> 8;
+    uint8_t value = menu_event & 0xff;
+
+    switch(command)
+    {
+    case MC_SELECT_ENTRY:
+        switch(value)
+        {
+        /// Main Menü
+        case M_BACK:
+            set_gui_mode(GUI_INFO_MODE);
+            break;
+        case M_IMAGE:
+            current_menu = &image_menu;
+            menu_refresh(&image_menu);
+            break;
+        case M_SETTINGS:
+            break;
+        case M_INFO:
+            show_start_message();
+            menu_refresh(&main_menu);
+            break;
+
+        /// Image Menü
+        case M_BACK_IMAGE:
+            current_menu = &main_menu;
+            menu_refresh(&main_menu);
+            break;
+        case M_INSERT_IMAGE:
+            set_gui_mode(GUI_FILE_BROWSER);
+            break;
+        }
         break;
     }
 }
@@ -276,6 +339,9 @@ void set_gui_mode(uint8_t gui_mode)
 
         break;
     case GUI_MENU_MODE:
+        menu_refresh(current_menu);
+        break;
+    case GUI_FILE_BROWSER:
         lcd_clear();
         view_dir_entry(dir_pos,&file_entry);
         break;
@@ -409,11 +475,13 @@ int8_t init_sd_card(void)
 void show_start_message(void)
 {
     lcd_clear();
-    lcd_setcursor( 1, 2);
+    lcd_setcursor( 1, 1);
     lcd_string("-- 1541-rebuild --");
-    lcd_setcursor( 2,3);
+    lcd_setcursor( 2,2);
     lcd_string("Firmware:  ");
     lcd_string(VERSION);
+    lcd_setcursor( 0,4);
+    lcd_string("by thorsten kattanek");
     _delay_ms(START_MESSAGE_TIME);
     lcd_clear();
 }
@@ -725,15 +793,15 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
 
 	if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
 	{
-            if(fat_read_file(fd, (uint8_t*)&offset, 4))
+        if(fat_read_file(fd, (uint8_t*)&offset, 4))
 	    {
-		if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
-		{
-                    fat_read_file(fd, (uint8_t*)gcr_track_length, 2);
-                    fat_read_file(fd, track_buffer, *gcr_track_length);
+            if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
+            {
+                        fat_read_file(fd, (uint8_t*)gcr_track_length, 2);
+                        fat_read_file(fd, track_buffer, *gcr_track_length);
 
-		    is_read = 1;
-		}
+                is_read = 1;
+            }
 	    }
 	}
 	break;
@@ -749,68 +817,68 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
 
 	    for(sector_nr=0;sector_nr<d64_sector_count[track_nr];sector_nr++)
 	    {
-		fat_read_file(fd, d64_sector_puffer, D64_SECTOR_SIZE);
+            fat_read_file(fd, d64_sector_puffer, D64_SECTOR_SIZE);
 
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
+            *P++ = 0xFF;								// SYNC
+            *P++ = 0xFF;								// SYNC
+            *P++ = 0xFF;								// SYNC
+            *P++ = 0xFF;								// SYNC
+            *P++ = 0xFF;								// SYNC
 
-		buffer[0] = 0x08;							// Header Markierung
-		buffer[1] = sector_nr ^ track_nr ^ id2 ^ id1;				// Checksumme
-		buffer[2] = sector_nr;
-		buffer[3] = track_nr;
-		ConvertToGCR(buffer, P);
-		buffer[0] = id2;
-		buffer[1] = id1;
-		buffer[2] = 0x0F;
-		buffer[3] = 0x0F;
-		ConvertToGCR(buffer, P+5);
-		P += 10;
+            buffer[0] = 0x08;							// Header Markierung
+            buffer[1] = sector_nr ^ track_nr ^ id2 ^ id1;				// Checksumme
+            buffer[2] = sector_nr;
+            buffer[3] = track_nr;
+            ConvertToGCR(buffer, P);
+            buffer[0] = id2;
+            buffer[1] = id1;
+            buffer[2] = 0x0F;
+            buffer[3] = 0x0F;
+            ConvertToGCR(buffer, P+5);
+            P += 10;
 
-		// GAP Bytes als Lücke
-		memset(P, 0x55, HEADER_GAP_BYTES);
-		P += HEADER_GAP_BYTES;
+            // GAP Bytes als Lücke
+            memset(P, 0x55, HEADER_GAP_BYTES);
+            P += HEADER_GAP_BYTES;
 
-		// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
-		*P++ = 0xFF;								// SYNC
+            // SYNC
+            *P++ = 0xFF;								// SYNC
+            *P++ = 0xFF;								// SYNC
+            *P++ = 0xFF;								// SYNC
+            *P++ = 0xFF;								// SYNC
+            *P++ = 0xFF;								// SYNC
 
-		buffer[0] = 0x07;							// Data mark
-		SUM = buffer[1] = d64_sector_puffer[0];
-		SUM ^= buffer[2] = d64_sector_puffer[1];
-		SUM ^= buffer[3] = d64_sector_puffer[2];
-		ConvertToGCR(buffer, P);
-		P += 5;
+            buffer[0] = 0x07;							// Data mark
+            SUM = buffer[1] = d64_sector_puffer[0];
+            SUM ^= buffer[2] = d64_sector_puffer[1];
+            SUM ^= buffer[3] = d64_sector_puffer[2];
+            ConvertToGCR(buffer, P);
+            P += 5;
 
-		for (int i=3; i<255; i+=4)
-		{
-		    SUM ^= buffer[0] = d64_sector_puffer[i];
-		    SUM ^= buffer[1] = d64_sector_puffer[i+1];
-		    SUM ^= buffer[2] = d64_sector_puffer[i+2];
-		    SUM ^= buffer[3] = d64_sector_puffer[i+3];
-		    ConvertToGCR(buffer, P);
-		    P += 5;
-		}
+            for (int i=3; i<255; i+=4)
+            {
+                SUM ^= buffer[0] = d64_sector_puffer[i];
+                SUM ^= buffer[1] = d64_sector_puffer[i+1];
+                SUM ^= buffer[2] = d64_sector_puffer[i+2];
+                SUM ^= buffer[3] = d64_sector_puffer[i+3];
+                ConvertToGCR(buffer, P);
+                P += 5;
+            }
 
-		SUM ^= buffer[0] = d64_sector_puffer[255];
-		buffer[1] = SUM;							// Checksum
-		buffer[2] = 0;
-		buffer[3] = 0;
-		ConvertToGCR(buffer, P);
-		P += 5;
+            SUM ^= buffer[0] = d64_sector_puffer[255];
+            buffer[1] = SUM;							// Checksum
+            buffer[2] = 0;
+            buffer[3] = 0;
+            ConvertToGCR(buffer, P);
+            P += 5;
 
-		// GCR Bytes als Lücken auffüllen (sorgt für eine Gleichverteilung)
-		uint8_t gap_size = d64_sector_gap[d64_track_zone[track_nr]];
-		memset(P, 0x55, gap_size);
-		P += gap_size;
+            // GCR Bytes als Lücken auffüllen (sorgt für eine Gleichverteilung)
+            uint8_t gap_size = d64_sector_gap[d64_track_zone[track_nr]];
+            memset(P, 0x55, gap_size);
+            P += gap_size;
 
-		//*gcr_track_length = d64_track_length[d64_track_zone[track_nr]];
-		*gcr_track_length = P - gcr_track;
+            //*gcr_track_length = d64_track_length[d64_track_zone[track_nr]];
+            *gcr_track_length = P - gcr_track;
 	    }
 	}
 	break;
@@ -856,7 +924,7 @@ void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t tr
 
 inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer)
 {
-    const uint8_t GCR_TBL[16] = {0x0a, 0x0b, 0x12, 0x13, 0x0e, 0x0f, 0x16, 0x17,0x09, 0x19, 0x1a, 0x1b, 0x0d, 0x1d, 0x1e, 0x15};
+    const static uint8_t GCR_TBL[16] = {0x0a, 0x0b, 0x12, 0x13, 0x0e, 0x0f, 0x16, 0x17,0x09, 0x19, 0x1a, 0x1b, 0x0d, 0x1d, 0x1e, 0x15};
     uint16_t tmp;
 
     tmp = (GCR_TBL[*source_buffer >> 4] << 5) | GCR_TBL[*source_buffer & 15];

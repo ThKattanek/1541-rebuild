@@ -7,8 +7,9 @@
 #include <QFileDialog>
 #include <QDebug>
 
+enum  MENU_IDS{M_IMAGE,M_SETTINGS,M_INFO};
 
-static MENU_ENTRY menu_entrys01[] = {{"Punkt1",0},{"Punkt2",1},{"Punkt3",2},{"Punkt4",3},{"Punkt5",4},{"Punkt6",5},{"Punkt7",6},{"Punkt8",7},{"Punkt9",8},{"Punkt10",9}};
+static MENU_ENTRY menu_entrys01[] = {{"Image",M_IMAGE},{"Settings",M_SETTINGS},{"Info",M_INFO}};
 static MENU_STRUCT menu1;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -34,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lcd_generatechar(15, arrow_char);
     menu1.lcd_cursor_char = 15;
 
-    menu_init(&menu1, (MENU_ENTRY*) &menu_entrys01, 10, 4);
+    menu_init(&menu1, (MENU_ENTRY*) &menu_entrys01, 3, 4);
 
     QTimer::singleShot(2000, this,SLOT(StartMenue()));
 
@@ -56,8 +57,10 @@ void MainWindow::StartMenue()
 
 void MainWindow::MainLoopSimulation()
 {
-    menu_update(ui->lcd, &menu1,current_keycode);
+    uint16_t ret = menu_update(ui->lcd, &menu1,current_keycode);
     current_keycode = NO_KEY;
+
+    if(ret >> 8 != MC_NO_COMMAND) qDebug() << "Command:" << (ret >> 8) << " Value: " << (ret & 0x0ff);
 }
 
 
