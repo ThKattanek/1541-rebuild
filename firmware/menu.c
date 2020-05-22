@@ -108,7 +108,7 @@ void menu_refresh(MENU_STRUCT *menu)
     // Menu Neu Zeichnen
     lcd_clear();
 
-    for(int i=0; i<menu->lcd_row_count; i++)
+    for(int i=0; i<menu->lcd_row_count && i<menu->entry_count; i++)
     {
         lcd_setcursor(1,i+1);
         lcd_string(menu->entry_list[i+menu->lcd_window_pos].name);
