@@ -167,7 +167,9 @@ uint8_t get_key_from_buffer();
 void update_gui();
 void check_menu_events(uint16_t menu_event);
 void set_gui_mode(uint8_t gui_mode);
-void select_image(uint8_t key);
+void filebrowser_update(uint8_t key_code);
+void filebrowser_refresh();
+void select_image(uint8_t key);     // Obsolete
 void init_debug_led1();
 int8_t init_sd_card(void);
 void release_sd_card(void);
@@ -189,7 +191,8 @@ void soe_gatearry_init(void);
 void soe_gatearry_lo(void);
 void soe_gatearry_hi(void);
 
-int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_entry);
+int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_entry);    // Obsolete
+
 struct fat_file_struct* open_disk_image(struct fat_fs_struct *fs, struct fat_dir_entry_struct* file_entry, uint8_t *image_type);
 void close_disk_image(struct fat_file_struct*);
 int8_t open_g64_image(struct fat_file_struct *fd);

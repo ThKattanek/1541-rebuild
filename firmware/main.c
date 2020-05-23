@@ -290,7 +290,7 @@ void update_gui()
         break;
 
     case GUI_FILE_BROWSER:
-        select_image(key_code);
+        filebrowser_update(key_code);
         break;
 
     default:
@@ -409,12 +409,26 @@ void set_gui_mode(uint8_t gui_mode)
         menu_refresh();
         break;
     case GUI_FILE_BROWSER:
-        lcd_clear();
-        view_dir_entry(dir_pos,&file_entry);
+        filebrowser_refresh();
         break;
     default:
         break;
     }
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void filebrowser_update(uint8_t key_code)
+{
+     select_image(key_code);
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void filebrowser_refresh()
+{
+    lcd_clear();
+    view_dir_entry(dir_pos,&file_entry);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -1373,4 +1387,3 @@ ISR (TIMER2_COMPA_vect)
     old_key1 = key1;
     old_key2 = key2;
 }
-
