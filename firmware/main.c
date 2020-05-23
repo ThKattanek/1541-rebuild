@@ -40,16 +40,16 @@ int main(void)
         MENU_ENTRY info_menu_entrys[] = {{"Back",M_BACK_INFO,ENTRY_TO_PARENT}, {"Version",M_VERSION_INFO}, {"SD Card Info",M_SDCARD_INFO}};
 
         main_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-        menu_init(&main_menu, main_menu_entrys, 4,4);
+        menu_init(&main_menu, main_menu_entrys, 4,LCD_LINE_COUNT);
 
         image_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-        menu_init(&image_menu, image_menu_entrys, 6,4);
+        menu_init(&image_menu, image_menu_entrys, 6,LCD_LINE_COUNT);
 
         settings_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-        menu_init(&settings_menu, settings_menu_entrys, 3,4);
+        menu_init(&settings_menu, settings_menu_entrys, 3,LCD_LINE_COUNT);
 
         info_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-        menu_init(&info_menu, info_menu_entrys, 3,4);
+        menu_init(&info_menu, info_menu_entrys, 3,LCD_LINE_COUNT);
 
         menu_set_root(&main_menu);
 
@@ -445,7 +445,15 @@ void filebrowser_update(uint8_t key_code)
 void filebrowser_refresh()
 {
     lcd_clear();
-    //view_dir_entry(dir_pos,&file_entry);
+    seek_to_dir_entry(fb_dir_pos);
+
+    for(uint16_t i=0; i<LCD_LINE_COUNT; i++)
+    {
+        fat_read_dir(dd, &dir_entry);   // nächsten Directory Entry holen
+        lcd_setcursor(1,i+1);
+        dir_entry.long_name[19]=0;
+        lcd_string(dir_entry.long_name);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -584,11 +592,12 @@ void release_sd_card()
 
 uint8_t find_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name, struct fat_dir_entry_struct* dir_entry)
 {
+    fat_reset_dir(dd);
     while(fat_read_dir(dd, dir_entry))
     {
         if(strcmp(dir_entry->long_name, name) == 0)
         {
-            fat_reset_dir(dd);
+            //fat_reset_dir(dd);
             return 1;
         }
     }
@@ -613,10 +622,16 @@ uint16_t get_dir_entry_count()
 
 uint16_t seek_to_dir_entry(uint16_t entry_num)
 {
+    if(entry_num == 0)
+    {
+        fat_reset_dir(dd);
+        return 0;
+    }
+
     uint16_t entry_count = 0;
 
     fat_reset_dir(dd);
-    while(fat_read_dir(dd, &dir_entry) && (entry_count < entry_num))
+    while(fat_read_dir(dd, &dir_entry) && (entry_count < (entry_num-1)))
     {
         entry_count++;
     }
