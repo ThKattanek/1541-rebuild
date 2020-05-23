@@ -17,63 +17,78 @@
 
 enum  MENU_IDS{M_BACK, M_IMAGE, M_SETTINGS, M_INFO, \
                M_BACK_IMAGE, M_INSERT_IMAGE, M_REMOVE_IMAGE, M_WP_IMAGE, M_NEW_IMAGE, M_SAVE_IMAGE, \
-               M_BACK_SETTINGS,M_DEBUG_LED};
+               M_BACK_SETTINGS,M_DEBUG_LED,M_RESTART, \
+               M_BACK_INFO, M_VERSION_INFO, M_SDCARD_INFO};
 
 MENU_STRUCT main_menu;
 MENU_STRUCT image_menu;
 MENU_STRUCT settings_menu;
+MENU_STRUCT info_menu;
+
+static uint8_t exit_main = 1;
 
 int main(void)
 {
-    reset();                // Alles initialisieren
-
-    /// Menüs einrichten
-    /// Hauptmenü
-    MENU_ENTRY main_menu_entrys[] = {{"Back",M_BACK},{"Disk Image",M_IMAGE,ENTRY_MENU,0,&image_menu},{"Settings",M_SETTINGS,ENTRY_MENU,0,&settings_menu},{"Info",M_INFO}};
-    /// Image Menü
-    MENU_ENTRY image_menu_entrys[] = {{"Back",M_BACK_IMAGE,ENTRY_TO_PARENT}, {"Insert Image",M_INSERT_IMAGE}, {"Remove Image",M_REMOVE_IMAGE}, {"Write Protect",M_WP_IMAGE,ENTRY_ONOFF,1}, {"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
-    /// Setting Menü
-    MENU_ENTRY settings_menu_entrys[] = {{"Back",M_BACK_SETTINGS,ENTRY_TO_PARENT}, {"Debug LED",M_DEBUG_LED,ENTRY_ONOFF,0}};
-
-    main_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-    menu_init(&main_menu, main_menu_entrys, 4,4);
-
-    image_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-    menu_init(&image_menu, image_menu_entrys, 6,4);
-
-    settings_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-    menu_init(&settings_menu, settings_menu_entrys, 2,4);
-
-    menu_set_root(&main_menu);
-
-    // Zeichen für Menü More Top setzen
-    uint8_t char00[] = {4,14,31,0,0,0,0,0};
-    lcd_generatechar(0, char00);
-
-    // Zeichen für Menü More Down setzen
-    uint8_t char01[] = {0,0,0,0,31,14,4,0};
-    lcd_generatechar(1, char01);
-
-    // Zeichen für Menü Position setzen
-    uint8_t arrow_char[] = {0,4,6,31,6,4,0,0};
-    lcd_generatechar(2, arrow_char);
-
-    // Zeichen für Directory
-    uint8_t dir_char[] = {0,28,31,17,17,31,0,0};
-    lcd_generatechar(3, dir_char);
-    lcd_dir_char = 3;
-
-    // Zeichen für Diskimage
-    uint8_t diskimage_char[] = {15,27,17,27,31,27,27,31};
-    lcd_generatechar(4, diskimage_char);
-    lcd_disk_char = 4;
-
-    //// MAIN LOOP /////
     while(1)
     {
-        check_stepper_signals();
-        check_motor_signal();
-        update_gui();
+        exit_main = 1;
+        reset();                // Alles initialisieren
+
+        /// Menüs einrichten
+        /// Hauptmenü
+        MENU_ENTRY main_menu_entrys[] = {{"Back",M_BACK},{"Disk Image",M_IMAGE,ENTRY_MENU,0,&image_menu},{"Settings",M_SETTINGS,ENTRY_MENU,0,&settings_menu},{"Info",M_INFO,ENTRY_MENU,0,&info_menu}};
+        /// Image Menü
+        MENU_ENTRY image_menu_entrys[] = {{"Back",M_BACK_IMAGE,ENTRY_TO_PARENT}, {"Insert Image",M_INSERT_IMAGE}, {"Remove Image",M_REMOVE_IMAGE}, {"Write Protect",M_WP_IMAGE,ENTRY_ONOFF,1}, {"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
+        /// Setting Menü
+        MENU_ENTRY settings_menu_entrys[] = {{"Back",M_BACK_SETTINGS,ENTRY_TO_PARENT}, {"Debug LED",M_DEBUG_LED,ENTRY_ONOFF,0}, {"Restart",M_RESTART}};
+        /// Info Menü
+        MENU_ENTRY info_menu_entrys[] = {{"Back",M_BACK_INFO,ENTRY_TO_PARENT}, {"Version",M_VERSION_INFO}, {"SD Card Info",M_SDCARD_INFO}};
+
+        main_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
+        menu_init(&main_menu, main_menu_entrys, 4,4);
+
+        image_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
+        menu_init(&image_menu, image_menu_entrys, 6,4);
+
+        settings_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
+        menu_init(&settings_menu, settings_menu_entrys, 3,4);
+
+        info_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
+        menu_init(&info_menu, info_menu_entrys, 3,4);
+
+        menu_set_root(&main_menu);
+
+        // Zeichen für Menü More Top setzen
+        uint8_t char00[] = {4,14,31,0,0,0,0,0};
+        lcd_generatechar(0, char00);
+
+        // Zeichen für Menü More Down setzen
+        uint8_t char01[] = {0,0,0,0,31,14,4,0};
+        lcd_generatechar(1, char01);
+
+        // Zeichen für Menü Position setzen
+        uint8_t arrow_char[] = {0,4,6,31,6,4,0,0};
+        lcd_generatechar(2, arrow_char);
+
+        // Zeichen für Directory
+        uint8_t dir_char[] = {0,28,31,17,17,31,0,0};
+        lcd_generatechar(3, dir_char);
+        lcd_dir_char = 3;
+
+        // Zeichen für Diskimage
+        uint8_t diskimage_char[] = {15,27,17,27,31,27,27,31};
+        lcd_generatechar(4, diskimage_char);
+        lcd_disk_char = 4;
+
+        //// MAIN LOOP /////
+        while(exit_main)
+        {
+            check_stepper_signals();
+            check_motor_signal();
+            update_gui();
+        }
+
+        release_sd_card();
     }
 }
 
@@ -305,20 +320,6 @@ void check_menu_events(uint16_t menu_event)
             set_gui_mode(GUI_INFO_MODE);
             break;
 
-        case M_INFO:
-            show_start_message();
-            menu_refresh();
-            break;
-
-        /// Settings Menü
-        case M_DEBUG_LED:
-            if(menu_get_entry_var1(&settings_menu, M_DEBUG_LED))
-                debug_led1_on();
-            else
-                debug_led1_off();
-            menu_refresh();
-            break;
-
         /// Image Menü
         case M_INSERT_IMAGE:
             set_gui_mode(GUI_FILE_BROWSER);
@@ -336,6 +337,29 @@ void check_menu_events(uint16_t menu_event)
             else
                 set_write_protection(0);
                 menu_refresh();
+            break;
+
+        /// Settings Menü
+        case M_DEBUG_LED:
+            if(menu_get_entry_var1(&settings_menu, M_DEBUG_LED))
+                debug_led1_on();
+            else
+                debug_led1_off();
+            menu_refresh();
+            break;
+        case M_RESTART:
+            exit_main = 0;
+            break;
+
+        /// Info Menü
+        case M_VERSION_INFO:
+            show_start_message();
+            menu_refresh();
+            break;
+
+        case M_SDCARD_INFO:
+            show_sdcard_info_message();
+            menu_refresh();
             break;
         }
         break;
@@ -524,6 +548,16 @@ int8_t init_sd_card(void)
 
 /////////////////////////////////////////////////////////////////////
 
+void release_sd_card()
+{
+    fat_close_dir(dd);
+    fat_close(fs);
+    partition_close(partition);
+}
+
+
+/////////////////////////////////////////////////////////////////////
+
 void show_start_message(void)
 {
     lcd_clear();
@@ -536,6 +570,69 @@ void show_start_message(void)
     lcd_string("by thorsten kattanek");
     _delay_ms(START_MESSAGE_TIME);
     lcd_clear();
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void show_sdcard_info_message()
+{
+    lcd_clear();
+
+    struct sd_raw_info info;
+
+    uint8_t counter = 5;
+    uint8_t get_info_ok = 0;
+
+    while(counter != 0)
+    {
+        if(0 != sd_raw_get_info(&info))
+        {
+            lcd_setcursor(0,1);
+            char out_str[21];
+            sprintf(out_str,"MANUFACT.: %.x",info.manufacturer);
+            lcd_string(out_str);
+
+            lcd_setcursor(0,2);
+            lcd_string("OEM      : ");
+            lcd_string(info.oem);
+
+            lcd_setcursor(0,3);
+            lcd_string("PRODUCT  : ");
+            lcd_string(info.product);
+
+            lcd_setcursor(0,4);
+            sprintf(out_str,"SIZE     : %d MB", (uint16_t)(info.capacity / 1024 / 1024));
+            lcd_string(out_str);
+
+            get_info_ok = 1;
+
+            break;
+        }
+
+        release_sd_card();
+        init_sd_card();
+
+        counter--;
+    }
+
+    if(!get_info_ok)
+    {
+        lcd_clear();
+        lcd_setcursor(0,2);
+        lcd_string("Error: Ret Failure");
+        lcd_setcursor(0,3);
+        lcd_string("sd_raw_get_info");
+    }
+
+    _delay_ms(START_MESSAGE_TIME);
+
+    /*
+    lcd_clear();
+
+    _delay_ms(START_MESSAGE_TIME);
+
+    lcd_clear();
+    */
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -1233,3 +1330,4 @@ ISR (TIMER2_COMPA_vect)
     old_key1 = key1;
     old_key2 = key2;
 }
+

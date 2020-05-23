@@ -37,7 +37,7 @@
 #define LCD_LINE_SIZE 20
 
 // Zeit in ms wie lange die Version nach dem Start angezeigt wird
-#define START_MESSAGE_TIME 2000
+#define START_MESSAGE_TIME 1500
 
 // Spur auf dem der Lesekopf beim Start/Reset stehen soll
 // Track 18 --> Directory
@@ -165,7 +165,9 @@ void set_gui_mode(uint8_t gui_mode);
 void select_image(uint8_t key);
 void init_debug_led1();
 int8_t init_sd_card(void);
+void release_sd_card(void);
 void show_start_message(void);
+void show_sdcard_info_message();
 void init_stepper(void);
 void stepper_inc(void);
 void stepper_dec(void);
