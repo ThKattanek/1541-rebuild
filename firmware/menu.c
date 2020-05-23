@@ -83,12 +83,12 @@ uint16_t menu_update(uint8_t key_code)
         case ENTRY_MENU:
             current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].menu->parent_menu = current_menu;
             current_menu = current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].menu;
-            menu_refresh();
+            current_menu->view_obsolete = 1;
             break;
 
         case ENTRY_TO_PARENT:
             current_menu = current_menu->parent_menu;
-            menu_refresh();
+            current_menu->view_obsolete = 1;
             break;
 
         case ENTRY_ONOFF:

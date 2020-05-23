@@ -63,7 +63,7 @@ void menu_set_root(MENU_STRUCT* menu);
     void menu_set_entry_var1(MENU_STRUCT *menu, uint8_t id, uint8_t var1);
     uint8_t menu_get_entry_var1(MENU_STRUCT *menu, uint8_t id);
 
-MENU_STRUCT *current_menu;
+static MENU_STRUCT *current_menu;
 
 #endif // MENUE_H
 
