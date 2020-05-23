@@ -68,12 +68,12 @@ int main(void)
         // Zeichen für Directory
         uint8_t dir_char[] = {0,28,31,17,17,31,0,0};
         lcd_generatechar(3, dir_char);
-        lcd_dir_char = 3;
+        fb_lcd_dir_char = 3;
 
         // Zeichen für Diskimage
         uint8_t diskimage_char[] = {15,27,17,27,31,27,27,31};
         lcd_generatechar(4, diskimage_char);
-        lcd_disk_char = 4;
+        fb_lcd_disk_char = 4;
 
         //// MAIN LOOP /////
         while(exit_main)
@@ -142,6 +142,8 @@ void reset()
     {
         _delay_ms(1000);
     }
+
+    fb_dir_entry_count = get_dir_entry_count();
 
     // GUI Mode festlegen
     set_gui_mode(GUI_INFO_MODE);
@@ -420,15 +422,30 @@ void set_gui_mode(uint8_t gui_mode)
 
 void filebrowser_update(uint8_t key_code)
 {
-     select_image(key_code);
-}
+    uint16_t ret;
+    char out_str[21];
 
-/////////////////////////////////////////////////////////////////////
+    switch (key_code)
+    {
+    case KEY0_DOWN:
+        lcd_setcursor(0,1);
+        sprintf(out_str,"Files: %d", fb_dir_entry_count);
+        lcd_string(out_str);
+        break;
+    case KEY1_DOWN:
+        break;
+    case KEY2_DOWN:
+        set_gui_mode(GUI_MENU_MODE);
+        break;
+    }
+
+    // select_image(key_code);
+}
 
 void filebrowser_refresh()
 {
     lcd_clear();
-    view_dir_entry(dir_pos,&file_entry);
+    //view_dir_entry(dir_pos,&file_entry);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -441,15 +458,15 @@ void select_image(uint8_t key)
     switch (key)
     {
     case KEY0_DOWN:
-        if(dir_pos > 0)
+        if(fb_dir_pos > 0)
         {
-            dir_pos--;
+            fb_dir_pos--;
         }
-        view_dir_entry(dir_pos,&file_entry);
+        view_dir_entry(fb_dir_pos,&file_entry);
         break;
     case KEY1_DOWN:
-        dir_pos++;
-        if(!view_dir_entry(dir_pos,&file_entry)) dir_pos--;
+        fb_dir_pos++;
+        if(!view_dir_entry(fb_dir_pos,&file_entry)) fb_dir_pos--;
         break;
     case KEY2_DOWN:
         stop_timer0();
@@ -543,15 +560,14 @@ int8_t init_sd_card(void)
     }
 
     // Root Verzeichnis öffnen
-    fat_get_dir_entry_of_path(fs, "/", &directory);
-    dd = fat_open_dir(fs, &directory);
+    fat_get_dir_entry_of_path(fs, "/", &dir_entry);
+    dd = fat_open_dir(fs, &dir_entry);
     if(!dd)
     {
         lcd_setcursor( 0, 4);
         lcd_string("err: fat_open_root");
         return 4;
     }
-
     return 0;
 }
 
@@ -564,6 +580,71 @@ void release_sd_card()
     partition_close(partition);
 }
 
+/////////////////////////////////////////////////////////////////////
+
+uint8_t find_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name, struct fat_dir_entry_struct* dir_entry)
+{
+    while(fat_read_dir(dd, dir_entry))
+    {
+        if(strcmp(dir_entry->long_name, name) == 0)
+        {
+            fat_reset_dir(dd);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/////////////////////////////////////////////////////////////////////
+
+uint16_t get_dir_entry_count()
+{
+    uint16_t entry_count = 0;
+
+    fat_reset_dir(dd);
+    while(fat_read_dir(dd, &dir_entry))
+    {
+        entry_count++;
+    }
+    return entry_count;
+}
+
+/////////////////////////////////////////////////////////////////////
+
+uint16_t seek_to_dir_entry(uint16_t entry_num)
+{
+    uint16_t entry_count = 0;
+
+    fat_reset_dir(dd);
+    while(fat_read_dir(dd, &dir_entry) && (entry_count < entry_num))
+    {
+        entry_count++;
+    }
+    return entry_count;
+}
+
+/////////////////////////////////////////////////////////////////////
+
+uint8_t change_dir(const char* path)
+{
+    /* change directory */
+    struct fat_dir_entry_struct subdir_entry;
+    if(find_file_in_dir(fs, dd, path, &subdir_entry))
+    {
+        struct fat_dir_struct* dd_new = fat_open_dir(fs, &subdir_entry);
+        if(dd_new)
+        {
+
+            fat_close_dir(dd);
+            dd = dd_new;
+
+            fb_dir_entry_count = get_dir_entry_count();
+
+            return 1;
+        }
+    }
+    return 0;
+}
 
 /////////////////////////////////////////////////////////////////////
 
@@ -860,7 +941,7 @@ int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_ent
     {
 	if(dir_entry->attributes == FAT_ATTRIB_DIR)
 	{
-        image_filename[0] = lcd_dir_char;
+        image_filename[0] = fb_lcd_dir_char;
         strcpy(image_filename+1, dir_entry->long_name);
         uint8_t len = strlen(image_filename);
 	    if(len > 19)

@@ -173,6 +173,10 @@ void select_image(uint8_t key);     // Obsolete
 void init_debug_led1();
 int8_t init_sd_card(void);
 void release_sd_card(void);
+uint8_t change_dir(const char* path);
+uint8_t find_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name, struct fat_dir_entry_struct* dir_entry);
+uint16_t get_dir_entry_count();
+uint16_t seek_to_dir_entry(uint16_t entry_num);
 void show_start_message(void);
 void show_sdcard_info_message();
 void init_stepper(void);
@@ -222,14 +226,18 @@ volatile uint8_t key_buffer_w_pos = 0;
 uint8_t current_gui_mode;
 int8_t byte_str[16];
 
-uint8_t lcd_dir_char;       // Char Nummer für Directory Symbol
-uint8_t lcd_disk_char;      // Char Nummer für Diskimage Symbol
-uint16_t dir_pos = 0;
+// Alles für den Filebrowser
+uint8_t fb_lcd_dir_char;          // Char Nummer für Directory Symbol
+uint8_t fb_lcd_disk_char;         // Char Nummer für Diskimage Symbol
+uint16_t fb_dir_entry_count=0;    // Anzahl der Einträge im aktuellen Direktory
+uint16_t fb_dir_pos=0;            // Position des Eintrags im Directory welcher gerade ausgewählt ist
+uint8_t fb_lcd_cursor_pos=0;      // Position des Cursors auf dem LCD Display
+uint8_t fb_lcd_window_pos=0;      // Position des Anzeigebereichs innerhablb der Menüeinträge
 
 // filesystem
 struct partition_struct* partition = NULL;
 struct fat_fs_struct* fs = NULL;
-struct fat_dir_entry_struct directory;
+struct fat_dir_entry_struct dir_entry;
 struct fat_dir_struct* dd = NULL;
 
 struct fat_dir_entry_struct file_entry;
