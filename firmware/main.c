@@ -15,11 +15,6 @@
 #include <string.h>
 #include <ctype.h>
 
-enum  MENU_IDS{M_BACK, M_IMAGE, M_SETTINGS, M_INFO, \
-               M_BACK_IMAGE, M_INSERT_IMAGE, M_REMOVE_IMAGE, M_WP_IMAGE, M_NEW_IMAGE, M_SAVE_IMAGE, \
-               M_BACK_SETTINGS,M_DEBUG_LED,M_RESTART, \
-               M_BACK_INFO, M_VERSION_INFO, M_SDCARD_INFO};
-
 MENU_STRUCT main_menu;
 MENU_STRUCT image_menu;
 MENU_STRUCT settings_menu;
@@ -582,13 +577,13 @@ void show_sdcard_info_message()
 
     uint8_t counter = 5;
     uint8_t get_info_ok = 0;
+    char out_str[21];
 
     while(counter != 0)
     {
         if(0 != sd_raw_get_info(&info))
         {
             lcd_setcursor(0,1);
-            char out_str[21];
             sprintf(out_str,"MANUFACT.: %.x",info.manufacturer);
             lcd_string(out_str);
 
@@ -622,17 +617,65 @@ void show_sdcard_info_message()
         lcd_string("Error: Ret Failure");
         lcd_setcursor(0,3);
         lcd_string("sd_raw_get_info");
+        return;
     }
 
     _delay_ms(START_MESSAGE_TIME);
 
-    /*
     lcd_clear();
+
+    lcd_setcursor(0,1);
+    sprintf(out_str,"REVISION : %c.%c",(info.revision>>4)+'0', (info.revision&0x0f)+'0');
+    lcd_string(out_str);
+
+    lcd_setcursor(0,2);
+    sprintf(out_str,"SERIALNR.: %4.4X",info.serial>>16);
+    lcd_string(out_str);
+    sprintf(out_str,"%4.4X",info.serial&0xffff);
+    lcd_string(out_str);
+
+    lcd_setcursor(0,3);
+    lcd_string("PARTITION: ");
+    switch(partition->type)
+    {
+    case 0x01:
+        lcd_string("FAT12");
+        break;
+
+    case 0x04:
+        lcd_string("FAT16 MAX 32MB");
+        break;
+
+    case 0x05:
+        lcd_string("EXTENDED");
+        break;
+
+    case 0x06:
+        lcd_string("FAT16");
+        break;
+
+    case 0x0b:
+        lcd_string("FAT32");
+        break;
+
+    case 0x0c:
+        lcd_string("FAT32 LBA");
+        break;
+
+    case 0x0e:
+        lcd_string("FAT16 LBA");
+        break;
+
+    case 0x0f:
+        lcd_string("EXT LBA");
+        break;
+
+    default:
+        lcd_string("UNKNOWN");
+        break;
+    }
 
     _delay_ms(START_MESSAGE_TIME);
-
-    lcd_clear();
-    */
 }
 
 /////////////////////////////////////////////////////////////////////

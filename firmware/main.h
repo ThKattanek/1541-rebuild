@@ -150,6 +150,11 @@
 #define debug_led1_on() DEBUG_LED1_PORT |= 1<<PB2
 #define debug_led1_off() DEBUG_LED1_PORT &= ~(1<<PB2)
 
+enum  MENU_IDS{M_BACK, M_IMAGE, M_SETTINGS, M_INFO, \
+               M_BACK_IMAGE, M_INSERT_IMAGE, M_REMOVE_IMAGE, M_WP_IMAGE, M_NEW_IMAGE, M_SAVE_IMAGE, \
+               M_BACK_SETTINGS,M_DEBUG_LED,M_RESTART, \
+               M_BACK_INFO, M_VERSION_INFO, M_SDCARD_INFO};
+
 //////////////////////////////////////////////////////////////////
 // #define __AVR_ATmega128__
 
