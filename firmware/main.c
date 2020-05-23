@@ -15,8 +15,9 @@
 #include <string.h>
 #include <ctype.h>
 
-enum  MENU_IDS{M_BACK, M_IMAGE, M_SETTINGS, M_INFO, M_BACK_IMAGE, M_INSERT_IMAGE, M_REMOVE_IMAGE, M_WP_IMAGE, M_NEW_IMAGE, M_SAVE_IMAGE, \
-               M_DEBUG_LED};
+enum  MENU_IDS{M_BACK, M_IMAGE, M_SETTINGS, M_INFO, \
+               M_BACK_IMAGE, M_INSERT_IMAGE, M_REMOVE_IMAGE, M_WP_IMAGE, M_NEW_IMAGE, M_SAVE_IMAGE, \
+               M_BACK_SETTINGS,M_DEBUG_LED};
 
 MENU_STRUCT main_menu;
 MENU_STRUCT image_menu;
@@ -28,11 +29,11 @@ int main(void)
 
     /// Menüs einrichten
     /// Hauptmenü
-    MENU_ENTRY main_menu_entrys[] = {{"Back",M_BACK},{"Disk Image",M_IMAGE},{"Settings",M_SETTINGS},{"Info",M_INFO}};
+    MENU_ENTRY main_menu_entrys[] = {{"Back",M_BACK},{"Disk Image",M_IMAGE,ENTRY_MENU,0,&image_menu},{"Settings",M_SETTINGS,ENTRY_MENU,0,&settings_menu},{"Info",M_INFO}};
     /// Image Menü
-    MENU_ENTRY image_menu_entrys[] = {{"Back",M_BACK_IMAGE}, {"Insert Image",M_INSERT_IMAGE}, {"Remove Image",M_REMOVE_IMAGE}, {"Write Protect",M_WP_IMAGE,ENTRY_ONOFF,1}, {"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
+    MENU_ENTRY image_menu_entrys[] = {{"Back",M_BACK_IMAGE,ENTRY_TO_PARENT}, {"Insert Image",M_INSERT_IMAGE}, {"Remove Image",M_REMOVE_IMAGE}, {"Write Protect",M_WP_IMAGE,ENTRY_ONOFF,1}, {"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
     /// Setting Menü
-    MENU_ENTRY settings_menu_entrys[] = {{"Back",M_BACK_IMAGE}, {"Debug LED",M_DEBUG_LED,ENTRY_ONOFF,0}};
+    MENU_ENTRY settings_menu_entrys[] = {{"Back",M_BACK_SETTINGS,ENTRY_TO_PARENT}, {"Debug LED",M_DEBUG_LED,ENTRY_ONOFF,0}};
 
     main_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
     menu_init(&main_menu, main_menu_entrys, 4,4);
@@ -43,7 +44,7 @@ int main(void)
     settings_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
     menu_init(&settings_menu, settings_menu_entrys, 2,4);
 
-    current_menu = &main_menu;
+    menu_set_root(&main_menu);
 
     // Zeichen für Menü More Top setzen
     uint8_t char00[] = {4,14,31,0,0,0,0,0};
@@ -275,7 +276,7 @@ void update_gui()
         break;
 
     case GUI_MENU_MODE:
-        check_menu_events(menu_update(current_menu, key_code));
+        check_menu_events(menu_update(key_code));
         break;
 
     case GUI_FILE_BROWSER:
@@ -303,17 +304,10 @@ void check_menu_events(uint16_t menu_event)
         case M_BACK:
             set_gui_mode(GUI_INFO_MODE);
             break;
-        case M_IMAGE:
-            current_menu = &image_menu;
-            menu_refresh(&image_menu);
-            break;
-        case M_SETTINGS:
-            current_menu = &settings_menu;
-            menu_refresh(&settings_menu);
-            break;
+
         case M_INFO:
             show_start_message();
-            menu_refresh(&main_menu);
+            menu_refresh();
             break;
 
         /// Settings Menü
@@ -322,14 +316,10 @@ void check_menu_events(uint16_t menu_event)
                 debug_led1_on();
             else
                 debug_led1_off();
-            menu_refresh(&settings_menu);
+            menu_refresh();
             break;
 
         /// Image Menü
-        case M_BACK_IMAGE:
-            current_menu = &main_menu;
-            menu_refresh(&main_menu);
-            break;
         case M_INSERT_IMAGE:
             set_gui_mode(GUI_FILE_BROWSER);
             break;
@@ -345,7 +335,7 @@ void check_menu_events(uint16_t menu_event)
                 set_write_protection(1);
             else
                 set_write_protection(0);
-            menu_refresh(&image_menu);
+                menu_refresh();
             break;
         }
         break;
@@ -397,7 +387,7 @@ void set_gui_mode(uint8_t gui_mode)
 
         break;
     case GUI_MENU_MODE:
-        menu_refresh(current_menu);
+        menu_refresh();
         break;
     case GUI_FILE_BROWSER:
         lcd_clear();
