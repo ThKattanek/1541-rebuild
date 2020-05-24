@@ -169,7 +169,6 @@ void check_menu_events(uint16_t menu_event);
 void set_gui_mode(uint8_t gui_mode);
 void filebrowser_update(uint8_t key_code);
 void filebrowser_refresh();
-void select_image(uint8_t key);     // Obsolete
 void init_debug_led1();
 int8_t init_sd_card(void);
 void release_sd_card(void);
@@ -195,8 +194,6 @@ void soe_gatearry_init(void);
 void soe_gatearry_lo(void);
 void soe_gatearry_hi(void);
 
-int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_entry);    // Obsolete
-
 struct fat_file_struct* open_disk_image(struct fat_fs_struct *fs, struct fat_dir_entry_struct* file_entry, uint8_t *image_type);
 void close_disk_image(struct fat_file_struct*);
 int8_t open_g64_image(struct fat_file_struct *fd);
@@ -216,7 +213,7 @@ void send_disk_change(void);
 // Globale Variablen
 
 // gui
-char image_filename[33]; //Maximal 32 Zeichen
+char image_filename[32]; //Maximal 32 Zeichen
 
 
 volatile uint8_t key_buffer[16];
@@ -229,8 +226,10 @@ int8_t byte_str[16];
 // Alles für den Filebrowser
 uint8_t fb_lcd_dir_char;            // Char Nummer für Directory Symbol
 uint8_t fb_lcd_disk_char;           // Char Nummer für Diskimage Symbol
+uint8_t fb_lcd_cursor_char;         // Char für Auswahl Cursor
+uint8_t fb_lcd_more_top_char;
+uint8_t fb_lcd_more_down_char;
 uint16_t fb_dir_entry_count=0;      // Anzahl der Einträge im aktuellen Direktory
-uint16_t fb_dir_pos=0;              // Position des Eintrags im Directory welcher gerade ausgewählt ist
 uint8_t fb_lcd_cursor_pos=0;        // Position des Cursors auf dem LCD Display
 uint8_t fb_lcd_window_pos=0;        // Position des Anzeigebereichs innerhablb der Menüeinträge
 
@@ -246,7 +245,7 @@ struct fat_dir_entry_struct file_entry;
 struct fat_file_struct* fd;
 
 // floppydisk emulation
-uint8_t akt_image_type = 0;     // 0=kein Image, 1=G64, 2=D64
+uint8_t akt_image_type = UNDEF_IMAGE;     // 0=kein Image, 1=G64, 2=D64
 uint8_t is_image_mount;
 
 uint8_t is_wps_pin_enable = 0; // 0=WPS PIN=HiZ / 1=WPS Output

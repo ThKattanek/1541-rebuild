@@ -56,16 +56,20 @@ int main(void)
         // Zeichen für Menü More Top setzen
         uint8_t char00[] = {4,14,31,0,0,0,0,0};
         lcd_generatechar(0, char00);
+        fb_lcd_more_top_char = 0;
+
 
         // Zeichen für Menü More Down setzen
         uint8_t char01[] = {0,0,0,0,31,14,4,0};
         lcd_generatechar(1, char01);
+        fb_lcd_more_down_char = 1;
 
         // Zeichen für Menü Position setzen
         uint8_t arrow_char[] = {0,4,6,31,6,4,0,0};
         lcd_generatechar(2, arrow_char);
+        fb_lcd_cursor_char = 2;
 
-        // Zeichen für Directory
+        // Zeichen für Directory Symbol
         uint8_t dir_char[] = {0,28,31,17,17,31,0,0};
         lcd_generatechar(3, dir_char);
         fb_lcd_dir_char = 3;
@@ -436,70 +440,64 @@ void filebrowser_update(uint8_t key_code)
     switch (key_code)
     {
     case KEY0_DOWN:
-        change_dir("Demos D64");
-        filebrowser_refresh();
+        if(fb_lcd_cursor_pos > 0)
+        {
+            fb_lcd_cursor_pos--;
+            filebrowser_refresh();
+        }
+        else
+        {
+            if(fb_lcd_window_pos > 0)
+            {
+                fb_lcd_window_pos--;
+                filebrowser_refresh();
+            }
+        }
         break;
     case KEY1_DOWN:
-        change_dir("..");
-        filebrowser_refresh();
-        break;
-    case KEY2_DOWN:
+        if((fb_lcd_cursor_pos < LCD_LINE_COUNT-1) && (fb_lcd_cursor_pos < fb_dir_entry_count-1))
+        {
+            fb_lcd_cursor_pos++;
+            filebrowser_refresh();
+        }
+        else
+        {
+            if(fb_lcd_window_pos < fb_dir_entry_count - LCD_LINE_COUNT)
+            {
+                fb_lcd_window_pos++;
+                filebrowser_refresh();
+            }
+        }
         break;
     case KEY2_UP:
-        break;
-    case KEY2_TIMEOUT1:
-        set_gui_mode(GUI_MENU_MODE);
-        break;
-    }
-
-    // select_image(key_code);
-}
-
-void filebrowser_refresh()
-{
-    lcd_clear();
-    seek_to_dir_entry(fb_dir_pos);
-
-    for(uint16_t i=0; i<LCD_LINE_COUNT; i++)
-    {
-        fat_read_dir(dd, &fb_dir_entry[i]);   // nächsten Directory Entry holen
-        lcd_setcursor(1,i+1);
-        if(fb_dir_entry[i].attributes & FAT_ATTRIB_DIR)
-            lcd_data(fb_lcd_dir_char);
-        else
-            lcd_data(' ');
-        dir_entry.long_name[19]=0;
-        lcd_string(fb_dir_entry[i].long_name);
-    }
-}
-
-/////////////////////////////////////////////////////////////////////
-
-void select_image(uint8_t key)
-{
-    /////////////////////////////////////////////////////////////////////////////////////////
-    //// Image Auswahl
-
-    switch (key)
-    {
-    case KEY0_DOWN:
-        if(fb_dir_pos > 0)
-        {
-            fb_dir_pos--;
-        }
-        view_dir_entry(fb_dir_pos,&file_entry);
-        break;
-    case KEY1_DOWN:
-        fb_dir_pos++;
-        if(!view_dir_entry(fb_dir_pos,&file_entry)) fb_dir_pos--;
-        break;
-    case KEY2_DOWN:
         stop_timer0();
         no_byte_ready_send = 1;
 
         close_disk_image(fd);
 
-        fd = open_disk_image(fs, &file_entry, &akt_image_type);
+        if(fb_dir_entry[fb_lcd_cursor_pos].attributes & FAT_ATTRIB_DIR)
+        {
+            // Eintrag ist ein Verzeichnis
+            change_dir(fb_dir_entry[fb_lcd_cursor_pos].long_name);
+            fb_lcd_cursor_pos = 0;
+            fb_lcd_window_pos = 0;
+            filebrowser_refresh();
+            return;
+        }
+
+        fd = open_disk_image(fs, &fb_dir_entry[fb_lcd_cursor_pos], &akt_image_type);
+
+        if(akt_image_type == UNDEF_IMAGE)
+        {
+            lcd_clear();
+            lcd_setcursor(0,2);
+            lcd_string("Not Supported Image!");
+            _delay_ms(1000);
+        }
+
+        filebrowser_refresh();
+
+        strcpy(image_filename, fb_dir_entry[fb_lcd_cursor_pos].long_name);
 
         if(!fd)
         {
@@ -522,10 +520,52 @@ void select_image(uint8_t key)
             menu_set_entry_var1(&image_menu, M_WP_IMAGE, 0);
 
         set_gui_mode(GUI_INFO_MODE);
+        break;
+    case KEY2_TIMEOUT1:
+        set_gui_mode(GUI_MENU_MODE);
+        break;
+    }
 
-        break;
-    default:
-        break;
+    // select_image(key_code);
+}
+
+void filebrowser_refresh()
+{
+    lcd_clear();
+    seek_to_dir_entry(fb_lcd_window_pos);
+
+    uint8_t i=0;
+
+    while(i<LCD_LINE_COUNT && ((fb_lcd_window_pos + i) < fb_dir_entry_count))
+    {
+        fat_read_dir(dd, &fb_dir_entry[i]);   // nächsten Directory Entry holen
+        if(!(fb_dir_entry[i].attributes & (FAT_ATTRIB_SYSTEM | FAT_ATTRIB_VOLUME | FAT_ATTRIB_HIDDEN)))
+        {
+            lcd_setcursor(1,i+1);
+            if(fb_dir_entry[i].attributes & FAT_ATTRIB_DIR)
+                lcd_data(fb_lcd_dir_char);
+            else
+                lcd_data(' ');
+            dir_entry.long_name[19]=0;
+            lcd_string(fb_dir_entry[i].long_name);
+            i++;
+        }
+    }
+
+    lcd_setcursor(0,fb_lcd_cursor_pos+1);
+    lcd_data(fb_lcd_cursor_char);
+
+
+    if(fb_lcd_window_pos > 0)
+    {
+        lcd_setcursor(19,1);
+        lcd_data(fb_lcd_more_top_char);
+    }
+
+    if(fb_lcd_window_pos + LCD_LINE_COUNT < fb_dir_entry_count)
+    {
+        lcd_setcursor(19, LCD_LINE_COUNT);
+        lcd_data(fb_lcd_more_down_char);
     }
 }
 
@@ -630,7 +670,8 @@ uint16_t get_dir_entry_count()
     fat_reset_dir(dd);
     while(fat_read_dir(dd, &dir_entry))
     {
-        entry_count++;
+        if(!(dir_entry.attributes & (FAT_ATTRIB_SYSTEM | FAT_ATTRIB_VOLUME | FAT_ATTRIB_HIDDEN)))
+            entry_count++;
     }
     return entry_count;
 }
@@ -650,7 +691,8 @@ uint16_t seek_to_dir_entry(uint16_t entry_num)
     fat_reset_dir(dd);
     while(fat_read_dir(dd, &dir_entry) && (entry_count < (entry_num-1)))
     {
-        entry_count++;
+        if(!(dir_entry.attributes & (FAT_ATTRIB_SYSTEM | FAT_ATTRIB_VOLUME | FAT_ATTRIB_HIDDEN)))
+            entry_count++;
     }
     return entry_count;
 }
@@ -801,7 +843,6 @@ void show_sdcard_info_message()
         lcd_string("UNKNOWN");
         break;
     }
-
     _delay_ms(START_MESSAGE_TIME);
 }
 
@@ -959,59 +1000,6 @@ void soe_gatearry_lo(void)
 
 /////////////////////////////////////////////////////////////////////
 
-int8_t view_dir_entry(uint16_t entry_start, struct fat_dir_entry_struct* dir_entry)
-{
-    uint16_t entry_pos = 0;
-
-    fat_reset_dir(dd);
-    while(fat_read_dir(dd, dir_entry) && (entry_pos < entry_start))
-    {
-	entry_pos++;
-    }
-
-    if((entry_pos == entry_start) && (dir_entry->attributes != FAT_ATTRIB_VOLUME))
-    {
-	if(dir_entry->attributes == FAT_ATTRIB_DIR)
-	{
-        image_filename[0] = fb_lcd_dir_char;
-        strcpy(image_filename+1, dir_entry->long_name);
-        uint8_t len = strlen(image_filename);
-	    if(len > 19)
-        image_filename[32] = 0;
-	    else
-	    {
-		for(int i=len; i<20; i++)
-            image_filename[i] = ' ';
-        image_filename[32] = 0;
-	    }
-
-	    lcd_setcursor(0,1);
-        lcd_string(image_filename);
-	}
-	else
-	{
-        strcpy(image_filename, dir_entry->long_name);
-        uint8_t len = strlen(image_filename);
-	    if(len > 20)
-        image_filename[32] = 0;
-	    else
-	    {
-		for(int i=len; i<20; i++)
-            image_filename[i] = ' ';
-        image_filename[32] = 0;
-	    }
-
-	    lcd_setcursor(0,1);
-        lcd_string(image_filename);
-	}
-	    return 1;
-
-    }
-    return 0;
-}
-
-/////////////////////////////////////////////////////////////////////
-
 struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir_entry_struct* file_entry, uint8_t* image_type)
 {
     if(strlen(file_entry->long_name) < 4) return NULL;
@@ -1054,8 +1042,6 @@ struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir
     else
     {
         // Nicht unterstützt
-        lcd_setcursor( 0, 3);
-        lcd_string("Not Supported");
         fat_close_file(fd);
         fd = NULL;
         *image_type = UNDEF_IMAGE;
