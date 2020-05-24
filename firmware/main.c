@@ -145,6 +145,10 @@ void reset()
 
     fb_dir_entry_count = get_dir_entry_count();
 
+    // Key Puffer leeren
+    key_buffer_r_pos = 0;
+    key_buffer_w_pos = 0;
+
     // GUI Mode festlegen
     set_gui_mode(GUI_INFO_MODE);
 
@@ -262,8 +266,11 @@ void update_gui()
     {
     case GUI_INFO_MODE:
 
-        if(key_code == KEY2_DOWN)
+        if(key_code == KEY2_UP)
             set_gui_mode(GUI_MENU_MODE);
+
+        if(key_code == KEY2_TIMEOUT2)
+            exit_main = 0;
 
         if(old_half_track != akt_half_track)
         {
@@ -436,6 +443,10 @@ void filebrowser_update(uint8_t key_code)
         filebrowser_refresh();
         break;
     case KEY2_DOWN:
+        break;
+    case KEY2_UP:
+        break;
+    case KEY2_TIMEOUT1:
         set_gui_mode(GUI_MENU_MODE);
         break;
     }
@@ -1439,16 +1450,24 @@ ISR (TIMER0_COMPA_vect)
 
 ISR (TIMER2_COMPA_vect)
 {
-    volatile static uint8_t counter = 0;
-    if(counter < 5)
+    // ISR wird alle 10ms (100Hz) aufgerufen
+
+    volatile static uint8_t counter0 = 0;
+
+    volatile static uint16_t counter1 = 0;
+    volatile static uint8_t key2_is_pressed = 0;
+    volatile static uint8_t key2_next_up_is_invalid = 0;
+
+    if(counter0 < 5)
     {
-        counter++;
+        counter0++;
         return 0;
     }
 
-    counter = 0;
+    // Alle 50ms ab hier //
+    counter0 = 0;
+    counter1++;
 
-    // ISR wird alle 10ms (100Hz) aufgerufen
     volatile static uint8_t old_key0 = 0;
     volatile static uint8_t old_key1 = 0;
     volatile static uint8_t old_key2 = 0;
@@ -1478,10 +1497,32 @@ ISR (TIMER2_COMPA_vect)
     if(key2 != old_key2)
     {
         if(key2)
+        {
             key_buffer[key_buffer_w_pos++] = KEY2_DOWN;
+            counter1 = 0;
+            key2_is_pressed = 1;
+        }
         else
-            key_buffer[key_buffer_w_pos++] = KEY2_UP;
+        {
+            if(!key2_next_up_is_invalid)
+                key_buffer[key_buffer_w_pos++] = KEY2_UP;
+            key2_is_pressed = 0;
+            key2_next_up_is_invalid = 0;
+        }
     }
+
+    if(key2_is_pressed && counter1 == TIMEOUT1_KEY2)
+    {
+        key_buffer[key_buffer_w_pos++] = KEY2_TIMEOUT1;
+        key2_next_up_is_invalid = 1;
+    }
+
+    if(key2_is_pressed && counter1 == TIMEOUT2_KEY2)
+    {
+        key_buffer[key_buffer_w_pos++] = KEY2_TIMEOUT2;
+        key2_next_up_is_invalid = 1;
+    }
+
     key_buffer_w_pos &= 0x0f;
 
     old_key0 = key0;
