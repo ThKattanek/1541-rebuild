@@ -428,11 +428,12 @@ void filebrowser_update(uint8_t key_code)
     switch (key_code)
     {
     case KEY0_DOWN:
-        lcd_setcursor(0,1);
-        sprintf(out_str,"Files: %d", fb_dir_entry_count);
-        lcd_string(out_str);
+        change_dir("Demos D64");
+        filebrowser_refresh();
         break;
     case KEY1_DOWN:
+        change_dir("..");
+        filebrowser_refresh();
         break;
     case KEY2_DOWN:
         set_gui_mode(GUI_MENU_MODE);
@@ -449,10 +450,14 @@ void filebrowser_refresh()
 
     for(uint16_t i=0; i<LCD_LINE_COUNT; i++)
     {
-        fat_read_dir(dd, &dir_entry);   // nächsten Directory Entry holen
+        fat_read_dir(dd, &fb_dir_entry[i]);   // nächsten Directory Entry holen
         lcd_setcursor(1,i+1);
+        if(fb_dir_entry[i].attributes & FAT_ATTRIB_DIR)
+            lcd_data(fb_lcd_dir_char);
+        else
+            lcd_data(' ');
         dir_entry.long_name[19]=0;
-        lcd_string(dir_entry.long_name);
+        lcd_string(fb_dir_entry[i].long_name);
     }
 }
 

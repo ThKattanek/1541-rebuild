@@ -234,6 +234,8 @@ uint16_t fb_dir_pos=0;            // Position des Eintrags im Directory welcher 
 uint8_t fb_lcd_cursor_pos=0;      // Position des Cursors auf dem LCD Display
 uint8_t fb_lcd_window_pos=0;      // Position des Anzeigebereichs innerhablb der Menüeinträge
 
+struct fat_dir_entry_struct fb_dir_entry[LCD_LINE_COUNT];
+
 // filesystem
 struct partition_struct* partition = NULL;
 struct fat_fs_struct* fs = NULL;
