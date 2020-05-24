@@ -263,6 +263,7 @@ void update_gui()
 {
     static uint8_t old_half_track = 0;
     static uint8_t old_motor_status = 0;
+    static uint16_t wait_counter0 = 0;
 
     uint8_t key_code = get_key_from_buffer();
 
@@ -296,6 +297,46 @@ void update_gui()
         }
         old_motor_status = get_motor_status();
 
+        if(is_image_mount)
+        {
+            //// Filename Scrolling
+
+            wait_counter0++;
+
+            if(gui_current_line_offset > 0 && wait_counter0 == 30000)
+            {
+                wait_counter0 = 0;
+
+                if(gui_line_scroll_end_begin_wait == 0)
+                {
+                    // Es darf gescrollt werden
+
+
+                    if(!gui_line_scroll_direction)
+                    {
+                        gui_line_scroll_pos++;
+                        if(gui_line_scroll_pos >= gui_current_line_offset)
+                        {
+                            gui_line_scroll_end_begin_wait = 6;
+                            gui_line_scroll_direction = 1;
+                        }
+                    }
+                    else
+                    {
+                        gui_line_scroll_pos--;
+                        if(gui_line_scroll_pos == 0)
+                        {
+                            gui_line_scroll_end_begin_wait = 6;
+                            gui_line_scroll_direction = 0;
+                        }
+                    }
+
+                    lcd_setcursor(0,4);
+                    lcd_print(image_filename,gui_line_scroll_pos,20);
+                }
+                else gui_line_scroll_end_begin_wait--;
+            }
+        }
         break;
 
     case GUI_MENU_MODE:
@@ -412,6 +453,16 @@ void set_gui_mode(uint8_t gui_mode)
         {
             lcd_setcursor(0,4);
             lcd_print(image_filename,0,20);
+
+            // Für Scrollenden Filename
+            int8_t var = (int8_t)strlen(image_filename) - 20;
+            if(var < 0)
+                gui_current_line_offset = 0;
+            else
+                gui_current_line_offset = var;
+            gui_line_scroll_pos = 0;
+            gui_line_scroll_direction = 0;
+            gui_line_scroll_end_begin_wait = 6;
         }
 
         lcd_setcursor(2,4);
@@ -526,7 +577,43 @@ void filebrowser_update(uint8_t key_code)
         break;
     }
 
-    // select_image(key_code);
+    //// Filename Scrolling
+    static uint16_t wait_counter0;
+    wait_counter0++;
+
+    if(fb_current_line_offset > 0 && wait_counter0 == 30000)
+    {
+        wait_counter0 = 0;
+
+        if(fb_line_scroll_end_begin_wait == 0)
+        {
+            // Es darf gescrollt werden
+
+
+            if(!fb_line_scroll_direction)
+            {
+                fb_line_scroll_pos++;
+                if(fb_line_scroll_pos >= fb_current_line_offset)
+                {
+                    fb_line_scroll_end_begin_wait = 6;
+                    fb_line_scroll_direction = 1;
+                }
+            }
+            else
+            {
+                fb_line_scroll_pos--;
+                if(fb_line_scroll_pos == 0)
+                {
+                    fb_line_scroll_end_begin_wait = 6;
+                    fb_line_scroll_direction = 0;
+                }
+            }
+
+            lcd_setcursor(2,fb_lcd_cursor_pos+1);
+            lcd_print(fb_dir_entry[fb_lcd_cursor_pos].long_name,fb_line_scroll_pos,17);
+        }
+        else fb_line_scroll_end_begin_wait--;
+    }
 }
 
 void filebrowser_refresh()
@@ -568,6 +655,17 @@ void filebrowser_refresh()
         lcd_setcursor(19, LCD_LINE_COUNT);
         lcd_data(fb_lcd_more_down_char);
     }
+
+    // Für Scrollenden Filename
+    int8_t var = (int8_t)strlen(fb_dir_entry[fb_lcd_cursor_pos].long_name) - 17;
+    if(var < 0)
+        fb_current_line_offset = 0;
+    else
+        fb_current_line_offset = var;
+    fb_line_scroll_pos = 0;
+    fb_line_scroll_direction = 0;
+    fb_line_scroll_end_begin_wait = 6;
+
 }
 
 /////////////////////////////////////////////////////////////////////

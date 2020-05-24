@@ -223,6 +223,11 @@ volatile uint8_t key_buffer_w_pos;
 uint8_t current_gui_mode;
 int8_t byte_str[16];
 
+uint8_t gui_current_line_offset;         // >0 dann ist der Name länger als die maximale Anzeigelaenge
+uint8_t gui_line_scroll_pos;             // Kann zwischen 0 und fb_current_line_offset liegen
+uint8_t gui_line_scroll_direction;       // Richtung des Scrollings
+uint8_t gui_line_scroll_end_begin_wait;
+
 // Alles für den Filebrowser
 uint8_t fb_lcd_dir_char;            // Char Nummer für Directory Symbol
 uint8_t fb_lcd_disk_char;           // Char Nummer für Diskimage Symbol
@@ -232,6 +237,11 @@ uint8_t fb_lcd_more_down_char;
 uint16_t fb_dir_entry_count=0;      // Anzahl der Einträge im aktuellen Direktory
 uint8_t fb_lcd_cursor_pos=0;        // Position des Cursors auf dem LCD Display
 uint8_t fb_lcd_window_pos=0;        // Position des Anzeigebereichs innerhablb der Menüeinträge
+
+uint8_t fb_current_line_offset = 0;         // >0 dann ist der Name länger als die maximale Anzeigelaenge
+uint8_t fb_line_scroll_pos = 0;             // Kann zwischen 0 und fb_current_line_offset liegen
+uint8_t fb_line_scroll_direction = 0;       // Richtung des Scrollings
+uint8_t fb_line_scroll_end_begin_wait = 10;
 
 struct fat_dir_entry_struct fb_dir_entry[LCD_LINE_COUNT];
 
