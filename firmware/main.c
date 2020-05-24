@@ -31,25 +31,25 @@ int main(void)
 
         /// Menüs einrichten
         /// Hauptmenü
-        MENU_ENTRY main_menu_entrys[] = {{"Back",M_BACK},{"Disk Image",M_IMAGE,ENTRY_MENU,0,&image_menu},{"Settings",M_SETTINGS,ENTRY_MENU,0,&settings_menu},{"Info",M_INFO,ENTRY_MENU,0,&info_menu}};
+        MENU_ENTRY main_menu_entrys[] = {{"Disk Image",M_IMAGE,ENTRY_MENU,0,&image_menu},{"Settings",M_SETTINGS,ENTRY_MENU,0,&settings_menu},{"Info",M_INFO,ENTRY_MENU,0,&info_menu}};
         /// Image Menü
-        MENU_ENTRY image_menu_entrys[] = {{"Back",M_BACK_IMAGE,ENTRY_TO_PARENT}, {"Insert Image",M_INSERT_IMAGE}, {"Remove Image",M_REMOVE_IMAGE}, {"Write Protect",M_WP_IMAGE,ENTRY_ONOFF,1}, {"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
+        MENU_ENTRY image_menu_entrys[] = {{"Insert Image",M_INSERT_IMAGE}, {"Remove Image",M_REMOVE_IMAGE}, {"Write Protect",M_WP_IMAGE,ENTRY_ONOFF,1}, {"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
         /// Setting Menü
-        MENU_ENTRY settings_menu_entrys[] = {{"Back",M_BACK_SETTINGS,ENTRY_TO_PARENT}, {"Debug LED",M_DEBUG_LED,ENTRY_ONOFF,0}, {"Restart",M_RESTART}};
+        MENU_ENTRY settings_menu_entrys[] = {{"Debug LED",M_DEBUG_LED,ENTRY_ONOFF,0}, {"Restart",M_RESTART}};
         /// Info Menü
-        MENU_ENTRY info_menu_entrys[] = {{"Back",M_BACK_INFO,ENTRY_TO_PARENT}, {"Version",M_VERSION_INFO}, {"SD Card Info",M_SDCARD_INFO}};
+        MENU_ENTRY info_menu_entrys[] = {{"Version",M_VERSION_INFO}, {"SD Card Info",M_SDCARD_INFO}};
 
         main_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-        menu_init(&main_menu, main_menu_entrys, 4,LCD_LINE_COUNT);
+        menu_init(&main_menu, main_menu_entrys, 3,LCD_LINE_COUNT);
 
         image_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-        menu_init(&image_menu, image_menu_entrys, 6,LCD_LINE_COUNT);
+        menu_init(&image_menu, image_menu_entrys, 5,LCD_LINE_COUNT);
 
         settings_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-        menu_init(&settings_menu, settings_menu_entrys, 3,LCD_LINE_COUNT);
+        menu_init(&settings_menu, settings_menu_entrys, 2,LCD_LINE_COUNT);
 
         info_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-        menu_init(&info_menu, info_menu_entrys, 3,LCD_LINE_COUNT);
+        menu_init(&info_menu, info_menu_entrys, 2,LCD_LINE_COUNT);
 
         menu_set_root(&main_menu);
 
@@ -316,13 +316,14 @@ void check_menu_events(uint16_t menu_event)
 
     switch(command)
     {
+    case MC_EXIT_MENU:
+        set_gui_mode(GUI_INFO_MODE);
+        break;
+
     case MC_SELECT_ENTRY:
         switch(value)
         {
         /// Main Menü
-        case M_BACK:
-            set_gui_mode(GUI_INFO_MODE);
-            break;
 
         /// Image Menü
         case M_INSERT_IMAGE:

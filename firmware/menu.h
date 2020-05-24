@@ -13,7 +13,8 @@
     #define lcd_generatechar(code, data) lcd->SetUserChar(code, data)
 #endif
 
-enum MenuCommands {MC_NO_COMMAND, MC_SELECT_ENTRY, MC_CHANGE_ENTRY};
+// MC_EXIT_MENU wird ausgeführt wenn ein KEY2_TIMEOUT1 kommt und das Menü schon im Hauptmenü befindet
+enum MenuCommands {MC_NO_COMMAND, MC_EXIT_MENU, MC_SELECT_ENTRY, MC_CHANGE_ENTRY};
 enum MenuTypes {ENTRY_NORMAL, ENTRY_MENU, ENTRY_TO_PARENT,ENTRY_ONOFF, ENTRY_BOOL, ENTRY_BIN, ENTRY_8BIT_DEC};
 
 // MENU COMMANDS

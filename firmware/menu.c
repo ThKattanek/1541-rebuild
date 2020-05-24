@@ -73,7 +73,7 @@ uint16_t menu_update(uint8_t key_code)
         }
         break;
 
-    case KEY2_DOWN:
+    case KEY2_UP:
         // menu->lcd_window_pos + menu->lcd_cursor_pos = index in MenuEntryList
         command = MC_SELECT_ENTRY;
         value = current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].id;
@@ -98,6 +98,18 @@ uint16_t menu_update(uint8_t key_code)
             break;
         }
 
+        break;
+
+    case KEY2_TIMEOUT1:
+        if(current_menu->parent_menu != 0)
+        {
+            current_menu = current_menu->parent_menu;
+            current_menu->view_obsolete = 1;
+        }
+        else command = MC_EXIT_MENU;
+        break;
+
+    case KEY2_TIMEOUT2:
         break;
     }
 
