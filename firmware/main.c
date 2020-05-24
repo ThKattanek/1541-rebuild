@@ -411,7 +411,7 @@ void set_gui_mode(uint8_t gui_mode)
         if(is_image_mount)
         {
             lcd_setcursor(0,4);
-            lcd_string(image_filename);
+            lcd_print(image_filename,0,20);
         }
 
         lcd_setcursor(2,4);
@@ -546,8 +546,9 @@ void filebrowser_refresh()
                 lcd_data(fb_lcd_dir_char);
             else
                 lcd_data(' ');
-            dir_entry.long_name[19]=0;
-            lcd_string(fb_dir_entry[i].long_name);
+
+            lcd_print(fb_dir_entry[i].long_name,0,17);
+
             i++;
         }
     }

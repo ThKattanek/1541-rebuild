@@ -79,6 +79,12 @@ void lcd_data( uint8_t data );
 void lcd_string( const char *data );
  
 ////////////////////////////////////////////////////////////////////////////////
+// Schreibt einen String auf das LCD mit erweiterten Parametern
+// start:   Position des erstes Zeichens im String was ausgegeben werden soll
+// length:  Maximale Anzahl der Zeichen die Ausgegeben werden sollen
+void lcd_print(char *string, uint8_t start, uint8_t length);
+
+////////////////////////////////////////////////////////////////////////////////
 // Definition eines benutzerdefinierten Sonderzeichens.
 // data muss auf ein Array[8] mit den Zeilencodes des zu definierenden Zeichens
 // zeigen

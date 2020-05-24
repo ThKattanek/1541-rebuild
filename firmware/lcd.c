@@ -159,6 +159,23 @@ void lcd_string( const char *data )
     while( *data != '\0' )
         lcd_data( *data++ );
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Schreibt einen String auf das LCD mit erweiterten Parametern
+// start:   Position des erstes Zeichens im String was ausgegeben werden soll
+// length:  Maximale Anzahl der Zeichen die Ausgegeben werden sollen
+
+void lcd_print(char *string, uint8_t start, uint8_t length)
+{
+    uint8_t char_counter = 1;
+    uint8_t current_char = string[0];
+
+    while(current_char != '\0' && char_counter-1 < length)
+    {
+        lcd_data(current_char);
+        current_char = string[char_counter++];
+    }
+}
  
 ////////////////////////////////////////////////////////////////////////////////
 // Schreibt ein Zeichen in den Character Generator RAM
