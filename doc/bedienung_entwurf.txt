@@ -4,20 +4,19 @@
 - Button3 - Enter 
 
 // Grundlegende Sachen //
-- nach dem Start befindet sich die 1541-rebuild immer im Info Screen
-- durch längeres drücken von Enter (1,5 sek) wechselt man vom Info Screen ins Menü
-- durch längeres drücken von Enter (1,5 sek) wechselt man ins Menü in den Info Screen
-- der Wechsel von Menü in den Info Screen kann von jeden Punkt im Menü geschehen
+- nach dem Start befindet sich die 1541-rebuild immer im Info Screen [erledit!]
+- durch drücken von Enter wechselt man vom Info Screen ins Menü [erledit!]
+- durch längeres drücken von Enter kommt man wieder zurück in den Info Screen, oder eine Menü Ebene wieder hoch [erledit!]
 - die Position im Menü wird sich gemerkt
 
 // Info Screen //
-- Anzeige der aktuellen Spur / Motor Status
-- Anzeige aktuelles Images (Dateiname länger als 20 Zeichen soll gescrollt werden)
+- Anzeige der aktuellen Spur / Motor Status / Write Protect [erledit!]
+- Anzeige aktuelles Images (Dateiname länger als 20 Zeichen soll gescrollt werden), [erledit!]
 
 // Menü //
 - [Image]
-  - [Mount]
-  - [UnMount]
+  - [Mount]	[erledit!]
+  - [UnMount]	[erledit!]
   - [New]
   - [Save]
 - [Settings]
