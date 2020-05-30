@@ -1598,9 +1598,8 @@ ISR (TIMER2_COMPA_vect)
     uint8_t key1 = get_key1();
     uint8_t key2 = get_key2();
 
-    switch (input_mode)
+    if(input_mode == INPUT_MODE_BUTTON)
     {
-    case INPUT_MODE_BUTTON:
         if(key0 != old_key0)
         {
             if(key0)
@@ -1618,29 +1617,6 @@ ISR (TIMER2_COMPA_vect)
                 key_buffer[key_buffer_w_pos++] = KEY1_UP;
         }
         key_buffer_w_pos &= 0x0f;
-        break;
-
-    case INPUT_MODE_ENCODER:
-        /*
-        old_drehgeber = (old_drehgeber << 2)  & 0x0F;
-        if (PHASE_1A) old_drehgeber |=2;
-        if (PHASE_1B) old_drehgeber |=1;
-
-        pos_change = (char)pgm_read_byte(&drehimp_tab[old_drehgeber]);
-
-        switch(pos_change)
-        {
-        case 1:
-            key_buffer[key_buffer_w_pos++] = KEY0_DOWN;
-            break;
-        case 2:
-            key_buffer[key_buffer_w_pos++] = KEY1_DOWN;
-            break;
-        default:
-            break;
-        }
-        */
-        break;
     }
 
     if(key2 != old_key2)
