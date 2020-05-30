@@ -10,6 +10,7 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
+#include <avr/pgmspace.h>
 
 // Für die LCD Ansteuerung
 #include "./lcd.h"
@@ -142,6 +143,21 @@
 #define get_key1() (~KEY1_PIN & (1<<KEY1))
 #define get_key2() (~KEY2_PIN & (1<<KEY2))
 
+// Drehimpulsgeber // Liegen immer auf KEY0 + KEY1
+/// \brief Pin Nummer des Ports für Drehgeber PIN 1A
+#define IMPULS_1A_PIN KEY1
+/// \brief Port für Drehgeber PIN 1A
+#define IMPULS_1A_PORT KEY1_PORT
+/// \brief Datenrichtungsregister des Ports für Drehgeber PIN 1A
+#define IMPULS_1A_DDR KEY1_DDR
+
+/// \brief Pin Nummer des Ports für Drehgeber PIN 1B
+#define IMPULS_1B_PIN KEY0
+/// \brief Port für Drehgeber PIN 1B
+#define IMPULS_1B_PORT KEY0_PORT
+/// \brief Datenrichtungsregister des Ports für Drehgeber PIN 1B
+#define IMPULS_1B_DDR KEY0_DDR
+
 // DEBUG LED1
 #define DEBUG_LED1_DDR DDRB
 #define DEBUG_LED1_PORT PORTB
@@ -154,6 +170,8 @@ enum  MENU_IDS{M_BACK, M_IMAGE, M_SETTINGS, M_INFO, \
                M_BACK_IMAGE, M_INSERT_IMAGE, M_REMOVE_IMAGE, M_WP_IMAGE, M_NEW_IMAGE, M_SAVE_IMAGE, \
                M_BACK_SETTINGS,M_DEBUG_LED,M_RESTART, \
                M_BACK_INFO, M_VERSION_INFO, M_SDCARD_INFO};
+
+enum INPUT_MODE{INPUT_MODE_BUTTON, INPUT_MODE_ENCODER};
 
 //////////////////////////////////////////////////////////////////
 // #define __AVR_ATmega128__
@@ -215,10 +233,11 @@ void send_disk_change(void);
 // gui
 char image_filename[32]; //Maximal 32 Zeichen
 
-
 volatile uint8_t key_buffer[16];
 volatile uint8_t key_buffer_r_pos;
 volatile uint8_t key_buffer_w_pos;
+
+uint8_t input_mode = INPUT_MODE_ENCODER;
 
 uint8_t current_gui_mode;
 int8_t byte_str[16];

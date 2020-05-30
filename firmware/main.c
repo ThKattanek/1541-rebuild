@@ -15,6 +15,14 @@
 #include <string.h>
 #include <ctype.h>
 
+/// \brief Anschluss für Drehgeber PIN A
+#define PHASE_1A	(PINB & (1<<IMPULS_1A_PIN))
+/// \brief Anschluss für Drehgeber PIN B
+#define PHASE_1B	(PINB & (1<<IMPULS_1B_PIN))
+
+/// \brief Decodierungstabelle für Drehgeber
+const unsigned char drehimp_tab[16]PROGMEM = {0,0,2,0,0,0,0,0,1,0,0,0,0,0,0,0};
+
 MENU_STRUCT main_menu;
 MENU_STRUCT image_menu;
 MENU_STRUCT settings_menu;
@@ -1032,12 +1040,14 @@ void stop_timer0(void)
 void init_timer2(void)
 {
     TCCR2A = (1<<WGM21);    // CTC Modus
-    TCCR2B |= (1<<CS20) | (1<<CS21) | (1<<CS22);    // Prescaler 1024
+  //  TCCR2B |= (1<<CS20) | (1<<CS21) | (1<<CS22);    // Prescaler 1024
 
-    // alle 10 ms aufrufen --> 100Hz
-    // ((24000000/1024)/100) = 234
+    TCCR2B |= (1<<CS21) | (1<<CS22); // Prescaler 256
 
-    OCR2A = 234-1;
+    // alle 2 ms aufrufen --> 500Hz
+    // ((24000000/256)/500) = 187,5
+
+    OCR2A = 188-1;
 
     start_timer2();
 }
@@ -1536,7 +1546,7 @@ ISR (TIMER0_COMPA_vect)
 
 ISR (TIMER2_COMPA_vect)
 {
-    // ISR wird alle 10ms (100Hz) aufgerufen
+    // ISR wird alle 2ms (500Hz) aufgerufen
 
     volatile static uint8_t counter0 = 0;
 
@@ -1544,13 +1554,39 @@ ISR (TIMER2_COMPA_vect)
     volatile static uint8_t key2_is_pressed = 0;
     volatile static uint8_t key2_next_up_is_invalid = 0;
 
-    if(counter0 < 5)
+    volatile static uint8_t old_drehgeber = 0;
+    uint8_t pos_change;	// 0=keine Änderung 1=hoch 2=runter
+
+    /// Drehencoder
+    if(input_mode == INPUT_MODE_ENCODER)
+    {
+        old_drehgeber = (old_drehgeber << 2)  & 0x0F;
+        if (PHASE_1A) old_drehgeber |=2;
+        if (PHASE_1B) old_drehgeber |=1;
+        pos_change = (char)pgm_read_byte(&drehimp_tab[old_drehgeber]);
+
+        switch(pos_change)
+        {
+        case 1:
+            key_buffer[key_buffer_w_pos++] = KEY0_DOWN;
+            break;
+        case 2:
+            key_buffer[key_buffer_w_pos++] = KEY1_DOWN;
+            break;
+        default:
+            break;
+        }
+        key_buffer_w_pos &= 0x0f;
+    }
+
+    if(counter0 < 25)
     {
         counter0++;
         return 0;
     }
 
     // Alle 50ms ab hier //
+
     counter0 = 0;
     counter1++;
 
@@ -1562,23 +1598,50 @@ ISR (TIMER2_COMPA_vect)
     uint8_t key1 = get_key1();
     uint8_t key2 = get_key2();
 
-    if(key0 != old_key0)
+    switch (input_mode)
     {
-        if(key0)
-            key_buffer[key_buffer_w_pos++] = KEY0_DOWN;
-        else
-            key_buffer[key_buffer_w_pos++] = KEY0_UP;
-    }
-    key_buffer_w_pos &= 0x0f;
+    case INPUT_MODE_BUTTON:
+        if(key0 != old_key0)
+        {
+            if(key0)
+                key_buffer[key_buffer_w_pos++] = KEY0_DOWN;
+            else
+                key_buffer[key_buffer_w_pos++] = KEY0_UP;
+        }
+        key_buffer_w_pos &= 0x0f;
 
-    if(key1 != old_key1)
-    {
-        if(key1)
+        if(key1 != old_key1)
+        {
+            if(key1)
+                key_buffer[key_buffer_w_pos++] = KEY1_DOWN;
+            else
+                key_buffer[key_buffer_w_pos++] = KEY1_UP;
+        }
+        key_buffer_w_pos &= 0x0f;
+        break;
+
+    case INPUT_MODE_ENCODER:
+        /*
+        old_drehgeber = (old_drehgeber << 2)  & 0x0F;
+        if (PHASE_1A) old_drehgeber |=2;
+        if (PHASE_1B) old_drehgeber |=1;
+
+        pos_change = (char)pgm_read_byte(&drehimp_tab[old_drehgeber]);
+
+        switch(pos_change)
+        {
+        case 1:
+            key_buffer[key_buffer_w_pos++] = KEY0_DOWN;
+            break;
+        case 2:
             key_buffer[key_buffer_w_pos++] = KEY1_DOWN;
-        else
-            key_buffer[key_buffer_w_pos++] = KEY1_UP;
+            break;
+        default:
+            break;
+        }
+        */
+        break;
     }
-    key_buffer_w_pos &= 0x0f;
 
     if(key2 != old_key2)
     {
