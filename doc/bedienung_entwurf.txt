@@ -1,4 +1,8 @@
-﻿// 1541-rebuild kann 3 Tasten auswerten
+﻿// Messung der Umdrehung im Info Screen -> mit Eingaben und ISR und ohne ISR für Tasteneingabe
+// Eventuell muss sofort in den Infoscreen gesprungen werden wenn der Floppymotor angeht
+// und aus dem Infoscreen kommt man erst wenn der Motor aus ist !! Muss alles noch getestet werden.
+
+// 1541-rebuild kann 3 Tasten auswerten
 - Button1 - Hoch	
 - Button2 - Runter
 - Button3 - Enter 
