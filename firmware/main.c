@@ -146,10 +146,10 @@ void reset()
         else
         {
             eeprom_update_byte((uint8_t*)SETTINGS_INPUT_MODE, INPUT_MODE_BUTTON);
-            lcd_setcursor(5,3);
+            lcd_setcursor(4,3);
             lcd_string("Button Mode");
         }
-        _delay_ms(2000);
+        _delay_ms(3000);
     }
 
     // Input Mode Setzen
