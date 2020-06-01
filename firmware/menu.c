@@ -95,6 +95,7 @@ uint16_t menu_update(uint8_t key_code)
         case ENTRY_BOOL:
         case ENTRY_BIN:
             current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].var1 ^= 1;
+            current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].var1 &= 1;
             break;
         }
 

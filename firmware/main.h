@@ -29,6 +29,9 @@
 // Enthält nur die Versionsnummer als String
 #include "./version.h"
 
+// Settings speichern in EEPROM und Import / Export
+#include "./settings.h"
+
 #define NULL    ((void *)0)
 
 // Konfiguration /////////////////////////////////////////////////
@@ -158,21 +161,6 @@
 /// \brief Datenrichtungsregister des Ports für Drehgeber PIN 1B
 #define IMPULS_1B_DDR KEY0_DDR
 
-// DEBUG LED1
-#define DEBUG_LED1_DDR DDRB
-#define DEBUG_LED1_PORT PORTB
-#define DEBUG_LED1 PB2
-
-#define debug_led1_on() DEBUG_LED1_PORT |= 1<<PB2
-#define debug_led1_off() DEBUG_LED1_PORT &= ~(1<<PB2)
-
-enum  MENU_IDS{M_BACK, M_IMAGE, M_SETTINGS, M_INFO, \
-               M_BACK_IMAGE, M_INSERT_IMAGE, M_REMOVE_IMAGE, M_WP_IMAGE, M_NEW_IMAGE, M_SAVE_IMAGE, \
-               M_BACK_SETTINGS,M_DEBUG_LED,M_RESTART, \
-               M_BACK_INFO, M_VERSION_INFO, M_SDCARD_INFO};
-
-enum INPUT_MODE{INPUT_MODE_BUTTON, INPUT_MODE_ENCODER};
-
 //////////////////////////////////////////////////////////////////
 // #define __AVR_ATmega128__
 
@@ -187,7 +175,7 @@ void check_menu_events(uint16_t menu_event);
 void set_gui_mode(uint8_t gui_mode);
 void filebrowser_update(uint8_t key_code);
 void filebrowser_refresh();
-void init_debug_led1();
+void init_pb2_pb3();
 int8_t init_sd_card(void);
 void release_sd_card(void);
 uint8_t change_dir(const char* path);

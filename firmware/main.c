@@ -28,6 +28,11 @@ MENU_STRUCT image_menu;
 MENU_STRUCT settings_menu;
 MENU_STRUCT info_menu;
 
+enum  MENU_IDS{M_BACK, M_IMAGE, M_SETTINGS, M_INFO, \
+               M_BACK_IMAGE, M_INSERT_IMAGE, M_REMOVE_IMAGE, M_WP_IMAGE, M_NEW_IMAGE, M_SAVE_IMAGE, \
+               M_BACK_SETTINGS, M_PIN_PB2, M_PIN_PB3, M_SAVE_EEPROM, M_RESTART, \
+               M_BACK_INFO, M_VERSION_INFO, M_SDCARD_INFO};
+
 static uint8_t exit_main = 1;
 
 int main(void)
@@ -43,7 +48,7 @@ int main(void)
         /// Image Menü
         MENU_ENTRY image_menu_entrys[] = {{"Insert Image",M_INSERT_IMAGE}, {"Remove Image",M_REMOVE_IMAGE}, {"Write Protect",M_WP_IMAGE,ENTRY_ONOFF,1}, {"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
         /// Setting Menü
-        MENU_ENTRY settings_menu_entrys[] = {{"Debug LED",M_DEBUG_LED,ENTRY_ONOFF,0}, {"Restart",M_RESTART}};
+        MENU_ENTRY settings_menu_entrys[] = {{"Pin PB2",M_PIN_PB2, ENTRY_ONOFF, 0}, {"Pin PB3",M_PIN_PB3, ENTRY_ONOFF, 0}, {"Restart",M_RESTART}};
         /// Info Menü
         MENU_ENTRY info_menu_entrys[] = {{"Version",M_VERSION_INFO}, {"SD Card Info",M_SDCARD_INFO}};
 
@@ -54,7 +59,7 @@ int main(void)
         menu_init(&image_menu, image_menu_entrys, 5,LCD_LINE_COUNT);
 
         settings_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-        menu_init(&settings_menu, settings_menu_entrys, 2,LCD_LINE_COUNT);
+        menu_init(&settings_menu, settings_menu_entrys, 3,LCD_LINE_COUNT);
 
         info_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
         menu_init(&info_menu, info_menu_entrys, 2,LCD_LINE_COUNT);
@@ -103,8 +108,8 @@ int main(void)
 
 void reset()
 {
-    // Debug LED initisalieren
-    init_debug_led1();
+    // PB23 initialisieren
+    init_pb2_pb3();
 
     // SOE GateArray initialisieren
     soe_gatearry_init();
@@ -112,11 +117,46 @@ void reset()
                             // Somit stört mich das Signal nicht mehr und ich muss Byte_Ready
                             // Nur auf Lo ziehen (hi = hiz und lo = gnd)
 
-    // WPS PIN Enable
-    endable_wps_port(1);
+    // Settings vom EEPROM prüfen
+    if(eeprom_read_dword((uint32_t*)SETTINGS_IDENTIFIER) != 0x15411541)
+    {
+        settings_set_default_values(); // Default Values setzen
+        reset();
+    }
+
+    // Tasten Initialisieren
+    init_keys();
 
     // LCD Display intialisieren
     lcd_init();
+
+    // Prüfen on Button2 gedrückt ist
+    if(get_key2())
+    {
+        lcd_clear();
+        lcd_setcursor(1,2);
+        lcd_string("Changed Input Mode");
+
+        if(eeprom_read_byte((uint8_t*)SETTINGS_INPUT_MODE) == INPUT_MODE_BUTTON)
+        {
+            eeprom_update_byte((uint8_t*)SETTINGS_INPUT_MODE, INPUT_MODE_ENCODER);
+            lcd_setcursor(4,3);
+            lcd_string("Encoder Mode");
+        }
+        else
+        {
+            eeprom_update_byte((uint8_t*)SETTINGS_INPUT_MODE, INPUT_MODE_BUTTON);
+            lcd_setcursor(5,3);
+            lcd_string("Button Mode");
+        }
+        _delay_ms(2000);
+    }
+
+    // Input Mode Setzen
+    input_mode = eeprom_read_byte((uint8_t)SETTINGS_INPUT_MODE);
+
+    // WPS PIN Enable
+    endable_wps_port(1);
 
     // Startmeldung ausgeben
     show_start_message();
@@ -135,9 +175,6 @@ void reset()
 
     // Timer0 --> GCR senden
     init_timer0();
-
-    // Tasten Initialisieren
-    init_keys();
 
     // Timer2 --> wird alle 1ms aufgerufen
     // z.B. zu Tasten entprellen
@@ -166,8 +203,6 @@ void reset()
 
     // Interrupts erlauben
     sei();
-
-    debug_led1_off();
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -398,13 +433,33 @@ void check_menu_events(uint16_t menu_event)
             break;
 
         /// Settings Menü
-        case M_DEBUG_LED:
-            if(menu_get_entry_var1(&settings_menu, M_DEBUG_LED))
-                debug_led1_on();
+        case M_PIN_PB2:
+            if(menu_get_entry_var1(&settings_menu, M_PIN_PB2))
+            {
+                DDRB |= 1<<PB2;
+            }
             else
-                debug_led1_off();
+            {
+                DDRB &= ~(1<<PB2);
+            }
             menu_refresh();
             break;
+
+        case M_PIN_PB3:
+            if(menu_get_entry_var1(&settings_menu, M_PIN_PB3))
+            {
+                DDRB |= 1<<PB3;
+            }
+            else
+            {
+                DDRB &= ~(1<<PB3);
+            }
+            menu_refresh();
+            break;
+
+        case M_SAVE_EEPROM:
+            break;
+
         case M_RESTART:
             exit_main = 0;
             break;
@@ -678,10 +733,10 @@ void filebrowser_refresh()
 
 /////////////////////////////////////////////////////////////////////
 
-void init_debug_led1()
+void init_pb2_pb3()
 {
-    DEBUG_LED1_DDR |= 1 << PB2;
-    debug_led1_on();
+    DDRB &= ~(1<<PB2 | 1<<PB3);
+    PORTB |= 1<<PB2 | 1<<PB3;
 }
 
 /////////////////////////////////////////////////////////////////////
