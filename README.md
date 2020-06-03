@@ -1,7 +1,7 @@
 # 1541-rebuild
 Ersetzt den Analogteil einer Floppy 1541 durch ein Micro Controller der Disk Images per SD Karte lesen kann. Mit dieser Hardware ist es möglich ein Board wo der Analogteil defekt ist, durch diese wieder zum laufen zu bringen. Das schreiben ist nun auch schon enthalten. Es wird lediglich die 1541 Platine, diese Hardware und ein 5VDC Netzteil benötigt, oder auch das Originale Netzteil. An der 1541 II Platine müssen einige Änderungen vorgenommen werden (VIA2 (DC) sockeln, >>> 1 PIN vom Gate Arry trennen ...<<< Wird nochmal geprüft) Derzeit ist es möglich aus einem Root Verzeichnis einer SD Karte, D64 sowie G64 Images auszuwählen. Diese werden dann wie eine eingelgte Diskette erkannt und der C64 kann diese lesen. Als Anzeige kommt ein 4-Zeiliges LCD (20x4) zum Einsatz.
 
-### [Letzte Offizelle Windows Version hier](https://github.com/ThKattanek/1541-rebuild/releases/latest)
+### [Letzte Offizelle Version findet ihr hier](https://github.com/ThKattanek/1541-rebuild/releases/latest)
 
 ### Hardware / Schaltplan
 Die Hardware wird mit KiCad entwickelt. Version 5.1.4 unter Ubuntu.
