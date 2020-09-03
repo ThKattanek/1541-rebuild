@@ -299,7 +299,7 @@ ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 
 
 # Default target.
-all: begin gccversion sizebefore build sizeafter finished end
+all: begin gccversion sizebefore build sizeafter finished end to_bin
 
 build: elf hex eep lss sym
 
@@ -308,8 +308,6 @@ hex: $(TARGET).hex
 eep: $(TARGET).eep
 lss: $(TARGET).lss 
 sym: $(TARGET).sym
-
-
 
 # Eye candy.
 # AVR Studio 3.x does not check make's exit code but relies on
@@ -325,6 +323,9 @@ end:
 	@echo $(MSG_END)
 	@echo
 
+to_bin:
+	avr-objcopy -I ihex -O binary $(TARGET).hex $(TARGET).bin
+	avr-objcopy -I ihex -O binary $(TARGET).hex FIRMWARE.BIN
 
 # Display size of file.
 HEXSIZE = $(SIZE) --target=$(FORMAT) $(TARGET).hex
@@ -424,14 +425,14 @@ extcoff: $(TARGET).elf
 	@echo $(MSG_ASSEMBLING) $<
 	$(CC) -c $(ALL_ASFLAGS) $< -o $@
 
-
-
 # Target: clean project.
 clean: begin clean_list finished end
 
 clean_list :
 	@echo
 	@echo $(MSG_CLEANING)
+	$(REMOVE) $(TARGET).bin
+	$(REMOVE) FIRMWARE.BIN
 	$(REMOVE) $(TARGET).hex
 	$(REMOVE) $(TARGET).eep
 	$(REMOVE) $(TARGET).obj
