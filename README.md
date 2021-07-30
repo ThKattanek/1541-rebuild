@@ -1,4 +1,13 @@
-# 1541-rebuild
+#FORK of 1541-rebuild
+
+- planed changes: rerouting the PCB to be able to use I2C Displays instead of bitbanging to LCD. opens the world to OLED and even onscreen displays.
+- changing of firmware needed (pin assignments)
+- implementation of i2c routines for displays
+
+
+
+# original Readme.md:
+
 Ersetzt den Analogteil einer Floppy 1541 durch ein Micro Controller der Disk Images per SD Karte lesen kann. Mit dieser Hardware ist es möglich ein Board wo der Analogteil defekt ist, durch diese wieder zum laufen zu bringen. Das schreiben ist nun auch schon enthalten. Es wird lediglich die 1541 Platine, diese Hardware und ein 5VDC Netzteil benötigt, oder auch das Originale Netzteil. An der 1541 II Platine muss eine Änderungen vorgenommen werden und zwar die (VIA2 (DC) sockeln.
 
 ### [Letzte Offizelle Version findet ihr hier](https://github.com/ThKattanek/1541-rebuild/releases/latest)
