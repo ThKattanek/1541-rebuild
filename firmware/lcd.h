@@ -49,12 +49,12 @@
 // Zeilendefinitionen des verwendeten LCD
 
 // LCD 16x2
-// #define LCD_COLS (16)
-// #define LCD_ROWS (2)
+#define LCD_COLS (16)
+#define LCD_ROWS (2)
 
 // LCD 20x4
-#define LCD_COLS (20)
-#define LCD_ROWS (4)
+// #define LCD_COLS (20)
+// #define LCD_ROWS (4)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialisierung: muss ganz am Anfang des Programms aufgerufen werden.

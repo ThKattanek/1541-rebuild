@@ -132,9 +132,10 @@ void reset()
     if(get_key2())
     {
         lcd_clear();
-        lcd_setcursor(1,1);
+        lcd_setcursor(1,0);
         lcd_string("New Input Mode");
-        lcd_setcursor(4,2);
+        lcd_setcursor(2,1);
+
         if(eeprom_read_byte((uint8_t*)SETTINGS_INPUT_MODE) == INPUT_MODE_BUTTON)
         {
             eeprom_update_byte((uint8_t*)SETTINGS_INPUT_MODE, INPUT_MODE_ENCODER);
@@ -177,7 +178,7 @@ void reset()
     init_timer2();
 
     // Meldung ausgeben, das auf SD Karte gewartet wird
-    lcd_setcursor(0,1);
+    lcd_setcursor(0,0);
     lcd_string("Wait for SD-Card");
 
     // SD Karte initialisieren
@@ -333,7 +334,7 @@ void update_gui()
 
         if(old_half_track != akt_half_track)
         {
-            lcd_setcursor(7,0);
+            lcd_setcursor(2,0);
             sprintf (byte_str,"%02d",akt_half_track >> 1);
             lcd_string(byte_str);
         }
@@ -343,11 +344,11 @@ void update_gui()
         if(old_motor_status != new_motor_status)
         {
             old_motor_status = new_motor_status;
-            lcd_setcursor(7,1);
+            lcd_setcursor(5,0);
             if(new_motor_status)
-                lcd_string("On ");
+                lcd_string("MTR");
             else
-                lcd_string("Off");
+                lcd_string("   ");
         }
 
         if(is_image_mount)
@@ -382,7 +383,7 @@ void update_gui()
                         }
                     }
 
-                    lcd_setcursor(0,3);
+                    lcd_setcursor(0,1);
                     lcd_print(image_filename,gui_line_scroll_pos,LCD_COLS);
                 } else {
                     --gui_line_scroll_end_begin_wait;
@@ -507,29 +508,19 @@ void set_gui_mode(uint8_t gui_mode)
         lcd_clear();
 
         lcd_setcursor(0,0);
-        lcd_string("Track:");
-
-        lcd_setcursor(7,0);
-        sprintf (byte_str,"%d",akt_half_track >> 1);
+        lcd_string("T:");
+        sprintf (byte_str,"%02d",akt_half_track >> 1);
         lcd_string(byte_str);
 
-        lcd_setcursor(0,1);
-        lcd_string("Motor:");
-
+        lcd_setcursor(5,0);
         if(get_motor_status())
-            lcd_string(" On ");
-        else
-            lcd_string(" Off");
+            lcd_string("MTR");
 
-        lcd_setcursor(12,0);
-        lcd_string("WP:");
-
+        lcd_setcursor(9,0);
         if(floppy_wp)
-            lcd_string(" On");
-        else
-            lcd_string(" Off");
+            lcd_string("WProt");
 
-        lcd_setcursor(0,3);
+        lcd_setcursor(0,1);
         if(is_image_mount)
         {
             lcd_print(image_filename,0,LCD_COLS);
@@ -544,7 +535,7 @@ void set_gui_mode(uint8_t gui_mode)
             gui_line_scroll_direction = 0;
             gui_line_scroll_end_begin_wait = 6;
         } else {
-            lcd_string("  No Image Mounted");
+            lcd_string("--- No Image ---");
         }
 
         break;
@@ -616,9 +607,11 @@ void filebrowser_update(uint8_t key_code)
         if(akt_image_type == UNDEF_IMAGE)
         {
             lcd_clear();
-            lcd_setcursor(0,1);
-            lcd_string("Not Supported Image!");
-            _delay_ms(1000);
+            lcd_setcursor(2,0);
+            lcd_string("Image-type");
+            lcd_setcursor(7,1);
+            lcd_string("unknown");
+            _delay_ms(2000);
         }
 
         filebrowser_refresh();
@@ -754,16 +747,16 @@ void init_pb2_pb3()
 int8_t init_sd_card(void)
 {
     // LCD Fehlermeldung löschen
-    lcd_setcursor( 0, 3);
-    lcd_string("                    ");
-    lcd_setcursor( 0, 3);
+    lcd_setcursor( 0, 1);
+    lcd_string("                ");
+    lcd_setcursor( 0, 1);
 
     set_sleep_mode(SLEEP_MODE_IDLE);
 
     // SD Karte initialisieren
     if(!sd_raw_init())
     {
-        lcd_setcursor( 0, 3);
+        lcd_setcursor( 0, 1);
         lcd_string("err: sd_raw_init");
         return 1;
     }
@@ -775,23 +768,23 @@ int8_t init_sd_card(void)
         partition = partition_open(sd_raw_read,sd_raw_read_interval,sd_raw_write,sd_raw_write_interval,-1);
         if(!partition)
         {
-            lcd_setcursor( 0, 3);
-            lcd_string("err: partition_open");
+            lcd_setcursor( 0, 1);
+            lcd_string("err: part_open");
             return 2;
         }
     }
 
     // FAT16/32 Filesystem versuchen zu öffnen
 
-    lcd_string("*");
+    // lcd_string("*");
 
     fs = fat_open(partition);
 
-    lcd_string("*");
+    // lcd_string("*");
 
     if(!fs)
     {
-        lcd_setcursor( 0, 3);
+        lcd_setcursor( 0, 1);
         lcd_string("err: fat_open");
         return 3;
     }
@@ -801,8 +794,8 @@ int8_t init_sd_card(void)
     dd = fat_open_dir(fs, &dir_entry);
     if(!dd)
     {
-        lcd_setcursor( 0, 3);
-        lcd_string("err: fat_open_root");
+        lcd_setcursor( 0, 1);
+        lcd_string("err: fat_open_rt");
         return 4;
     }
     return 0;
@@ -897,13 +890,16 @@ uint8_t change_dir(const char* path)
 void show_start_message(void)
 {
     lcd_clear();
-    lcd_setcursor( 1, 0);
-    lcd_string("-- 1541-rebuild --");
-    lcd_setcursor( 2, 1);
-    lcd_string("Firmware:  ");
+    lcd_setcursor( 0, 0);
+    lcd_string("- 1541-rebuild -");
+    lcd_setcursor( 0, 1);
+    lcd_string("FW: ");
     lcd_string(VERSION);
-    lcd_setcursor( 0, 3);
-    lcd_string("by thorsten kattanek");
+    _delay_ms(START_MESSAGE_TIME);
+    lcd_setcursor( 0, 0);
+    lcd_string("by Thorsten     ");
+    lcd_setcursor( 0, 1);
+    lcd_string("   Kattanek     ");
     _delay_ms(START_MESSAGE_TIME);
     lcd_clear();
 }
@@ -925,19 +921,17 @@ void show_sdcard_info_message()
         if(0 != sd_raw_get_info(&info))
         {
             lcd_setcursor(0,0);
-            sprintf(out_str,"MANUFACT.: %.x",info.manufacturer);
+            sprintf(out_str,"MANU:%.x",info.manufacturer);
             lcd_string(out_str);
 
-            lcd_setcursor(0,1);
-            lcd_string("OEM      : ");
+            lcd_setcursor(8,0);
             lcd_string(info.oem);
 
-            lcd_setcursor(0,2);
-            lcd_string("PRODUCT  : ");
+            lcd_setcursor(0,1);
             lcd_string(info.product);
 
-            lcd_setcursor(0,3);
-            sprintf(out_str,"SIZE     : %d MB", (uint16_t)(info.capacity / 1024 / 1024));
+            lcd_setcursor(8,1);
+            sprintf(out_str,"%d MB", (uint16_t)(info.capacity / 1024 / 1024));
             lcd_string(out_str);
 
             get_info_ok = 1;
@@ -954,9 +948,9 @@ void show_sdcard_info_message()
     if(!get_info_ok)
     {
         lcd_clear();
+        lcd_setcursor(0,0);
+        lcd_string("- Read Failure -");
         lcd_setcursor(0,1);
-        lcd_string("Error: Ret Failure");
-        lcd_setcursor(0,2);
         lcd_string("sd_raw_get_info");
         return;
     }
@@ -966,17 +960,17 @@ void show_sdcard_info_message()
     lcd_clear();
 
     lcd_setcursor(0,0);
-    sprintf(out_str,"REVISION : %c.%c",(info.revision>>4)+'0', (info.revision&0x0f)+'0');
+    sprintf(out_str,"REV:%c.%c",(info.revision>>4)+'0', (info.revision&0x0f)+'0');
     lcd_string(out_str);
 
-    lcd_setcursor(0,1);
-    sprintf(out_str,"SERIALNR.: %4.4X",info.serial>>16);
+    lcd_setcursor(8,0);
+    sprintf(out_str,"%4.4X",info.serial>>16);
     lcd_string(out_str);
     sprintf(out_str,"%4.4X",info.serial&0xffff);
     lcd_string(out_str);
 
-    lcd_setcursor(0,2);
-    lcd_string("PARTITION: ");
+    lcd_setcursor(0,1);
+    lcd_string("-");
     switch(partition->type)
     {
     case 0x01:
