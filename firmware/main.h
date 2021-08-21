@@ -38,15 +38,15 @@
 // Konfiguration /////////////////////////////////////////////////
 
 // LCD
-#define LCD_LINE_COUNT 4
-#define LCD_LINE_SIZE 20
+#define LCD_LINE_COUNT  (LCD_ROWS)
+#define LCD_LINE_SIZE   (LCD_COLS)
 
 // Zeit in ms wie lange die Version nach dem Start angezeigt wird
 #define START_MESSAGE_TIME 1500
 
 // Spur auf dem der Lesekopf beim Start/Reset stehen soll
 // Track 18 --> Directory
-#define INIT_TRACK 18
+#define INIT_TRACK  (18)
 
 // Zeit die nach der letzten Stepperaktivität vergehen muss, um einen neuen Track von SD Karte zu laden
 // (1541 Original Rom schaltet STP1 alle 15ms)
@@ -167,24 +167,24 @@
 
 enum {UNDEF_IMAGE, G64_IMAGE, D64_IMAGE};
 
-void reset();
-void check_stepper_signals();
-void check_motor_signal();
-uint8_t get_key_from_buffer();
-void update_gui();
+void reset(void);
+void check_stepper_signals(void);
+void check_motor_signal(void);
+uint8_t get_key_from_buffer(void);
+void update_gui(void);
 void check_menu_events(uint16_t menu_event);
 void set_gui_mode(uint8_t gui_mode);
 void filebrowser_update(uint8_t key_code);
-void filebrowser_refresh();
-void init_pb2_pb3();
+void filebrowser_refresh(void);
+void init_pb2_pb3(void);
 int8_t init_sd_card(void);
 void release_sd_card(void);
 uint8_t change_dir(const char* path);
 uint8_t find_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name, struct fat_dir_entry_struct* dir_entry);
-uint16_t get_dir_entry_count();
+uint16_t get_dir_entry_count(void);
 uint16_t seek_to_dir_entry(uint16_t entry_num);
 void show_start_message(void);
-void show_sdcard_info_message();
+void show_sdcard_info_message(void);
 void init_stepper(void);
 void stepper_inc(void);
 void stepper_dec(void);
@@ -203,12 +203,12 @@ void soe_gatearry_hi(void);
 
 struct fat_file_struct* open_disk_image(struct fat_fs_struct *fs, struct fat_dir_entry_struct* file_entry, uint8_t *image_type);
 void close_disk_image(struct fat_file_struct*);
-int8_t open_g64_image(struct fat_file_struct *fd);
-int8_t open_d64_image(struct fat_file_struct *fd);
+// int8_t open_g64_image(struct fat_file_struct *fd);
+// int8_t open_d64_image(struct fat_file_struct *fd);
 int8_t read_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
 void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
 
-void remove_image();
+void remove_image(void);
 
 inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
 
@@ -237,11 +237,6 @@ uint8_t gui_line_scroll_direction;       // Richtung des Scrollings
 uint8_t gui_line_scroll_end_begin_wait;
 
 // Alles für den Filebrowser
-uint8_t fb_lcd_dir_char;            // Char Nummer für Directory Symbol
-uint8_t fb_lcd_disk_char;           // Char Nummer für Diskimage Symbol
-uint8_t fb_lcd_cursor_char;         // Char für Auswahl Cursor
-uint8_t fb_lcd_more_top_char;
-uint8_t fb_lcd_more_down_char;
 uint16_t fb_dir_entry_count=0;      // Anzahl der Einträge im aktuellen Direktory
 uint8_t fb_lcd_cursor_pos=0;        // Position des Cursors auf dem LCD Display
 uint8_t fb_lcd_window_pos=0;        // Position des Anzeigebereichs innerhablb der Menüeinträge

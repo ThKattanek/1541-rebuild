@@ -23,6 +23,24 @@
 /// \brief Decodierungstabelle für Drehgeber
 const unsigned char drehimp_tab[16]PROGMEM = {0,0,2,0,0,0,0,0,1,0,0,0,0,0,0,0};
 
+// custom character definitions for LCD display
+#define num_of_customchars  (5)
+const uint8_t customchars[num_of_customchars][8] =
+                                    {   {4,14,31,0,0,0,0,0},        // Menü More Top
+                                        {0,0,0,0,31,14,4,0},        // Menü More Down
+                                        {0,4,6,31,6,4,0,0},         // Menü Position
+                                        {0,28,31,17,17,31,0,0},     // Directory Symbol
+                                        {15,27,17,27,31,27,27,31}   // Diskimage
+                                    };
+
+#define fb_lcd_more_top_char    (0)
+#define fb_lcd_more_down_char   (1)
+#define fb_lcd_cursor_char      (2)
+#define fb_lcd_dir_char         (3)
+#define fb_lcd_disk_char        (4)
+// ---
+
+
 MENU_STRUCT main_menu;
 MENU_STRUCT image_menu;
 MENU_STRUCT settings_menu;
@@ -46,51 +64,25 @@ int main(void)
         /// Hauptmenü
         MENU_ENTRY main_menu_entrys[] = {{"Disk Image",M_IMAGE,ENTRY_MENU,0,&image_menu},{"Settings",M_SETTINGS,ENTRY_MENU,0,&settings_menu},{"Info",M_INFO,ENTRY_MENU,0,&info_menu}};
         /// Image Menü
-        MENU_ENTRY image_menu_entrys[] = {{"Insert Image",M_INSERT_IMAGE}, {"Remove Image",M_REMOVE_IMAGE}, {"Write Protect",M_WP_IMAGE,ENTRY_ONOFF,1}, {"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
+        MENU_ENTRY image_menu_entrys[] = {{"Insert Image",M_INSERT_IMAGE}, {"Remove Image",M_REMOVE_IMAGE}, {"WriteProtect",M_WP_IMAGE,ENTRY_ONOFF,1}, {"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
         /// Setting Menü
         MENU_ENTRY settings_menu_entrys[] = {{"Pin PB2",M_PIN_PB2, ENTRY_ONOFF, 0}, {"Pin PB3",M_PIN_PB3, ENTRY_ONOFF, 0}, {"Restart",M_RESTART}};
         /// Info Menü
         MENU_ENTRY info_menu_entrys[] = {{"Version",M_VERSION_INFO}, {"SD Card Info",M_SDCARD_INFO}};
 
         main_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-        menu_init(&main_menu, main_menu_entrys, 3,LCD_LINE_COUNT);
+        menu_init(&main_menu, main_menu_entrys, 3, LCD_LINE_SIZE, LCD_LINE_COUNT);
 
         image_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-        menu_init(&image_menu, image_menu_entrys, 5,LCD_LINE_COUNT);
+        menu_init(&image_menu, image_menu_entrys, 5, LCD_LINE_SIZE, LCD_LINE_COUNT);
 
         settings_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-        menu_init(&settings_menu, settings_menu_entrys, 3,LCD_LINE_COUNT);
+        menu_init(&settings_menu, settings_menu_entrys, 3, LCD_LINE_SIZE, LCD_LINE_COUNT);
 
         info_menu.lcd_cursor_char = 2;  // 126 Standard Pfeil
-        menu_init(&info_menu, info_menu_entrys, 2,LCD_LINE_COUNT);
+        menu_init(&info_menu, info_menu_entrys, 2, LCD_LINE_SIZE, LCD_LINE_COUNT);
 
         menu_set_root(&main_menu);
-
-        // Zeichen für Menü More Top setzen
-        uint8_t char00[] = {4,14,31,0,0,0,0,0};
-        lcd_generatechar(0, char00);
-        fb_lcd_more_top_char = 0;
-
-
-        // Zeichen für Menü More Down setzen
-        uint8_t char01[] = {0,0,0,0,31,14,4,0};
-        lcd_generatechar(1, char01);
-        fb_lcd_more_down_char = 1;
-
-        // Zeichen für Menü Position setzen
-        uint8_t arrow_char[] = {0,4,6,31,6,4,0,0};
-        lcd_generatechar(2, arrow_char);
-        fb_lcd_cursor_char = 2;
-
-        // Zeichen für Directory Symbol
-        uint8_t dir_char[] = {0,28,31,17,17,31,0,0};
-        lcd_generatechar(3, dir_char);
-        fb_lcd_dir_char = 3;
-
-        // Zeichen für Diskimage
-        uint8_t diskimage_char[] = {15,27,17,27,31,27,27,31};
-        lcd_generatechar(4, diskimage_char);
-        fb_lcd_disk_char = 4;
 
         //// MAIN LOOP /////
         while(exit_main)
@@ -130,30 +122,34 @@ void reset()
     // LCD Display intialisieren
     lcd_init();
 
+    // eigene Zeichen im Display setzen
+    for(int i=0; i<num_of_customchars; ++i)
+    {
+        lcd_generatechar(i, customchars[i]);
+    }
+
     // Prüfen on Button2 gedrückt ist
     if(get_key2())
     {
         lcd_clear();
-        lcd_setcursor(1,2);
-        lcd_string("Changed Input Mode");
-
+        lcd_setcursor(1,1);
+        lcd_string("New Input Mode");
+        lcd_setcursor(4,2);
         if(eeprom_read_byte((uint8_t*)SETTINGS_INPUT_MODE) == INPUT_MODE_BUTTON)
         {
             eeprom_update_byte((uint8_t*)SETTINGS_INPUT_MODE, INPUT_MODE_ENCODER);
-            lcd_setcursor(4,3);
             lcd_string("Encoder Mode");
         }
         else
         {
             eeprom_update_byte((uint8_t*)SETTINGS_INPUT_MODE, INPUT_MODE_BUTTON);
-            lcd_setcursor(4,3);
-            lcd_string("Button Mode");
+            lcd_string("Button  Mode");
         }
-        _delay_ms(3000);
+        _delay_ms(2000);
     }
 
     // Input Mode Setzen
-    input_mode = eeprom_read_byte((uint8_t)SETTINGS_INPUT_MODE);
+    input_mode = eeprom_read_byte((uint8_t*)SETTINGS_INPUT_MODE);
 
     // WPS PIN Enable
     endable_wps_port(1);
@@ -181,8 +177,8 @@ void reset()
     init_timer2();
 
     // Meldung ausgeben, das auf SD Karte gewartet wird
-    lcd_setcursor(0,2);
-    lcd_string("Wait for SD-Karte...");
+    lcd_setcursor(0,1);
+    lcd_string("Wait for SD-Card");
 
     // SD Karte initialisieren
     // Partition und Filesystem öffnen
@@ -213,24 +209,37 @@ void check_stepper_signals()
     // und auswerten
     if(stepper_signal_r_pos != stepper_signal_w_pos)    // Prüfen ob sich was neues im Ringpuffer für die Steppersignale befindet
     {
-            uint8_t stepper = stepper_signal_puffer[stepper_signal_r_pos]>>2 | stepper_signal_puffer[stepper_signal_r_pos-1];
-            stepper_signal_r_pos++;
+        uint8_t stepper = stepper_signal_puffer[stepper_signal_r_pos]>>2 | stepper_signal_puffer[stepper_signal_r_pos-1];
+        stepper_signal_r_pos++;
 
         switch(stepper)
         {
-        case 0x30: case 0x40: case 0x90: case 0xE0:
-        // DEC
-        stepper_dec();
-            stepper_signal_time = 0;
-            stepper_signal = 1;
-        break;
+            case 0b00110000:
+            case 0b01000000:
+            case 0b10010000:
+            case 0b11100000:
+                {
+                    // DEC
+                    stepper_dec();
+                    stepper_signal_time = 0;
+                    stepper_signal = 1;
+                }
+                break;
 
-        case 0x10: case 0x60: case 0xB0: case 0xC0:
-        // INC
-        stepper_inc();
-            stepper_signal_time = 0;
-            stepper_signal = 1;
-        break;
+            case 0b00010000:
+            case 0b01100000:
+            case 0b10110000:
+            case 0b11000000:
+                {
+                    // INC
+                    stepper_inc();
+                    stepper_signal_time = 0;
+                    stepper_signal = 1;
+                }
+                break;
+
+            default:
+                break;
         }
     }
     else if(stepper_signal && (stepper_signal_time >= STEPPER_DELAY_TIME))
@@ -307,57 +316,56 @@ void update_gui()
     static uint8_t old_half_track = 0;
     static uint8_t old_motor_status = 0;
     static uint16_t wait_counter0 = 0;
-
+    uint8_t new_motor_status;
     uint8_t key_code = get_key_from_buffer();
 
     switch (current_gui_mode)
     {
     case GUI_INFO_MODE:
 
-        if(key_code == KEY2_UP)
+        if(KEY2_UP == key_code)
+        {
             set_gui_mode(GUI_MENU_MODE);
-
-        if(key_code == KEY2_TIMEOUT2)
+        } else if(KEY2_TIMEOUT2 == key_code)
+        {
             exit_main = 0;
+        }
 
         if(old_half_track != akt_half_track)
         {
-            lcd_setcursor(7,1);
-            lcd_string("   ");
-            lcd_setcursor(7,1);
-            sprintf (byte_str,"%d",akt_half_track >> 1);
+            lcd_setcursor(7,0);
+            sprintf (byte_str,"%02d",akt_half_track >> 1);
             lcd_string(byte_str);
         }
         old_half_track = akt_half_track;
 
-        if(old_motor_status != get_motor_status())
+        new_motor_status = get_motor_status();
+        if(old_motor_status != new_motor_status)
         {
-            lcd_setcursor(7,2);
-            if(get_motor_status())
+            old_motor_status = new_motor_status;
+            lcd_setcursor(7,1);
+            if(new_motor_status)
                 lcd_string("On ");
             else
                 lcd_string("Off");
         }
-        old_motor_status = get_motor_status();
 
         if(is_image_mount)
         {
             //// Filename Scrolling
 
-            wait_counter0++;
+            ++wait_counter0;
 
-            if(gui_current_line_offset > 0 && wait_counter0 == 30000)
+            if((gui_current_line_offset > 0) && (wait_counter0 == 30000))
             {
                 wait_counter0 = 0;
 
-                if(gui_line_scroll_end_begin_wait == 0)
+                if(0 == gui_line_scroll_end_begin_wait)
                 {
                     // Es darf gescrollt werden
-
-
                     if(!gui_line_scroll_direction)
                     {
-                        gui_line_scroll_pos++;
+                        ++gui_line_scroll_pos;
                         if(gui_line_scroll_pos >= gui_current_line_offset)
                         {
                             gui_line_scroll_end_begin_wait = 6;
@@ -366,7 +374,7 @@ void update_gui()
                     }
                     else
                     {
-                        gui_line_scroll_pos--;
+                        --gui_line_scroll_pos;
                         if(gui_line_scroll_pos == 0)
                         {
                             gui_line_scroll_end_begin_wait = 6;
@@ -374,10 +382,11 @@ void update_gui()
                         }
                     }
 
-                    lcd_setcursor(0,4);
-                    lcd_print(image_filename,gui_line_scroll_pos,20);
+                    lcd_setcursor(0,3);
+                    lcd_print(image_filename,gui_line_scroll_pos,LCD_COLS);
+                } else {
+                    --gui_line_scroll_end_begin_wait;
                 }
-                else gui_line_scroll_end_begin_wait--;
             }
         }
         break;
@@ -404,78 +413,86 @@ void check_menu_events(uint16_t menu_event)
 
     switch(command)
     {
-    case MC_EXIT_MENU:
-        set_gui_mode(GUI_INFO_MODE);
-        break;
-
-    case MC_SELECT_ENTRY:
-        switch(value)
-        {
-        /// Main Menü
-
-        /// Image Menü
-        case M_INSERT_IMAGE:
-            set_gui_mode(GUI_FILE_BROWSER);
-            break;
-        case M_REMOVE_IMAGE:
-            remove_image();
+        case MC_EXIT_MENU:
             set_gui_mode(GUI_INFO_MODE);
             break;
-        case M_WP_IMAGE:
-            if(akt_image_type != G64_IMAGE)
-                menu_set_entry_var1(&image_menu, M_WP_IMAGE, 1);
 
-            if(menu_get_entry_var1(&image_menu, M_WP_IMAGE))
-                set_write_protection(1);
-            else
-                set_write_protection(0);
-                menu_refresh();
-            break;
-
-        /// Settings Menü
-        case M_PIN_PB2:
-            if(menu_get_entry_var1(&settings_menu, M_PIN_PB2))
+        case MC_SELECT_ENTRY:
+            switch(value)
             {
-                DDRB |= 1<<PB2;
+                /// Main Menü
+
+                /// Image Menü
+                case M_INSERT_IMAGE:
+                    set_gui_mode(GUI_FILE_BROWSER);
+                    break;
+
+                case M_REMOVE_IMAGE:
+                    remove_image();
+                    set_gui_mode(GUI_INFO_MODE);
+                    break;
+
+                case M_WP_IMAGE:
+                    if(akt_image_type != G64_IMAGE)
+                    {
+                        menu_set_entry_var1(&image_menu, M_WP_IMAGE, 1);
+                    }
+
+                    if(menu_get_entry_var1(&image_menu, M_WP_IMAGE))
+                    {
+                        set_write_protection(1);
+                    } else {
+                        set_write_protection(0);
+                    }
+                    menu_refresh();
+                    break;
+
+                /// Settings Menü
+                case M_PIN_PB2:
+                    if(menu_get_entry_var1(&settings_menu, M_PIN_PB2))
+                    {
+                        DDRB |= 1<<PB2;
+                    } else {
+                        DDRB &= ~(1<<PB2);
+                    }
+                    menu_refresh();
+                    break;
+
+                case M_PIN_PB3:
+                    if(menu_get_entry_var1(&settings_menu, M_PIN_PB3))
+                    {
+                        DDRB |= 1<<PB3;
+                    } else {
+                        DDRB &= ~(1<<PB3);
+                    }
+                    menu_refresh();
+                    break;
+
+                case M_SAVE_EEPROM:
+                    break;
+
+                case M_RESTART:
+                    exit_main = 0;
+                    break;
+
+                /// Info Menü
+                case M_VERSION_INFO:
+                    show_start_message();
+                    menu_refresh();
+                    break;
+
+                case M_SDCARD_INFO:
+                    show_sdcard_info_message();
+                    menu_refresh();
+                    break;
+
+                default:
+                    break;
             }
-            else
-            {
-                DDRB &= ~(1<<PB2);
-            }
-            menu_refresh();
             break;
 
-        case M_PIN_PB3:
-            if(menu_get_entry_var1(&settings_menu, M_PIN_PB3))
-            {
-                DDRB |= 1<<PB3;
-            }
-            else
-            {
-                DDRB &= ~(1<<PB3);
-            }
-            menu_refresh();
+        default:
             break;
-
-        case M_SAVE_EEPROM:
-            break;
-
-        case M_RESTART:
-            exit_main = 0;
-            break;
-
-        /// Info Menü
-        case M_VERSION_INFO:
-            show_start_message();
-            menu_refresh();
-            break;
-
-        case M_SDCARD_INFO:
-            show_sdcard_info_message();
-            menu_refresh();
-            break;
-        }
-        break;
     }
 }
 
@@ -489,14 +506,14 @@ void set_gui_mode(uint8_t gui_mode)
     case GUI_INFO_MODE:
         lcd_clear();
 
-        lcd_setcursor(0,1);
+        lcd_setcursor(0,0);
         lcd_string("Track:");
 
-        lcd_setcursor(7,1);
+        lcd_setcursor(7,0);
         sprintf (byte_str,"%d",akt_half_track >> 1);
         lcd_string(byte_str);
 
-        lcd_setcursor(0,2);
+        lcd_setcursor(0,1);
         lcd_string("Motor:");
 
         if(get_motor_status())
@@ -504,7 +521,7 @@ void set_gui_mode(uint8_t gui_mode)
         else
             lcd_string(" Off");
 
-        lcd_setcursor(12,1);
+        lcd_setcursor(12,0);
         lcd_string("WP:");
 
         if(floppy_wp)
@@ -512,13 +529,13 @@ void set_gui_mode(uint8_t gui_mode)
         else
             lcd_string(" Off");
 
+        lcd_setcursor(0,3);
         if(is_image_mount)
         {
-            lcd_setcursor(0,4);
-            lcd_print(image_filename,0,20);
+            lcd_print(image_filename,0,LCD_COLS);
 
             // Für Scrollenden Filename
-            int8_t var = (int8_t)strlen(image_filename) - 20;
+            int8_t var = (int8_t)strlen(image_filename) - LCD_COLS;
             if(var < 0)
                 gui_current_line_offset = 0;
             else
@@ -526,11 +543,9 @@ void set_gui_mode(uint8_t gui_mode)
             gui_line_scroll_pos = 0;
             gui_line_scroll_direction = 0;
             gui_line_scroll_end_begin_wait = 6;
+        } else {
+            lcd_string("  No Image Mounted");
         }
-
-        lcd_setcursor(2,4);
-        if(!is_image_mount)
-            lcd_string("No Image Mounted");
 
         break;
     case GUI_MENU_MODE:
@@ -548,22 +563,19 @@ void set_gui_mode(uint8_t gui_mode)
 
 void filebrowser_update(uint8_t key_code)
 {
-    uint16_t ret;
-    char out_str[21];
-
     switch (key_code)
     {
     case KEY0_DOWN:
         if(fb_lcd_cursor_pos > 0)
         {
-            fb_lcd_cursor_pos--;
+            --fb_lcd_cursor_pos;
             filebrowser_refresh();
         }
         else
         {
             if(fb_lcd_window_pos > 0)
             {
-                fb_lcd_window_pos--;
+                --fb_lcd_window_pos;
                 filebrowser_refresh();
             }
         }
@@ -571,14 +583,14 @@ void filebrowser_update(uint8_t key_code)
     case KEY1_DOWN:
         if((fb_lcd_cursor_pos < LCD_LINE_COUNT-1) && (fb_lcd_cursor_pos < fb_dir_entry_count-1))
         {
-            fb_lcd_cursor_pos++;
+            ++fb_lcd_cursor_pos;
             filebrowser_refresh();
         }
         else
         {
             if(fb_lcd_window_pos < fb_dir_entry_count - LCD_LINE_COUNT)
             {
-                fb_lcd_window_pos++;
+                ++fb_lcd_window_pos;
                 filebrowser_refresh();
             }
         }
@@ -604,20 +616,20 @@ void filebrowser_update(uint8_t key_code)
         if(akt_image_type == UNDEF_IMAGE)
         {
             lcd_clear();
-            lcd_setcursor(0,2);
+            lcd_setcursor(0,1);
             lcd_string("Not Supported Image!");
             _delay_ms(1000);
         }
 
         filebrowser_refresh();
 
-        strcpy(image_filename, fb_dir_entry[fb_lcd_cursor_pos].long_name);
-
         if(!fd)
         {
             is_image_mount = 0;
             return ;
         }
+
+        strcpy(image_filename, fb_dir_entry[fb_lcd_cursor_pos].long_name);
 
         read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
         akt_track_pos = 0;
@@ -628,10 +640,7 @@ void filebrowser_update(uint8_t key_code)
         is_image_mount = 1;
         send_disk_change();
 
-        if(floppy_wp)
-            menu_set_entry_var1(&image_menu, M_WP_IMAGE, 1);
-        else
-            menu_set_entry_var1(&image_menu, M_WP_IMAGE, 0);
+        menu_set_entry_var1(&image_menu, M_WP_IMAGE, floppy_wp);
 
         set_gui_mode(GUI_INFO_MODE);
         break;
@@ -642,20 +651,18 @@ void filebrowser_update(uint8_t key_code)
 
     //// Filename Scrolling
     static uint16_t wait_counter0;
-    wait_counter0++;
+    ++wait_counter0;
 
-    if(fb_current_line_offset > 0 && wait_counter0 == 30000)
+    if((fb_current_line_offset > 0) && (wait_counter0 == 30000))
     {
         wait_counter0 = 0;
 
-        if(fb_line_scroll_end_begin_wait == 0)
+        if(0 == fb_line_scroll_end_begin_wait)
         {
             // Es darf gescrollt werden
-
-
             if(!fb_line_scroll_direction)
             {
-                fb_line_scroll_pos++;
+                ++fb_line_scroll_pos;
                 if(fb_line_scroll_pos >= fb_current_line_offset)
                 {
                     fb_line_scroll_end_begin_wait = 6;
@@ -664,7 +671,7 @@ void filebrowser_update(uint8_t key_code)
             }
             else
             {
-                fb_line_scroll_pos--;
+                --fb_line_scroll_pos;
                 if(fb_line_scroll_pos == 0)
                 {
                     fb_line_scroll_end_begin_wait = 6;
@@ -672,10 +679,13 @@ void filebrowser_update(uint8_t key_code)
                 }
             }
 
-            lcd_setcursor(2,fb_lcd_cursor_pos+1);
-            lcd_print(fb_dir_entry[fb_lcd_cursor_pos].long_name,fb_line_scroll_pos,17);
+            lcd_setcursor(2,fb_lcd_cursor_pos);
+            lcd_print(fb_dir_entry[fb_lcd_cursor_pos].long_name,fb_line_scroll_pos, LCD_COLS-3 );
         }
-        else fb_line_scroll_end_begin_wait--;
+        else
+        {
+            --fb_line_scroll_end_begin_wait;
+        }
     }
 }
 
@@ -686,49 +696,49 @@ void filebrowser_refresh()
 
     uint8_t i=0;
 
-    while(i<LCD_LINE_COUNT && ((fb_lcd_window_pos + i) < fb_dir_entry_count))
+    while((i<LCD_LINE_COUNT) && ((fb_lcd_window_pos + i) < fb_dir_entry_count))
     {
         fat_read_dir(dd, &fb_dir_entry[i]);   // nächsten Directory Entry holen
         if(!(fb_dir_entry[i].attributes & (FAT_ATTRIB_SYSTEM | FAT_ATTRIB_VOLUME | FAT_ATTRIB_HIDDEN)))
         {
-            lcd_setcursor(1,i+1);
+            lcd_setcursor(1,i);
             if(fb_dir_entry[i].attributes & FAT_ATTRIB_DIR)
                 lcd_data(fb_lcd_dir_char);
             else
                 lcd_data(' ');
 
-            lcd_print(fb_dir_entry[i].long_name,0,17);
+            lcd_print(fb_dir_entry[i].long_name,0,LCD_COLS-3);
 
             i++;
         }
     }
 
-    lcd_setcursor(0,fb_lcd_cursor_pos+1);
+    lcd_setcursor(0,fb_lcd_cursor_pos);
     lcd_data(fb_lcd_cursor_char);
 
 
     if(fb_lcd_window_pos > 0)
     {
-        lcd_setcursor(19,1);
+        lcd_setcursor(LCD_COLS-1,0);
         lcd_data(fb_lcd_more_top_char);
     }
 
-    if(fb_lcd_window_pos + LCD_LINE_COUNT < fb_dir_entry_count)
+    if((fb_lcd_window_pos + LCD_LINE_COUNT) < fb_dir_entry_count)
     {
-        lcd_setcursor(19, LCD_LINE_COUNT);
+        lcd_setcursor(LCD_COLS-1, LCD_LINE_COUNT-1);
         lcd_data(fb_lcd_more_down_char);
     }
 
     // Für Scrollenden Filename
-    int8_t var = (int8_t)strlen(fb_dir_entry[fb_lcd_cursor_pos].long_name) - 17;
+    int8_t var = (int8_t)strlen(fb_dir_entry[fb_lcd_cursor_pos].long_name) - (LCD_COLS-3);
     if(var < 0)
         fb_current_line_offset = 0;
     else
         fb_current_line_offset = var;
+
     fb_line_scroll_pos = 0;
     fb_line_scroll_direction = 0;
     fb_line_scroll_end_begin_wait = 6;
-
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -744,16 +754,16 @@ void init_pb2_pb3()
 int8_t init_sd_card(void)
 {
     // LCD Fehlermeldung löschen
-    lcd_setcursor( 0, 4);
+    lcd_setcursor( 0, 3);
     lcd_string("                    ");
-    lcd_setcursor( 0, 4);
+    lcd_setcursor( 0, 3);
 
     set_sleep_mode(SLEEP_MODE_IDLE);
 
     // SD Karte initialisieren
     if(!sd_raw_init())
     {
-        lcd_setcursor( 0, 4);
+        lcd_setcursor( 0, 3);
         lcd_string("err: sd_raw_init");
         return 1;
     }
@@ -765,7 +775,7 @@ int8_t init_sd_card(void)
         partition = partition_open(sd_raw_read,sd_raw_read_interval,sd_raw_write,sd_raw_write_interval,-1);
         if(!partition)
         {
-            lcd_setcursor( 0, 4);
+            lcd_setcursor( 0, 3);
             lcd_string("err: partition_open");
             return 2;
         }
@@ -781,7 +791,7 @@ int8_t init_sd_card(void)
 
     if(!fs)
     {
-        lcd_setcursor( 0, 4);
+        lcd_setcursor( 0, 3);
         lcd_string("err: fat_open");
         return 3;
     }
@@ -791,7 +801,7 @@ int8_t init_sd_card(void)
     dd = fat_open_dir(fs, &dir_entry);
     if(!dd)
     {
-        lcd_setcursor( 0, 4);
+        lcd_setcursor( 0, 3);
         lcd_string("err: fat_open_root");
         return 4;
     }
@@ -887,12 +897,12 @@ uint8_t change_dir(const char* path)
 void show_start_message(void)
 {
     lcd_clear();
-    lcd_setcursor( 1, 1);
+    lcd_setcursor( 1, 0);
     lcd_string("-- 1541-rebuild --");
-    lcd_setcursor( 2,2);
+    lcd_setcursor( 2, 1);
     lcd_string("Firmware:  ");
     lcd_string(VERSION);
-    lcd_setcursor( 0,4);
+    lcd_setcursor( 0, 3);
     lcd_string("by thorsten kattanek");
     _delay_ms(START_MESSAGE_TIME);
     lcd_clear();
@@ -914,19 +924,19 @@ void show_sdcard_info_message()
     {
         if(0 != sd_raw_get_info(&info))
         {
-            lcd_setcursor(0,1);
+            lcd_setcursor(0,0);
             sprintf(out_str,"MANUFACT.: %.x",info.manufacturer);
             lcd_string(out_str);
 
-            lcd_setcursor(0,2);
+            lcd_setcursor(0,1);
             lcd_string("OEM      : ");
             lcd_string(info.oem);
 
-            lcd_setcursor(0,3);
+            lcd_setcursor(0,2);
             lcd_string("PRODUCT  : ");
             lcd_string(info.product);
 
-            lcd_setcursor(0,4);
+            lcd_setcursor(0,3);
             sprintf(out_str,"SIZE     : %d MB", (uint16_t)(info.capacity / 1024 / 1024));
             lcd_string(out_str);
 
@@ -944,9 +954,9 @@ void show_sdcard_info_message()
     if(!get_info_ok)
     {
         lcd_clear();
-        lcd_setcursor(0,2);
+        lcd_setcursor(0,1);
         lcd_string("Error: Ret Failure");
-        lcd_setcursor(0,3);
+        lcd_setcursor(0,2);
         lcd_string("sd_raw_get_info");
         return;
     }
@@ -955,17 +965,17 @@ void show_sdcard_info_message()
 
     lcd_clear();
 
-    lcd_setcursor(0,1);
+    lcd_setcursor(0,0);
     sprintf(out_str,"REVISION : %c.%c",(info.revision>>4)+'0', (info.revision&0x0f)+'0');
     lcd_string(out_str);
 
-    lcd_setcursor(0,2);
+    lcd_setcursor(0,1);
     sprintf(out_str,"SERIALNR.: %4.4X",info.serial>>16);
     lcd_string(out_str);
     sprintf(out_str,"%4.4X",info.serial&0xffff);
     lcd_string(out_str);
 
-    lcd_setcursor(0,3);
+    lcd_setcursor(0,2);
     lcd_string("PARTITION: ");
     switch(partition->type)
     {
@@ -1024,17 +1034,19 @@ void init_stepper(void)
 /////////////////////////////////////////////////////////////////////
 
 void stepper_inc(void)
-{            
-    if(akt_half_track == 83) return;
-    akt_half_track++;
+{
+    if(akt_half_track >= 83) return;
+
+    ++akt_half_track;
 }
 
 /////////////////////////////////////////////////////////////////////
 
 void stepper_dec(void)
 {
-    if(akt_half_track == 2) return;
-    akt_half_track--;
+    if(akt_half_track <= 2) return;
+
+    --akt_half_track;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -1176,38 +1188,41 @@ struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir
     strcpy(extension, file_entry->long_name+(strlen(file_entry->long_name)-4));
 
     i=0;
-    while(extension[i] != 0)
+    while(extension[i] != '\0')
     {
         extension[i] = tolower(extension[i]);
-        i++;
-    }
-
-    fd = fat_open_file(fs, file_entry);
-    if(!fd)
-    {
-        *image_type = UNDEF_IMAGE;
-        return fd;
+        ++i;
     }
 
     if(!strcmp(extension,".g64"))
     {
         // Laut Extension ein G64
-        *image_type = G64_IMAGE;
-        open_g64_image(fd);
-        set_write_protection(1);
+        fd = fat_open_file(fs, file_entry);
+        if(fd)
+        {
+            *image_type = G64_IMAGE;
+            // open_g64_image(fd);
+            set_write_protection(1);
+        } else {
+            *image_type = UNDEF_IMAGE;
+        }
     }
     else if(!strcmp(extension,".d64"))
     {
         // Laut Extensions ein D64
-        *image_type = D64_IMAGE;
-        open_d64_image(fd);
-        set_write_protection(1);
+        fd = fat_open_file(fs, file_entry);
+        if(fd)
+        {
+            *image_type = D64_IMAGE;
+            // open_d64_image(fd);
+            set_write_protection(1);
+        } else {
+            *image_type = UNDEF_IMAGE;
+        }
     }
     else
     {
         // Nicht unterstützt
-        fat_close_file(fd);
-        fd = NULL;
         *image_type = UNDEF_IMAGE;
     }
 
@@ -1253,104 +1268,124 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
 
     switch(image_type)
     {
-    ///////////////////////////////////////////////////////////////////////////
-    case G64_IMAGE:	// G64
-	/// Track18 eines G64 einlesen
+        ///////////////////////////////////////////////////////////////////////////
+        case G64_IMAGE:	// G64
+        {
+            /// Track18 eines G64 einlesen
 
-	offset = (int32_t)track_nr - 1;
-	offset = (offset << 3) + 0x0c;
+            offset = (int32_t)track_nr - 1;
+            offset = (offset << 3) + 0x0c;
 
-	if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
-	{
-        if(fat_read_file(fd, (uint8_t*)&offset, 4))
-	    {
             if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
             {
+                if(fat_read_file(fd, (uint8_t*)&offset, 4))
+                {
+                    if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
+                    {
                         fat_read_file(fd, (uint8_t*)gcr_track_length, 2);
                         fat_read_file(fd, track_buffer, *gcr_track_length);
-
-                is_read = 1;
+                        is_read = 1;
+                    }
+                }
             }
-	    }
-	}
-	break;
+        }
+        break;
 
-    ///////////////////////////////////////////////////////////////////////////
-    case D64_IMAGE:	// D64
+        ///////////////////////////////////////////////////////////////////////////
+        case D64_IMAGE:	// D64
+        {
+            offset = d64_track_offset[track_nr];
 
-	offset = d64_track_offset[track_nr];
-
-	if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
-	{
-	    P = track_buffer;
-
-	    for(sector_nr=0;sector_nr<d64_sector_count[track_nr];sector_nr++)
-	    {
-            fat_read_file(fd, d64_sector_puffer, D64_SECTOR_SIZE);
-
-            *P++ = 0xFF;								// SYNC
-            *P++ = 0xFF;								// SYNC
-            *P++ = 0xFF;								// SYNC
-            *P++ = 0xFF;								// SYNC
-            *P++ = 0xFF;								// SYNC
-
-            buffer[0] = 0x08;							// Header Markierung
-            buffer[1] = sector_nr ^ track_nr ^ id2 ^ id1;				// Checksumme
-            buffer[2] = sector_nr;
-            buffer[3] = track_nr;
-            ConvertToGCR(buffer, P);
-            buffer[0] = id2;
-            buffer[1] = id1;
-            buffer[2] = 0x0F;
-            buffer[3] = 0x0F;
-            ConvertToGCR(buffer, P+5);
-            P += 10;
-
-            // GAP Bytes als Lücke
-            memset(P, 0x55, HEADER_GAP_BYTES);
-            P += HEADER_GAP_BYTES;
-
-            // SYNC
-            *P++ = 0xFF;								// SYNC
-            *P++ = 0xFF;								// SYNC
-            *P++ = 0xFF;								// SYNC
-            *P++ = 0xFF;								// SYNC
-            *P++ = 0xFF;								// SYNC
-
-            buffer[0] = 0x07;							// Data mark
-            SUM = buffer[1] = d64_sector_puffer[0];
-            SUM ^= buffer[2] = d64_sector_puffer[1];
-            SUM ^= buffer[3] = d64_sector_puffer[2];
-            ConvertToGCR(buffer, P);
-            P += 5;
-
-            for (int i=3; i<255; i+=4)
+            if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
             {
-                SUM ^= buffer[0] = d64_sector_puffer[i];
-                SUM ^= buffer[1] = d64_sector_puffer[i+1];
-                SUM ^= buffer[2] = d64_sector_puffer[i+2];
-                SUM ^= buffer[3] = d64_sector_puffer[i+3];
-                ConvertToGCR(buffer, P);
-                P += 5;
+                P = track_buffer;
+
+                for(sector_nr=0;sector_nr<d64_sector_count[track_nr];sector_nr++)
+                {
+                    fat_read_file(fd, d64_sector_puffer, D64_SECTOR_SIZE);
+
+                    *P++ = 0xFF;								// SYNC
+                    *P++ = 0xFF;								// SYNC
+                    *P++ = 0xFF;								// SYNC
+                    *P++ = 0xFF;								// SYNC
+                    *P++ = 0xFF;								// SYNC
+
+                    buffer[0] = 0x08;							// Header Markierung
+                    buffer[1] = sector_nr ^ track_nr ^ id2 ^ id1;				// Checksumme
+                    buffer[2] = sector_nr;
+                    buffer[3] = track_nr;
+                    ConvertToGCR(buffer, P);
+
+/* -- hint this data is constant -- replaced with precalculated data...
+                    buffer[0] = id2;
+                    // This is the second character of the ID that you specify when creating a new disk.
+                    // The drive uses this and the next byte to check with the byte in memory to ensure
+                    // the disk is not swapped in the mean time.
+                    buffer[1] = id1;
+                    buffer[2] = 0x0F;
+                    buffer[3] = 0x0F;
+                    ConvertToGCR(buffer, P+5);
+                    P += 10;
+*/
+                    P += 5;
+
+                    *P++ = 0x52;
+                    *P++ = 0x94;
+                    *P++ = 0xA5;
+                    *P++ = 0x55;
+                    *P++ = 0x55;
+// --
+                    // GAP Bytes als Lücke
+                    memset(P, 0x55, HEADER_GAP_BYTES);
+                    P += HEADER_GAP_BYTES;
+
+                    // SYNC
+                    *P++ = 0xFF;								// SYNC
+                    *P++ = 0xFF;								// SYNC
+                    *P++ = 0xFF;								// SYNC
+                    *P++ = 0xFF;								// SYNC
+                    *P++ = 0xFF;								// SYNC
+
+                    SUM = 0;
+                    for(int i=0; i<256; ++i)
+                    {
+                        SUM ^= d64_sector_puffer[i];
+                    }
+
+                    buffer[0] = 0x07;							// Data mark
+                    buffer[1] = d64_sector_puffer[0];
+                    buffer[2] = d64_sector_puffer[1];
+                    buffer[3] = d64_sector_puffer[2];
+                    ConvertToGCR(buffer, P);
+                    P += 5;
+
+                    for (int i=3; i<255; i+=4)
+                    {
+                        ConvertToGCR(&(d64_sector_puffer[i]), P);
+                        P += 5;
+                    }
+
+                    buffer[0] = d64_sector_puffer[255];
+                    buffer[1] = SUM;							// Checksum
+                    buffer[2] = 0;
+                    buffer[3] = 0;
+                    ConvertToGCR(buffer, P);
+                    P += 5;
+
+                    // GCR Bytes als Lücken auffüllen (sorgt für eine Gleichverteilung)
+                    uint8_t gap_size = d64_sector_gap[d64_track_zone[track_nr]];
+                    memset(P, 0x55, gap_size);
+                    P += gap_size;
+
+                    //*gcr_track_length = d64_track_length[d64_track_zone[track_nr]];
+                    *gcr_track_length = P - gcr_track;
+                }
             }
+        }
+        break;
 
-            SUM ^= buffer[0] = d64_sector_puffer[255];
-            buffer[1] = SUM;							// Checksum
-            buffer[2] = 0;
-            buffer[3] = 0;
-            ConvertToGCR(buffer, P);
-            P += 5;
-
-            // GCR Bytes als Lücken auffüllen (sorgt für eine Gleichverteilung)
-            uint8_t gap_size = d64_sector_gap[d64_track_zone[track_nr]];
-            memset(P, 0x55, gap_size);
-            P += gap_size;
-
-            //*gcr_track_length = d64_track_length[d64_track_zone[track_nr]];
-            *gcr_track_length = P - gcr_track;
-	    }
-	}
-	break;
+        default:
+            break;
     }
     return is_read;
 }
@@ -1363,29 +1398,33 @@ void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t tr
 
     switch(image_type)
     {
-    ///////////////////////////////////////////////////////////////////////////
-    case G64_IMAGE:	// G64
-        /// Track18 eines G64 einlesen
-
-        offset = (int32_t)track_nr - 1;
-        offset = (offset << 3) + 0x0c;
-
-        if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
-        {
-            if(fat_read_file(fd, (uint8_t*)&offset, 4))
+        ///////////////////////////////////////////////////////////////////////////
+        case G64_IMAGE:	// G64
             {
-                offset += 2;
+                /// Track18 eines G64 einlesen
+                offset = (int32_t)track_nr - 1;
+                offset = (offset << 3) + 0x0c;
+
                 if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
                 {
-                    fat_write_file(fd, track_buffer, *gcr_track_length);
+                    if(fat_read_file(fd, (uint8_t*)&offset, 4))
+                    {
+                        offset += 2;
+                        if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
+                        {
+                            fat_write_file(fd, track_buffer, *gcr_track_length);
+                        }
+                    }
                 }
             }
-        }
-        break;
+            break;
 
-    ///////////////////////////////////////////////////////////////////////////
-    case D64_IMAGE:	// D64
-        break;
+        ///////////////////////////////////////////////////////////////////////////
+        case D64_IMAGE:	// D64
+            break;
+
+        default:
+            break;
     }
 }
 
@@ -1457,17 +1496,17 @@ void endable_wps_port(uint8_t enable)
 
 void set_write_protection(int8_t wp)
 {
-    if(is_wps_pin_enable == 0) return;
+    if(0 == is_wps_pin_enable) return;
 
     floppy_wp = wp;
 
-    if(wp == 0)
+    if(wp)
     {
-        set_wps();
+        clear_wps();
     }
     else
     {
-        clear_wps();
+        set_wps();
     }
 }
 
@@ -1475,17 +1514,7 @@ void set_write_protection(int8_t wp)
 
 void send_disk_change(void)
 {
-    if(floppy_wp == 0)
-    {
-        clear_wps();
-        _delay_ms(1);
-        set_wps();
-        _delay_ms(1);
-        clear_wps();
-        _delay_ms(1);
-        set_wps();
-    }
-    else
+    if(floppy_wp)
     {
         set_wps();
         _delay_ms(1);
@@ -1494,7 +1523,16 @@ void send_disk_change(void)
         set_wps();
         _delay_ms(1);
         clear_wps();
+    } else {
+        clear_wps();
+        _delay_ms(1);
+        set_wps();
+        _delay_ms(1);
+        clear_wps();
+        _delay_ms(1);
+        set_wps();
     }
+
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -1637,7 +1675,7 @@ ISR (TIMER2_COMPA_vect)
     if(counter0 < 25)
     {
         counter0++;
-        return 0;
+        return;
     }
 
     // Alle 50ms ab hier //

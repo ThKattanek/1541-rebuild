@@ -10,6 +10,6 @@
 #define SETTINGS_PIN_PB3       7     // 1-Byte
 #define SETTINGS_INPUT_MODE    8     // 1-Byte
 
-void settings_set_default_values();
+void settings_set_default_values( void );
 
 #endif // SETTINGS_H

@@ -1,10 +1,11 @@
 #include "./menu.h"
 #include "./gui_constants.h"
 
-void menu_init(MENU_STRUCT *menu, MENU_ENTRY *menu_entrys, uint8_t menu_entry_count, uint8_t lcd_row_count)
+void menu_init(MENU_STRUCT* menu, MENU_ENTRY *menu_entrys, uint8_t menu_entry_count, uint8_t lcd_col_count, uint8_t lcd_row_count)
 {
     menu->entry_list = menu_entrys;
     menu->entry_count = menu_entry_count;
+    menu->lcd_col_count = lcd_col_count;
     menu->lcd_row_count = lcd_row_count;
 
     menu->pos = 0;
@@ -33,85 +34,102 @@ uint16_t menu_update(uint8_t key_code)
 
     switch(key_code)
     {
-    case KEY0_DOWN:
-        if(current_menu->lcd_cursor_pos > 0)
-        {
-            current_menu->lcd_cursor_pos--;
-            current_menu->view_obsolete = 1;
-            command = MC_CHANGE_ENTRY;
-            value = current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].id;
-        }
-        else
-        {
-            if(current_menu->lcd_window_pos > 0)
+        case KEY0_DOWN:
             {
-                current_menu->lcd_window_pos--;
-                current_menu->view_obsolete = 1;
-                command = MC_CHANGE_ENTRY;
-                value = current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].id;
+                if(current_menu->lcd_cursor_pos > 0)
+                {
+                    current_menu->lcd_cursor_pos--;
+                    current_menu->view_obsolete = 1;
+                    command = MC_CHANGE_ENTRY;
+                    value = current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].id;
+                }
+                else
+                {
+                    if(current_menu->lcd_window_pos > 0)
+                    {
+                        current_menu->lcd_window_pos--;
+                        current_menu->view_obsolete = 1;
+                        command = MC_CHANGE_ENTRY;
+                        value = current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].id;
+                    }
+                }
             }
-        }
-        break;
+            break;
 
-    case KEY1_DOWN:
-        if((current_menu->lcd_cursor_pos < current_menu->lcd_row_count-1) && (current_menu->lcd_cursor_pos < current_menu->entry_count-1))
-        {
-            current_menu->lcd_cursor_pos++;
-            current_menu->view_obsolete = 1;
-            command = MC_CHANGE_ENTRY;
-            value = current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].id;
-        }
-        else
-        {
-            if(current_menu->lcd_window_pos < current_menu->entry_count - current_menu->lcd_row_count)
+        case KEY1_DOWN:
             {
-                current_menu->lcd_window_pos++;
-                current_menu->view_obsolete = 1;
-                command = MC_CHANGE_ENTRY;
-                value = current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].id;
+                if((current_menu->lcd_cursor_pos < current_menu->lcd_row_count-1) && (current_menu->lcd_cursor_pos < current_menu->entry_count-1))
+                {
+                    current_menu->lcd_cursor_pos++;
+                    current_menu->view_obsolete = 1;
+                    command = MC_CHANGE_ENTRY;
+                    value = current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].id;
+                }
+                else
+                {
+                    if(current_menu->lcd_window_pos < (current_menu->entry_count - current_menu->lcd_row_count))
+                    {
+                        current_menu->lcd_window_pos++;
+                        current_menu->view_obsolete = 1;
+                        command = MC_CHANGE_ENTRY;
+                        value = current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].id;
+                    }
+                }
             }
-        }
-        break;
-
-    case KEY2_UP:
-        // menu->lcd_window_pos + menu->lcd_cursor_pos = index in MenuEntryList
-        command = MC_SELECT_ENTRY;
-        value = current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].id;
-
-        switch (current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].type)
-        {
-        case ENTRY_MENU:
-            current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].menu->parent_menu = current_menu;
-            current_menu = current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].menu;
-            current_menu->view_obsolete = 1;
             break;
 
-        case ENTRY_TO_PARENT:
-            current_menu = current_menu->parent_menu;
-            current_menu->view_obsolete = 1;
+        case KEY2_UP:
+            {
+                // menu->lcd_window_pos + menu->lcd_cursor_pos = index in MenuEntryList
+                command = MC_SELECT_ENTRY;
+                uint8_t menu_index = current_menu->lcd_window_pos + current_menu->lcd_cursor_pos;
+                value = current_menu->entry_list[menu_index].id;
+
+                switch (current_menu->entry_list[menu_index].type)
+                {
+                    case ENTRY_MENU:
+                        current_menu->entry_list[menu_index].menu->parent_menu = current_menu;
+                        current_menu = current_menu->entry_list[menu_index].menu;
+                        current_menu->view_obsolete = 1;
+                        break;
+
+                    case ENTRY_TO_PARENT:
+                        current_menu = current_menu->parent_menu;
+                        current_menu->view_obsolete = 1;
+                        break;
+
+                    case ENTRY_ONOFF:
+                    case ENTRY_BOOL:
+                    case ENTRY_BIN:
+                        current_menu->entry_list[menu_index].var1 ^= 1;
+                        current_menu->entry_list[menu_index].var1 &= 1;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
             break;
 
-        case ENTRY_ONOFF:
-        case ENTRY_BOOL:
-        case ENTRY_BIN:
-            current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].var1 ^= 1;
-            current_menu->entry_list[current_menu->lcd_window_pos + current_menu->lcd_cursor_pos].var1 &= 1;
+        case KEY2_TIMEOUT1:
+            {
+                if(current_menu->parent_menu != 0)
+                {
+                    current_menu = current_menu->parent_menu;
+                    current_menu->view_obsolete = 1;
+                }
+                else
+                {
+                    command = MC_EXIT_MENU;
+                }
+            }
             break;
-        }
 
-        break;
+        case KEY2_TIMEOUT2:
+            break;
 
-    case KEY2_TIMEOUT1:
-        if(current_menu->parent_menu != 0)
-        {
-            current_menu = current_menu->parent_menu;
-            current_menu->view_obsolete = 1;
-        }
-        else command = MC_EXIT_MENU;
-        break;
-
-    case KEY2_TIMEOUT2:
-        break;
+        default:
+            break;
     }
 
     if(current_menu->view_obsolete)
@@ -139,7 +157,7 @@ void menu_refresh()
 
     for(int i=0; i<current_menu->lcd_row_count && i<current_menu->entry_count; i++)
     {
-        lcd_setcursor(1,i+1);
+        lcd_setcursor(1,i);
         lcd_string(current_menu->entry_list[i+current_menu->lcd_window_pos].name);
 
         switch(current_menu->entry_list[i+current_menu->lcd_window_pos].type)
@@ -158,26 +176,26 @@ void menu_refresh()
             break;
        case ENTRY_BOOL:
                 if(current_menu->entry_list[i+current_menu->lcd_window_pos].var1)
-                    lcd_string(" true");
+                    lcd_string(" T");
                 else
-                    lcd_string(" false");
+                    lcd_string(" F");
             break;
         }
 
     }
 
-    lcd_setcursor(0,current_menu->lcd_cursor_pos+1);
+    lcd_setcursor(0, current_menu->lcd_cursor_pos);
     lcd_data(current_menu->lcd_cursor_char);
 
     if(current_menu->lcd_window_pos > 0)
     {
-        lcd_setcursor(19,1);
+        lcd_setcursor(current_menu->lcd_col_count-1, 0);
         lcd_data(current_menu->lcd_more_top_char);
     }
 
     if(current_menu->lcd_window_pos+current_menu->lcd_row_count < current_menu->entry_count)
     {
-        lcd_setcursor(19,current_menu->lcd_row_count);
+        lcd_setcursor(current_menu->lcd_col_count-1, current_menu->lcd_row_count-1);
         lcd_data(current_menu->lcd_more_down_char);
     }
 }
