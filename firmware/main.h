@@ -14,6 +14,7 @@
 
 // Für die LCD Ansteuerung
 #include "./lcd.h"
+#include "./i2c.h"
 
 // SDCard Lib
 #include "./sd_card_lib/fat.h"

@@ -77,6 +77,7 @@ AVRDUDE_ISP_SPEED = 0.1666  # (1/24000000Hz)*4 = 1.666µs
 # List C source files here. (C dependencies are automatically generated.)
 SRC = main.c
 SRC += lcd.c
+SRC += i2c.c
 SRC += menu.c
 SRC += settings.c
 
