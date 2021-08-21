@@ -4,7 +4,10 @@
 - changing of firmware needed (pin assignments)
 - implementation of i2c routines for displays
 
+I2C-Version of the PCB:
 
+![image4](/doc/fotos/platine_rev_1.4.0_i2c/eagle_pcb_1541i2c.jpg)
+![image5](/doc/fotos/platine_rev_1.4.0_i2c/eagle_pcb_1541i2c_render.jpg)
 
 # original Readme.md:
 
