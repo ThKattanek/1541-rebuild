@@ -229,7 +229,7 @@ volatile uint8_t key_buffer_w_pos;
 uint8_t input_mode = INPUT_MODE_ENCODER;
 
 uint8_t current_gui_mode;
-int8_t byte_str[16];
+char byte_str[16];
 
 uint8_t gui_current_line_offset;         // >0 dann ist der Name länger als die maximale Anzeigelaenge
 uint8_t gui_line_scroll_pos;             // Kann zwischen 0 und fb_current_line_offset liegen

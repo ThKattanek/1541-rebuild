@@ -1,6 +1,8 @@
 #include "./menu.h"
 #include "./gui_constants.h"
 
+static MENU_STRUCT *current_menu;
+
 void menu_init(MENU_STRUCT* menu, MENU_ENTRY *menu_entrys, uint8_t menu_entry_count, uint8_t lcd_col_count, uint8_t lcd_row_count)
 {
     menu->entry_list = menu_entrys;
