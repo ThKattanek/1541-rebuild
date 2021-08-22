@@ -24,13 +24,12 @@ enum GUI_MODE{GUI_INFO_MODE, GUI_MENU_MODE, GUI_FILE_BROWSER};
 #define disp_trackno_p        7,0
 
 #define disp_motortxt_p       0,1
-#define disp_motortxt_s       "Motor: "
-#define disp_motorstatus_p    7,1
-#define disp_on_s             "On "
-#define disp_off_s            "Off"
+#define disp_motor_on_s       "Motor: On "
+#define disp_motor_off_s      "Motor: Off"
 
 #define disp_writeprottxt_p   12,0
-#define disp_writeprottxt_s   "WP: "
+#define disp_writeprot_on_s   "WP: On "
+#define disp_writeprot_off_s  "WP: Off"
 
 #define disp_scrollfilename_p 0,3
 #define disp_nofilemounted_s  "  No Image Mounted  "
