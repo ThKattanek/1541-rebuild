@@ -348,11 +348,11 @@ void update_gui()
         if(old_motor_status != new_motor_status)
         {
             old_motor_status = new_motor_status;
-            lcd_setcursor(disp_motorstatus_p);
+            lcd_setcursor(disp_motortxt_p);
             if(new_motor_status)
-                lcd_string(disp_on_s);
+                lcd_string(disp_motor_on_s);
             else
-                lcd_string(disp_off_s);
+                lcd_string(disp_motor_off_s);
         }
 
         if(is_image_mount)
@@ -519,21 +519,16 @@ void set_gui_mode(uint8_t gui_mode)
         lcd_string(byte_str);
 
         lcd_setcursor(disp_motortxt_p);
-        lcd_string(disp_motortxt_s);
-
         if(get_motor_status())
-            lcd_string(disp_on_s);
+            lcd_string(disp_motor_on_s);
         else
-            lcd_string(disp_off_s);
+            lcd_string(disp_motor_off_s);
 
         lcd_setcursor(disp_writeprottxt_p);
-        lcd_string(disp_writeprottxt_s);
-
-        lcd_setcursor(9,0);
         if(floppy_wp)
-            lcd_string(disp_on_s);
+            lcd_string(disp_writeprot_on_s);
         else
-            lcd_string(disp_off_s);
+            lcd_string(disp_writeprot_off_s);
 
         lcd_setcursor(disp_scrollfilename_p);
         if(is_image_mount)
