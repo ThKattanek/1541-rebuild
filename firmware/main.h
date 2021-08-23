@@ -55,30 +55,30 @@
 
 // SOE GATEWAY --> Ausgang
 // LO wenn SD Karte laufen soll damit ByteReady High bleibt
-#define SOE_GATEARRAY_DDR DDRC
-#define SOE_GATEARRAY_PORT PORTC
-#define SOE_GATEARRAY PC7
+#define SOE_GATEARRAY_DDR   DDRD
+#define SOE_GATEARRAY_PORT  PORTD
+#define SOE_GATEARRAY       PD5
 
 // Anschluss der Stepper Signale
 // Zwingend diese PINs wegen Extern Interrupts PCINT6/7
 // Bei Änderung muss der Sourcecode angepasst werden !
-#define STP_DDR  DDRA
-#define STP_PIN PINA
-#define STP1 PINA6
-#define STP0 PINA7
+#define STP_DDR     DDRD
+#define STP_PIN     PIND
+#define STP1        PIND1
+#define STP0        PIND0
 
 // Anschluss des Laufwerkmotor Signals
-#define MTR_DDR DDRC
-#define MTR_PIN PINC
-#define MTR	PINC2
+#define MTR_DDR     DDRD
+#define MTR_PIN     PIND
+#define MTR         PIND2
 
 #define get_motor_status() (MTR_PIN & (1<<MTR))
 
 // Steuersignale
 // BYTE READY
-#define BYTE_READY_DDR DDRC
-#define BYTE_READY_PORT PORTC
-#define BYTE_READY  PC0
+#define BYTE_READY_DDR  DDRD
+#define BYTE_READY_PORT PORTD
+#define BYTE_READY      PD3
 
 //DDxn = 0 , PORTxn = 0 --> HiZ
 //DDxn = 1 , PORTxn = 0 --> Output Low (Sink)
@@ -87,24 +87,24 @@
 #define clear_byte_ready() BYTE_READY_DDR |= (1 << BYTE_READY)  // auf Ground ziehen
 
 // SYNC
-#define SYNC_DDR DDRC
-#define SYNC_PORT PORTC
-#define SYNC  PC1
+#define SYNC_DDR    DDRD
+#define SYNC_PORT   PORTD
+#define SYNC        PD7
 
 #define set_sync() SYNC_PORT |= 1 << SYNC
 #define clear_sync() SYNC_PORT &= ~(1 << SYNC)
 
 // SOE
-#define SOE_DDR DDRC
-#define SOE_PIN PINC
-#define SOE	PINC6
+#define SOE_DDR     DDRD
+#define SOE_PIN     PIND
+#define SOE         PIND4
 
 #define get_soe_status() (SOE_PIN & (1<<SOE))
 
-// SO
-#define SO_DDR DDRC
-#define SO_PIN PINC
-#define SO     PINC5
+// SO ... 6522_OE = MODE?
+#define SO_DDR      DDRC
+#define SO_PIN      PINC
+#define SO          PINC7
 
 #define get_so_status() (SO_PIN & (1<<SO))
 
@@ -112,36 +112,36 @@
 // PIN ist mit PIN14 U8 VIA6522 (Input) verbunden
 // PIN ist mit PIN14 (A) GateArray (Input) verbunden
 // PIN ist mit PIN8 LS04 DM74LS04N (Output) verbunden -> Einganag PIN9 hängt auf einen PullUp (47k)
-#define WPS_DDR DDRC
-#define WPS_PORT PORTC
-#define WPS  PC4
+#define WPS_DDR     DDRD
+#define WPS_PORT    PORTD
+#define WPS         PD6
 
 #define set_wps() WPS_PORT |= 1 << WPS          // 5V Level = WritePotect
 #define clear_wps() WPS_PORT &= ~(1 << WPS)     // 0V Level = Writetable
 
 // Anschluss der Datenleitungen
-#define DATA_DDR   DDRD
-#define DATA_PORT  PORTD
-#define DATA_PIN   PIND
+#define DATA_DDR    DDRA
+#define DATA_PORT   PORTA
+#define DATA_PIN    PINA
 
 #define out_gcr_byte(gcr_byte) DATA_PORT = gcr_byte
 #define in_gcr_byte DATA_PIN
 
 // Einabetasten
-#define KEY0_DDR DDRB
-#define KEY0_PORT PORTB
-#define KEY0_PIN PINB
-#define KEY0	 PINB0
+#define KEY0_DDR    DDRB
+#define KEY0_PORT   PORTB
+#define KEY0_PIN    PINB
+#define KEY0        PINB0
 
-#define KEY1_DDR DDRB
-#define KEY1_PORT PORTB
-#define KEY1_PIN PINB
-#define KEY1	 PINB1
+#define KEY1_DDR    DDRB
+#define KEY1_PORT   PORTB
+#define KEY1_PIN    PINB
+#define KEY1        PINB1
 
-#define KEY2_DDR DDRC
-#define KEY2_PORT PORTC
-#define KEY2_PIN PINC
-#define KEY2	 PINC3
+#define KEY2_DDR    DDRC
+#define KEY2_PORT   PORTC
+#define KEY2_PIN    PINC
+#define KEY2        PINC6
 
 #define get_key0() (~KEY0_PIN & (1<<KEY0))
 #define get_key1() (~KEY1_PIN & (1<<KEY1))
