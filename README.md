@@ -1,13 +1,13 @@
 #FORK of 1541-rebuild
 
-- planed changes: rerouting the PCB to be able to use I2C Displays instead of bitbanging to LCD. opens the world to OLED and even onscreen displays.
-- changing of firmware needed (pin assignments)
-- implementation of i2c routines for displays
+- done: rerouting the PCB to be able to use I2C Displays instead of bitbanging to LCD. opens the world to OLED and even onscreen displays.
+- open: changing of firmware needed (pin assignments)
+- open: implementation of i2c routines for displays
 
-I2C-Version of the PCB:
+new I2C-Version (1.4.1) of the PCB prepared in KiCad:
 
-![image4](/doc/fotos/platine_rev_1.4.0_i2c/eagle_pcb_1541i2c.jpg)
-![image5](/doc/fotos/platine_rev_1.4.0_i2c/eagle_pcb_1541i2c_render.jpg)
+![image4](/doc/fotos/1541-rebuild-141_front.png)
+![image5](/doc/fotos/1541-rebuild-141_back.png)
 
 # original Readme.md:
 

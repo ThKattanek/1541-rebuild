@@ -1,16 +1,15 @@
 EESchema Schematic File Version 4
-LIBS:1541-rebuild-cache
 EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 3 3
 Title "1541-rebuid"
-Date "2020-04-18"
-Rev "1.4.0"
+Date "2021-08-23"
+Rev "1.4.1"
 Comp ""
 Comment1 "Erstellt von: Thorsten Kattanek"
-Comment2 ""
+Comment2 "redesign and i2c added: F00K42"
 Comment3 ""
 Comment4 ""
 $EndDescr
@@ -108,7 +107,7 @@ F 3 "" H 5800 4800 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 Text HLabel 4650 2450 1    60   Input ~ 0
-SPT0
+STP0
 Text HLabel 4750 2450 1    60   Input ~ 0
 STP1
 Text HLabel 5300 2450 1    60   Input ~ 0
@@ -311,9 +310,11 @@ Wire Wire Line
 Wire Wire Line
 	7600 3300 8750 3300
 $Comp
-L floppy1541_tk:VIA6522 IC2
+L 1541-rebuild-rescue:VIA6522-floppy1541_tk IC2
 U 1 1 5E9FB04A
 P 6450 3650
+AR Path="/5E9FB04A" Ref="IC2"  Part="1" 
+AR Path="/55F9B22C/5E9FB04A" Ref="IC2"  Part="1" 
 F 0 "IC2" H 6425 4887 60  0000 C CNN
 F 1 "VIA6522" H 6425 4781 60  0000 C CNN
 F 2 "Package_DIP:DIP-40_W15.24mm_Socket_LongPads" H 7850 3650 60  0001 C CNN
