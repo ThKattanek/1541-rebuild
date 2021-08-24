@@ -16,9 +16,9 @@
 #include <ctype.h>
 
 /// \brief Anschluss für Drehgeber PIN A
-#define PHASE_1A	(PINB & (1<<IMPULS_1A_PIN))
+#define PHASE_1A    (KEY1_PIN & (1<<IMPULS_1A_PIN))
 /// \brief Anschluss für Drehgeber PIN B
-#define PHASE_1B	(PINB & (1<<IMPULS_1B_PIN))
+#define PHASE_1B    (KEY0_PIN & (1<<IMPULS_1B_PIN))
 
 /// \brief Decodierungstabelle für Drehgeber
 const unsigned char drehimp_tab[16]PROGMEM = {0,0,2,0,0,0,0,0,1,0,0,0,0,0,0,0};
@@ -214,15 +214,15 @@ void check_stepper_signals()
     // und auswerten
     if(stepper_signal_r_pos != stepper_signal_w_pos)    // Prüfen ob sich was neues im Ringpuffer für die Steppersignale befindet
     {
-        uint8_t stepper = stepper_signal_puffer[stepper_signal_r_pos]>>2 | stepper_signal_puffer[stepper_signal_r_pos-1];
+        uint8_t stepper = stepper_signal_puffer[stepper_signal_r_pos] | stepper_signal_puffer[stepper_signal_r_pos-1]<<2;
         stepper_signal_r_pos++;
 
         switch(stepper)
         {
-            case 0b00110000:
-            case 0b01000000:
-            case 0b10010000:
-            case 0b11100000:
+            case 0b00000011:
+            case 0b00000100:
+            case 0b00001001:
+            case 0b00001110:
                 {
                     // DEC
                     stepper_dec();
@@ -231,10 +231,10 @@ void check_stepper_signals()
                 }
                 break;
 
-            case 0b00010000:
-            case 0b01100000:
-            case 0b10110000:
-            case 0b11000000:
+            case 0b00000001:
+            case 0b00000110:
+            case 0b00001011:
+            case 0b00001100:
                 {
                     // INC
                     stepper_inc();
@@ -1042,9 +1042,9 @@ void init_stepper(void)
     STP_DDR &= ~(1<<STP0 | 1<<STP1);
     akt_half_track = INIT_TRACK << 1;
 
-    // Pin Change Ineterrupt für beide PIN's aktivieren
-    PCICR = 0x01;   // Enable PCINT0..7
-    PCMSK0 = 0xc0;  // Set Mask Register für PCINT6 und PCINT7
+    // Pin Change Ineterrupt für beide STPx PIN's aktivieren
+    PCICR = 0x08;   // Enable PCINT24..31
+    PCMSK3 = 0x03;  // Set Mask Register für PCINT24 und PCINT25
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -1285,7 +1285,7 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
     switch(image_type)
     {
         ///////////////////////////////////////////////////////////////////////////
-        case G64_IMAGE:	// G64
+        case G64_IMAGE: // G64
         {
             /// Track18 eines G64 einlesen
 
@@ -1308,7 +1308,7 @@ int8_t read_disk_track(struct fat_file_struct* fd, uint8_t image_type, uint8_t t
         break;
 
         ///////////////////////////////////////////////////////////////////////////
-        case D64_IMAGE:	// D64
+        case D64_IMAGE: // D64
         {
             offset = d64_track_offset[track_nr];
 
@@ -1555,10 +1555,10 @@ void send_disk_change(void)
 
 // Interrupt Service Routinen
 
-ISR (PCINT0_vect)
+ISR (PCINT3_vect)
 {
-    // Stepper Signale an PA6 und PA7
-    stepper_signal_puffer[stepper_signal_w_pos] = STP_PIN & 0xc0;
+    // Stepper Signale an PD0 und PD1
+    stepper_signal_puffer[stepper_signal_w_pos] = STP_PIN & ((1<<STP0) | (1<<STP1));
     stepper_signal_w_pos++;
 }
 
