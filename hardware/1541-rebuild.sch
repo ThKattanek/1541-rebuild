@@ -569,7 +569,7 @@ Wire Wire Line
 Wire Wire Line
 	5550 3100 10000 3100
 $Comp
-L 1541-rebuild-rescue:ATmega1284P-PU-MCU_Microchip_ATmega IC1
+L 1541-rebuild-rescue:ATmega1284P-PU-MCU_Microchip_ATmega-1541-rebuild-rescue IC1
 U 1 1 55F7E447
 P 4950 3800
 F 0 "IC1" H 4450 5750 40  0000 L BNN
@@ -787,4 +787,21 @@ F 3 "" H 6750 5750 50  0001 C CNN
 	1    6750 5750
 	0    -1   -1   0   
 $EndComp
+$Comp
+L Device:CP C4
+U 1 1 61268758
+P 1350 2000
+F 0 "C4" V 1095 2000 50  0000 C CNN
+F 1 "47µF" V 1186 2000 50  0000 C CNN
+F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm" H 1388 1850 50  0001 C CNN
+F 3 "~" H 1350 2000 50  0001 C CNN
+	1    1350 2000
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	1200 1550 1200 2000
+Connection ~ 1200 1550
+Wire Wire Line
+	1500 2000 1500 1550
+Connection ~ 1500 1550
 $EndSCHEMATC
