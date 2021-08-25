@@ -1,10 +1,18 @@
 #FORK of 1541-rebuild
 
-- done: rerouting the PCB to be able to use I2C Displays instead of bitbanging to LCD. opens the world to OLED and even onscreen displays.
-- open: changing of firmware needed (pin assignments)
-- open: implementation of i2c routines for displays
+done:
+- rerouting the PCB to be able to use I2C Displays instead of bitbanging to LCD. opens the world to OLED and even onscreen displays.
+- changing of firmware needed (pin assignments)
 
-new I2C-Version (1.4.1) of the PCB prepared in KiCad:
+open:
+- implementation of i2c routines for displays
+
+new I2C-Version (1.4.1) of the PCB created:
+- all Pin assigns are identical to 1.4.0 (!) -> LCD Displays can still be used!
+- I2C Pins share 4 pins with LCD-Display Header -> only Software reconfiguration needed
+- adopted Software needed (due to different Atmega-Ports used)
+
+layout prepared in KiCad:
 
 ![image4](/doc/fotos/1541-rebuild-141_front.png)
 ![image5](/doc/fotos/1541-rebuild-141_back.png)
