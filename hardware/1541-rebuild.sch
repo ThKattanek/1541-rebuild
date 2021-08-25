@@ -5,8 +5,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 3
 Title "1541-rebuid"
-Date "2021-08-23"
-Rev "1.4.1"
+Date "2021-08-26"
+Rev "1.4.2"
 Comp ""
 Comment1 "Erstellt von: Thorsten Kattanek"
 Comment2 "redesign and i2c added: F00K42"
@@ -222,7 +222,7 @@ F 3 "" H 10200 3000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text Notes 9500 3950 0    60   ~ 0
-Pinbelegung für KEYS\n\nPIN1: Taster1\nPIN2: Taster2\nPIN3: Taster3\nPIN4: GND (gemeinsam)
+Pinbelegung für KEYS\n\nPIN1: GND (gemeinsam)\nPIN2: Taster1\nPIN3: Taster2\nPIN4: Taster3
 $Comp
 L Connector_Generic:Conn_02x03_Odd_Even J1
 U 1 1 5AEEAD70
@@ -397,7 +397,7 @@ L Connector_Generic:Conn_02x08_Odd_Even J4
 U 1 1 5E991479
 P 2200 4700
 F 0 "J4" H 2250 5250 50  0000 C CNN
-F 1 "SD Card Modul Connector" H 2200 5150 50  0000 C CNN
+F 1 "SD Card Module Connector" H 2200 5150 50  0000 C CNN
 F 2 "Connector_PinSocket_2.54mm:PinSocket_2x08_P2.54mm_Vertical" H 2200 4700 50  0001 C CNN
 F 3 "~" H 2200 4700 50  0001 C CNN
 	1    2200 4700
@@ -751,11 +751,11 @@ Wire Wire Line
 Text Notes 3250 5150 0    60   ~ 0
 3.3V werden vom\nSD-Modul generiert
 $Comp
-L Connector_Generic:Conn_01x03 DSP_PWR1
+L Connector_Generic:Conn_01x03 Display_Power1
 U 1 1 6159A997
 P 6850 5950
-F 0 "DSP_PWR1" V 6850 6150 50  0000 L CNN
-F 1 "IO" V 6950 5950 50  0000 L CNN
+F 0 "Display_Power1" V 6850 6150 50  0000 L CNN
+F 1 "Display Power" V 6950 5950 50  0000 L CNN
 F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 6850 5950 50  0001 C CNN
 F 3 "~" H 6850 5950 50  0001 C CNN
 	1    6850 5950
