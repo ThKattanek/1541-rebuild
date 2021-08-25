@@ -310,7 +310,7 @@ Wire Wire Line
 Wire Wire Line
 	7600 3300 8750 3300
 $Comp
-L 1541-rebuild-rescue:VIA6522-floppy1541_tk IC2
+L 1541-rebuild-rescue:VIA6522-floppy1541_tk-1541-rebuild-rescue IC2
 U 1 1 5E9FB04A
 P 6450 3650
 AR Path="/5E9FB04A" Ref="IC2"  Part="1" 
