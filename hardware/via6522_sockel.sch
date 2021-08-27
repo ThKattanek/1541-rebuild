@@ -5,8 +5,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 3 3
 Title "1541-rebuid"
-Date "2021-08-23"
-Rev "1.4.1"
+Date "2021-08-26"
+Rev "1.4.2"
 Comp ""
 Comment1 "Erstellt von: Thorsten Kattanek"
 Comment2 "redesign and i2c added: F00K42"

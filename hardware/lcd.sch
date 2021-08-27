@@ -5,8 +5,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 2 3
 Title "1541-rebuid"
-Date "2021-08-23"
-Rev "1.4.1"
+Date "2021-08-26"
+Rev "1.4.2"
 Comp ""
 Comment1 "Erstellt von: Thorsten Kattanek"
 Comment2 "redesign and i2c added: F00K42"
@@ -127,5 +127,5 @@ DSP_PWR
 Wire Wire Line
 	5250 3400 5250 2900
 Text Notes 5950 5350 0    60   ~ 0
-Steckerbelegung für das I2C Display\n\nPIN_01: VDD ... +3.3V\nPIN_02: VSS ... GND\nPIN_03: I2C - SCL\nPIN_04: I2C - SDA\nPIN_05: n.c.\nPIN_06: n.c.\nPIN_07: n.c.\nPIN_08: n.c.\nPIN_09: n.c.\nPIN_10: n.c.\n
+Steckerbelegung für das I2C Display\n\nPIN_01: VDD ... +3.3V / +5V\nPIN_02: VSS ... GND\nPIN_03: I2C - SCL\nPIN_04: I2C - SDA\nPIN_05: n.c.\nPIN_06: n.c.\nPIN_07: n.c.\nPIN_08: n.c.\nPIN_09: n.c.\nPIN_10: n.c.\n
 $EndSCHEMATC
