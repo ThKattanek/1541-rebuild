@@ -4,6 +4,9 @@
 * Copyright: (c) 2020 by Thorsten Kattanek <thorsten.kattanek@gmx.de>
 * License: GPL 2
 */
+// adoption for LCD I2C handling
+// implementation: F00K42
+// last change: 28/08/2021
 
 /// CPU Clock
 #ifndef F_CPU
@@ -124,6 +127,18 @@ void reset()
     // Tasten Initialisieren
     init_keys();
 
+    // Stepper Initialisieren
+    init_stepper();
+
+    // Motor Initialisieren
+    init_motor();
+
+    // Steursignale BYTE_READY, SYNC und SOE Initialisieren
+    init_controll_signals();
+
+    // Interrupts erlauben
+    sei();
+
     // I2C initialisieren
     i2c_init();
 
@@ -165,15 +180,6 @@ void reset()
     // Startmeldung ausgeben
     show_start_message();
 
-    // Stepper Initialisieren
-    init_stepper();
-
-    // Motor Initialisieren
-    init_motor();
-
-    // Steursignale BYTE_READY, SYNC und SOE Initialisieren
-    init_controll_signals();
-
     // Image Remove
     remove_image();
 
@@ -204,9 +210,6 @@ void reset()
 
     // GUI Mode festlegen
     set_gui_mode(GUI_INFO_MODE);
-
-    // Interrupts erlauben
-    sei();
 }
 
 /////////////////////////////////////////////////////////////////////

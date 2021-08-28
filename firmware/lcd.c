@@ -3,6 +3,10 @@
 // http://www.mikrocontroller.net/articles/AVR-GCC-Tutorial/LCD-Ansteuerung
 //
 // Die Pinbelegung ist über defines in lcd-routines.h einstellbar
+//
+// adoption for portexpander PCF8574 via I2C:
+// implementation: F00K42
+// last change: 28/08/2021
 
 #include <avr/io.h>
 #include "lcd.h"
@@ -19,17 +23,23 @@ static void lcd_out( uint8_t data )
 {
     i2c_start();
     i2c_write( (PCF_I2C_ADDR<<1) | I2C_WRITE);
-    i2c_write(data | LCD_BACKLIGHT);
+    i2c_write( data );
     i2c_stop();
+}
+
+static void lcd_enable( uint8_t data )
+{
+    lcd_out( data | LCD_EN );   // Enable auf 1 setzen
+    _delay_us( LCD_ENABLE_US ); // kurze Pause
+    lcd_out( data );            // Enable auf 0 setzen
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Erzeugt einen Enable-Puls zusammen mit den Daten
-static void lcd_enable( uint8_t data )
+static void lcd_out_enable( uint8_t data, uint8_t signals )
 {
-    lcd_out( data | LCD_EN );   // Enable auf 1 setzen
-    _delay_ms( LCD_ENABLE_MS ); // kurze Pause
-    lcd_out( data );            // Enable auf 0 setzen
+    lcd_out( data | signals );            // Enable auf 0 setzen
+    lcd_enable( data | signals );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,11 +48,14 @@ void lcd_init( void )
 {
     // warten auf die Bereitschaft des LCD
     _delay_ms( LCD_BOOTUP_MS );
-    
+
+    lcd_out( 0 );   // init all PCF8574 outputs to 0
+    _delay_ms( 20 );
+
     // Soft-Reset muss 3mal hintereinander gesendet werden zur Initialisierung
-    lcd_enable( LCD_SOFT_RESET );
+    lcd_out_enable( LCD_SOFT_RESET, 0 );
     _delay_ms( LCD_SOFT_RESET_MS1 );
-    
+
     lcd_enable( LCD_SOFT_RESET );
     _delay_ms( LCD_SOFT_RESET_MS2 );
 
@@ -50,7 +63,7 @@ void lcd_init( void )
     _delay_ms( LCD_SOFT_RESET_MS3 );
 
     // 4-bit Modus aktivieren 
-    lcd_enable( LCD_SET_FUNCTION | LCD_FUNCTION_4BIT );
+    lcd_out_enable( LCD_SET_FUNCTION | LCD_FUNCTION_4BIT, 0 );
     _delay_ms( LCD_SET_4BITMODE_MS );
 
     // 4-bit Modus / 2 Zeilen / 5x7
@@ -78,13 +91,13 @@ void lcd_init( void )
 
     lcd_clear();
 }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 // Sendet ein Datenbyte an das LCD
 void lcd_data( uint8_t data )
 {
-    lcd_enable( ( data     & 0xF0) | (1<<LCD_RS) );    // zuerst die oberen, 
-    lcd_enable( ((data<<4) & 0xF0) | (1<<LCD_RS) );    // dann die unteren 4 Bit senden
+    lcd_out_enable( ( data     & 0xF0) , LCD_RS | LCD_BACKLIGHT );    // zuerst die oberen, 
+    lcd_out_enable( ((data<<4) & 0xF0) , LCD_RS | LCD_BACKLIGHT );    // dann die unteren 4 Bit senden
 
     _delay_us( LCD_WRITEDATA_US );
 }
@@ -93,8 +106,8 @@ void lcd_data( uint8_t data )
 // Sendet einen Befehl an das LCD
 void lcd_command( uint8_t data )
 {
-    lcd_enable(  data     & 0xF0 );    // zuerst die oberen, 
-    lcd_enable( (data<<4) & 0xF0 );    // dann die unteren 4 Bit senden
+    lcd_out_enable(  data     & 0xF0 , LCD_BACKLIGHT );    // zuerst die oberen, 
+    lcd_out_enable( (data<<4) & 0xF0 , LCD_BACKLIGHT );    // dann die unteren 4 Bit senden
 
     _delay_us( LCD_COMMAND_US );
 }

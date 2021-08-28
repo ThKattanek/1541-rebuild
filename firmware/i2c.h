@@ -1,5 +1,7 @@
 /* basic i2c routines for AVR */
 // header
+// implementation: F00K42
+// last change: 28/08/2021
 
 #ifndef _I2C_INCLUDE_
 #define _I2C_INCLUDE_
