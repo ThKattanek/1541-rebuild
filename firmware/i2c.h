@@ -11,6 +11,11 @@
 #define I2C_READ    (1)
 #define I2C_WRITE   (0)
 
+#define I2C_DDR     DDRC
+#define I2C_PORT    PORTC
+#define I2C_SDA_PIN PC1
+#define I2C_SCL_PIN PC0
+
 #define SCL_FREQ    (100000)
 
 #ifndef F_CPU

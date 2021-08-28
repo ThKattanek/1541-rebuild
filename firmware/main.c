@@ -124,6 +124,9 @@ void reset()
     // Tasten Initialisieren
     init_keys();
 
+    // I2C initialisieren
+    i2c_init();
+
     // LCD Display intialisieren
     lcd_init();
 

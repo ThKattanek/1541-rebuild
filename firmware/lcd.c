@@ -6,60 +6,51 @@
 
 #include <avr/io.h>
 #include "lcd.h"
+#include "i2c.h"
 #include <util/delay.h>
 
 // definition of LCD-ROW offsets .. needed for setcursor-routine
 const uint8_t lcd_rowoffset[] = { 0, 0x40, LCD_COLS, 0x40+LCD_COLS };
 
+
 ////////////////////////////////////////////////////////////////////////////////
-// Erzeugt einen Enable-Puls
-static void lcd_enable( void )
+// Sendet eine Ausgabeoperation an das LCD
+static void lcd_out( uint8_t data )
 {
-    LCD_PORT |= (1<<LCD_EN);     // Enable auf 1 setzen
-    _delay_us( LCD_ENABLE_US );  // kurze Pause
-    LCD_PORT &= ~(1<<LCD_EN);    // Enable auf 0 setzen
+    i2c_start();
+    i2c_write( (PCF_I2C_ADDR<<1) | I2C_WRITE);
+    i2c_write(data | LCD_BACKLIGHT);
+    i2c_stop();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Sendet eine 4-bit Ausgabeoperation an das LCD
-static void lcd_out( uint8_t data )
+// Erzeugt einen Enable-Puls zusammen mit den Daten
+static void lcd_enable( uint8_t data )
 {
-    data &= 0xF0;                       // obere 4 Bit maskieren
-
-    LCD_PORT &= ~(0xF0>>(4-LCD_DB));    // Maske löschen
-    LCD_PORT |= (data>>(4-LCD_DB));     // Bits setzen
-    lcd_enable();
+    lcd_out( data | LCD_EN );   // Enable auf 1 setzen
+    _delay_ms( LCD_ENABLE_MS ); // kurze Pause
+    lcd_out( data );            // Enable auf 0 setzen
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialisierung: muss ganz am Anfang des Programms aufgerufen werden.
 void lcd_init( void )
 {
-    // verwendete Pins auf Ausgang schalten
-    uint8_t pins = (0x0F << LCD_DB) |           // 4 Datenleitungen
-                   (1<<LCD_RS) |                // R/S Leitung
-                   (1<<LCD_EN);                 // Enable Leitung
-    LCD_DDR |= pins;
-
-    // initial alle Ausgänge auf Null
-    LCD_PORT &= ~pins;
-
     // warten auf die Bereitschaft des LCD
     _delay_ms( LCD_BOOTUP_MS );
     
     // Soft-Reset muss 3mal hintereinander gesendet werden zur Initialisierung
-    lcd_out( LCD_SOFT_RESET );
+    lcd_enable( LCD_SOFT_RESET );
     _delay_ms( LCD_SOFT_RESET_MS1 );
-
-    lcd_enable();
+    
+    lcd_enable( LCD_SOFT_RESET );
     _delay_ms( LCD_SOFT_RESET_MS2 );
 
-    lcd_enable();
+    lcd_enable( LCD_SOFT_RESET );
     _delay_ms( LCD_SOFT_RESET_MS3 );
 
     // 4-bit Modus aktivieren 
-    lcd_out( LCD_SET_FUNCTION |
-             LCD_FUNCTION_4BIT );
+    lcd_enable( LCD_SET_FUNCTION | LCD_FUNCTION_4BIT );
     _delay_ms( LCD_SET_4BITMODE_MS );
 
     // 4-bit Modus / 2 Zeilen / 5x7
@@ -68,16 +59,22 @@ void lcd_init( void )
                  LCD_FUNCTION_2LINE |
                  LCD_FUNCTION_5X7 );
 
-    // Display ein / Cursor aus / Blinken aus
+    // Display aus
     lcd_command( LCD_SET_DISPLAY |
-                 LCD_DISPLAY_ON |
+                 LCD_DISPLAY_OFF |
                  LCD_CURSOR_OFF |
-                 LCD_BLINKING_OFF); 
+                 LCD_BLINKING_OFF);
 
     // Cursor inkrement / kein Scrollen
     lcd_command( LCD_SET_ENTRY |
                  LCD_ENTRY_INCREASE |
                  LCD_ENTRY_NOSHIFT );
+
+    // Display ein / Cursor aus / Blinken aus
+    lcd_command( LCD_SET_DISPLAY |
+                 LCD_DISPLAY_ON |
+                 LCD_CURSOR_OFF |
+                 LCD_BLINKING_OFF);
 
     lcd_clear();
 }
@@ -86,10 +83,8 @@ void lcd_init( void )
 // Sendet ein Datenbyte an das LCD
 void lcd_data( uint8_t data )
 {
-    LCD_PORT |= (1<<LCD_RS);    // RS auf 1 setzen
-
-    lcd_out( data );            // zuerst die oberen, 
-    lcd_out( data<<4 );         // dann die unteren 4 Bit senden
+    lcd_enable( ( data     & 0xF0) | (1<<LCD_RS) );    // zuerst die oberen, 
+    lcd_enable( ((data<<4) & 0xF0) | (1<<LCD_RS) );    // dann die unteren 4 Bit senden
 
     _delay_us( LCD_WRITEDATA_US );
 }
@@ -98,10 +93,8 @@ void lcd_data( uint8_t data )
 // Sendet einen Befehl an das LCD
 void lcd_command( uint8_t data )
 {
-    LCD_PORT &= ~(1<<LCD_RS);    // RS auf 0 setzen
-
-    lcd_out( data );             // zuerst die oberen, 
-    lcd_out( data<<4 );           // dann die unteren 4 Bit senden
+    lcd_enable(  data     & 0xF0 );    // zuerst die oberen, 
+    lcd_enable( (data<<4) & 0xF0 );    // dann die unteren 4 Bit senden
 
     _delay_us( LCD_COMMAND_US );
 }
