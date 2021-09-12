@@ -6,7 +6,8 @@
 //
 // adoption for portexpander PCF8574 via I2C:
 // implementation: F00K42
-// last change: 28/08/2021
+// last change: 03/09/2021
+// todo: search for I2C device-adress between 0x20-0x27, 0x38-0x3f
 
 #include <avr/io.h>
 #include "lcd.h"
@@ -36,10 +37,10 @@ static void lcd_enable( uint8_t data )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Erzeugt einen Enable-Puls zusammen mit den Daten
-static void lcd_out_enable( uint8_t data, uint8_t signals )
+static void lcd_out_enable( uint8_t data )
 {
-    lcd_out( data | signals );            // Enable auf 0 setzen
-    lcd_enable( data | signals );
+    lcd_out( data );        // Enable auf 0 setzen
+    lcd_enable( data );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,7 +54,7 @@ void lcd_init( void )
     _delay_ms( 20 );
 
     // Soft-Reset muss 3mal hintereinander gesendet werden zur Initialisierung
-    lcd_out_enable( LCD_SOFT_RESET, 0 );
+    lcd_out_enable( LCD_SOFT_RESET );
     _delay_ms( LCD_SOFT_RESET_MS1 );
 
     lcd_enable( LCD_SOFT_RESET );
@@ -63,7 +64,7 @@ void lcd_init( void )
     _delay_ms( LCD_SOFT_RESET_MS3 );
 
     // 4-bit Modus aktivieren 
-    lcd_out_enable( LCD_SET_FUNCTION | LCD_FUNCTION_4BIT, 0 );
+    lcd_out_enable( LCD_SET_FUNCTION | LCD_FUNCTION_4BIT );
     _delay_ms( LCD_SET_4BITMODE_MS );
 
     // 4-bit Modus / 2 Zeilen / 5x7
@@ -96,8 +97,8 @@ void lcd_init( void )
 // Sendet ein Datenbyte an das LCD
 void lcd_data( uint8_t data )
 {
-    lcd_out_enable( ( data     & 0xF0) , LCD_RS | LCD_BACKLIGHT );    // zuerst die oberen, 
-    lcd_out_enable( ((data<<4) & 0xF0) , LCD_RS | LCD_BACKLIGHT );    // dann die unteren 4 Bit senden
+    lcd_out_enable( ( data     & 0xF0) | LCD_RS | LCD_BACKLIGHT );    // zuerst die oberen, 
+    lcd_out_enable( ((data<<4) & 0xF0) | LCD_RS | LCD_BACKLIGHT );    // dann die unteren 4 Bit senden
 
     _delay_us( LCD_WRITEDATA_US );
 }
@@ -106,8 +107,8 @@ void lcd_data( uint8_t data )
 // Sendet einen Befehl an das LCD
 void lcd_command( uint8_t data )
 {
-    lcd_out_enable(  data     & 0xF0 , LCD_BACKLIGHT );    // zuerst die oberen, 
-    lcd_out_enable( (data<<4) & 0xF0 , LCD_BACKLIGHT );    // dann die unteren 4 Bit senden
+    lcd_out_enable( ( data     & 0xF0) | LCD_BACKLIGHT );    // zuerst die oberen, 
+    lcd_out_enable( ((data<<4) & 0xF0) | LCD_BACKLIGHT );    // dann die unteren 4 Bit senden
 
     _delay_us( LCD_COMMAND_US );
 }
@@ -147,7 +148,9 @@ void lcd_setcursor( uint8_t x, uint8_t y )
 void lcd_string( const char *data )
 {
     while( *data != '\0' )
+    {
         lcd_data( *data++ );
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

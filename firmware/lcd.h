@@ -44,7 +44,6 @@
 // LCD Ausführungszeiten (MS=Millisekunden, US=Mikrosekunden)
 
 #define LCD_BOOTUP_MS           50 	// 15
-#define LCD_ENABLE_MS           5
 #define LCD_ENABLE_US           20	// 20
 #define LCD_WRITEDATA_US        46	// 46
 #define LCD_COMMAND_US          42	// 42
@@ -113,13 +112,13 @@ void lcd_command( uint8_t data );
 // Zur Verwendung in lcd_command
 
 // Clear Display -------------- 0b00000001
-#define LCD_CLEAR_DISPLAY       0x01
+#define LCD_CLEAR_DISPLAY       (1<<0)
 
 // Cursor Home ---------------- 0b0000001x
-#define LCD_CURSOR_HOME         0x02
+#define LCD_CURSOR_HOME         (1<<1)
 
 // Set Entry Mode ------------- 0b000001xx
-#define LCD_SET_ENTRY           0x04
+#define LCD_SET_ENTRY           (1<<2)
 
 #define LCD_ENTRY_DECREASE      0x00
 #define LCD_ENTRY_INCREASE      0x02
@@ -127,7 +126,7 @@ void lcd_command( uint8_t data );
 #define LCD_ENTRY_SHIFT         0x01
 
 // Set Display ---------------- 0b00001xxx
-#define LCD_SET_DISPLAY         0x08
+#define LCD_SET_DISPLAY         (1<<3)
 
 #define LCD_DISPLAY_OFF         0x00
 #define LCD_DISPLAY_ON          0x04
@@ -137,7 +136,7 @@ void lcd_command( uint8_t data );
 #define LCD_BLINKING_ON         0x01
 
 // Set Shift ------------------ 0b0001xxxx
-#define LCD_SET_SHIFT           0x10
+#define LCD_SET_SHIFT           (1<<4)
 
 #define LCD_CURSOR_MOVE         0x00
 #define LCD_DISPLAY_SHIFT       0x08
@@ -145,7 +144,7 @@ void lcd_command( uint8_t data );
 #define LCD_SHIFT_RIGHT         0x04
 
 // Set Function --------------- 0b001xxxxx
-#define LCD_SET_FUNCTION        0x20
+#define LCD_SET_FUNCTION        (1<<5)
 
 #define LCD_FUNCTION_4BIT       0x00
 #define LCD_FUNCTION_8BIT       0x10
@@ -157,18 +156,9 @@ void lcd_command( uint8_t data );
 #define LCD_SOFT_RESET          0x30
 
 // Set CG RAM Address --------- 0b01xxxxxx  (Character Generator RAM)
-#define LCD_SET_CGADR           0x40
-
-#define LCD_GC_CHAR0            0
-#define LCD_GC_CHAR1            1
-#define LCD_GC_CHAR2            2
-#define LCD_GC_CHAR3            3
-#define LCD_GC_CHAR4            4
-#define LCD_GC_CHAR5            5
-#define LCD_GC_CHAR6            6
-#define LCD_GC_CHAR7            7
+#define LCD_SET_CGADR           (1<<6)
 
 // Set DD RAM Address --------- 0b1xxxxxxx  (Display Data RAM)
-#define LCD_SET_DDADR           0x80
+#define LCD_SET_DDADR           (1<<7)
 
 #endif
