@@ -5,21 +5,18 @@ done:
 - rerouting the PCB to be able to use I2C Displays instead of bitbanging to LCD. opens the world to OLED and even onscreen displays.
 - changing of firmware (pin assignments) 
 - implementation of i2c routines for displays
+- updated BOM
+- updated documentation for PCB 1.4.2
 
 new I2C-Version (1.4.2) of the PCB created:
-- all Pin assigns are identical to 1.4.0 (!) -> LCD Displays can still be used!
+- LCD Displays can still be used
 - I2C Pins share 4 pins with LCD-Display Header -> only Software reconfiguration needed
 - adopted Software (firmware >= 1.3.2) needed (due to different Atmega-Ports used)
 - added a capacitor for better power stability
 
-layout prepared in KiCad:
-
-![image4](/doc/fotos/1541-rebuild-142_front.png)
-![image5](/doc/fotos/1541-rebuild-142_back.png)
-
-images of handwired new pin-assignments of Atmel chip:
-![image6](/doc/fotos/handwired_rev_1.4.2/I2C_handwired.jpg)
-![image7](/doc/fotos/handwired_rev_1.4.2/I2C_firmware132.jpg)
+images of new PCB (1.4.2):
+![image4](/doc/fotos/platine_rev_1.4.2/20210911_204849_kl.jpg)
+![image5](/doc/fotos/platine_rev_1.4.2/20210911_210521_kl.jpg)
 
 this type of I2C-displays is currently supported
 LCD 16\*2 with PCF8574T port-expander
