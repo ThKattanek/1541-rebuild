@@ -12,7 +12,8 @@ void i2c_init(void)
 //    I2C_PORT |= (1<<I2C_SCL_PIN) | (1<<I2C_SDA_PIN);
 
     TWSR = (0<<TWPS1) | (0<<TWPS0); //set presca1er bits to zero = 1
-    //    TWBR = 0x70; //SCL frequency 100Khz @ 24Mhz CPU
+    //    TWBR = 112; //SCL frequency 100Khz @ 24Mhz CPU
+    //    TWBR = 22; //SCL frequency 400Khz @ 24Mhz CPU
     TWBR = (uint8_t) ((F_CPU/(2*SCL_FREQ))-8);
 }
 

@@ -20,15 +20,6 @@
 // Pinbelegung für das LCD
 // Anschluss über PCF8574 -> Signaldefinition
 
-// PCF8574T  = 0x20
-// PCF8574AT = 0x38
-
-#define PCF_I2C_BASE    (0x20)      // Basis I2C-Adresse vom PCF8574T
-#define LCD_I2C_A0      (1)         // LCD Adresse per Jumper/Lötauge
-#define LCD_I2C_A1      (1)         // LCD Adresse per Jumper/Lötauge
-#define LCD_I2C_A2      (1)         // LCD Adresse per Jumper/Lötauge
-#define PCF_I2C_ADDR    (PCF_I2C_BASE | (LCD_I2C_A0<<0) | (LCD_I2C_A1<<1) | (LCD_I2C_A2<<2))
-
 #define LCD_RS          (1<<0)      // (RS: 1=Data, 0=Command)
 #define LCD_RW          (1<<1)
 #define LCD_EN          (1<<2)      // (EN: 1-Impuls für Daten)
