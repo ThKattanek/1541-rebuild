@@ -8,15 +8,19 @@
 
 void i2c_init(void)
 {
-    TWSR = 0x00; //set presca1er bits to zero = 1
+    // activate Pullups on SCL & SDA
+    I2C_PORT = (1<<I2C_SCL_PIN) | (1<<I2C_SDA_PIN);
+
+    TWSR = (0<<TWPS1) | (0<<TWPS0); //set presca1er bits to zero = 1
     //    TWBR = 0x70; //SCL frequency 100Khz @ 24Mhz CPU
     TWBR = (uint8_t) ((F_CPU/(2*SCL_FREQ))-8);
 }
 
-void i2c_start(void)
+uint8_t i2c_start(void)
 {
     TWCR = ((1<<TWINT) | (1<<TWEN)) | (1<<TWSTA);
     while (!(TWCR & (1<<TWINT)));
+    return (uint8_t) (TWSR & 0xF8);
 }
 
 void i2c_stop(void)
@@ -26,11 +30,12 @@ void i2c_stop(void)
     TWCR = 0;
 }
 
-void i2c_write(uint8_t data)
+uint8_t i2c_write(uint8_t data)
 {
     TWDR = data;
     TWCR = ((1<<TWINT) | (1<<TWEN));
     while (!(TWCR & (1 <<TWINT)));
+    return (uint8_t) (TWSR & 0xF8);
 }
 
 uint8_t i2c_read(uint8_t ack)
