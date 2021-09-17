@@ -63,7 +63,7 @@ static uint8_t i2c_test(uint8_t addr)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialisierung: muss ganz am Anfang des Programms aufgerufen werden.
-void lcd_init( void )
+uint8_t lcd_init( void )
 {
     // find display
     DEV_I2C_ADDR = 0;
@@ -79,7 +79,7 @@ void lcd_init( void )
     }
     if (0 == DEV_I2C_ADDR)
     {
-        reset();
+        return 0;
     }
 
     // ---
@@ -127,6 +127,7 @@ void lcd_init( void )
                  LCD_BLINKING_OFF);
 
     lcd_clear();
+    return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

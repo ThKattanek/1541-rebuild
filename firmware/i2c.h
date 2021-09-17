@@ -19,7 +19,7 @@
 #define I2C_SDA_PIN PC1
 #define I2C_SCL_PIN PC0
 
-#define SCL_FREQ    (100000)
+#define SCL_FREQ    (400000)
 
 #ifndef F_CPU
 #define F_CPU 24000000UL

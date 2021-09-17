@@ -143,7 +143,10 @@ void reset()
     i2c_init();
 
     // LCD Display intialisieren
-    lcd_init();
+    if (!lcd_init())
+    {
+        reset();
+    }
 
     // eigene Zeichen im Display setzen
     for(int i=0; i<num_of_customchars; ++i)
