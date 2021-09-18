@@ -6,8 +6,7 @@
 //
 // adoption for portexpander PCF8574 via I2C:
 // implementation: F00K42
-// last change: 03/09/2021
-// todo: search for I2C device-adress between 0x20-0x27, 0x38-0x3f
+// last change: 17/09/2021
 
 #include <avr/io.h>
 #include "lcd.h"
@@ -48,16 +47,16 @@ static void lcd_out_enable( uint8_t data )
 // Testet eine I2C-Addresse auf Antwort
 static uint8_t i2c_test(uint8_t addr)
 {
+    uint8_t ret = 0;
     if ( 0x08 == i2c_start() )
     {
         if ( 0x18 == i2c_write( (addr<<1) | I2C_WRITE ) )
         {
-            i2c_stop();
-            return 1;
+            ret = 1;
         }
     }
     i2c_stop();
-    return 0;
+    return ret;
 }
 
 

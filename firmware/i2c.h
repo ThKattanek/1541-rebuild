@@ -1,7 +1,7 @@
 /* basic i2c routines for AVR */
 // header
 // implementation: F00K42
-// last change: 28/08/2021
+// last change: 17/09/2021
 
 #ifndef _I2C_INCLUDE_
 #define _I2C_INCLUDE_
@@ -19,7 +19,7 @@
 #define I2C_SDA_PIN PC1
 #define I2C_SCL_PIN PC0
 
-#define SCL_FREQ    (400000)
+#define SCL_FREQ    (100000)
 
 #ifndef F_CPU
 #define F_CPU 24000000UL
