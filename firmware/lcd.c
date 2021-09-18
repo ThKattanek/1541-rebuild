@@ -13,14 +13,33 @@
 #include "i2c.h"
 #include <util/delay.h>
 
+extern uint8_t DEV_I2C_ADDR;
+
 // definition of LCD-ROW offsets .. needed for setcursor-routine
 const uint8_t lcd_rowoffset[] = { 0, 0x40, LCD_COLS, 0x40+LCD_COLS };
 
-uint8_t DEV_I2C_ADDR;
-
 ////////////////////////////////////////////////////////////////////////////////
 // Sendet eine Ausgabeoperation an das LCD
-static void lcd_out( uint8_t data )
+void par_lcd_out( uint8_t data )
+{
+    uint8_t parout = PAR_LCD_PORT & (uint8_t) (~((1<<PAR_LCD_EN) | (1<<PAR_LCD_RS) | (0xF0>>(4-PAR_LCD_DB))));
+    if (data & LCD_EN)
+    {
+        parout |= (1<<PAR_LCD_EN);      // Enable auf 1 setzen
+    }
+    if (data & LCD_RS)
+    {
+        parout |= (1<<PAR_LCD_RS);      // RS auf 1 setzen
+    }
+
+    data &= 0xF0;                       // obere 4 Bit maskieren
+    parout |= (data>>(4-PAR_LCD_DB));   // Bits setzen
+
+    PAR_LCD_PORT = parout;
+}
+
+// --------------------------
+void pcf_lcd_out( uint8_t data )
 {
     (void)i2c_start();
     (void)i2c_write( (DEV_I2C_ADDR<<1) | I2C_WRITE);
@@ -28,6 +47,9 @@ static void lcd_out( uint8_t data )
     i2c_stop();
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Erzeugt einen Enable-Puls zusammen mit den Daten
 static void lcd_enable( uint8_t data )
 {
     lcd_out( data | LCD_EN );   // Enable auf 1 setzen
@@ -43,16 +65,24 @@ static void lcd_out_enable( uint8_t data )
     lcd_enable( data );
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Initialisierung: muss ganz am Anfang des Programms aufgerufen werden.
 void lcd_setup( void )
 {
+    if (0 == DEV_I2C_ADDR)
+    {
+        // verwendete Pins auf Ausgang schalten
+        uint8_t pins = (0b00001111 << PAR_LCD_DB) | // 4 Datenleitungen
+                        (1 << PAR_LCD_RS) |         // R/S Leitung
+                        (1 << PAR_LCD_EN);          // Enable Leitung
+
+        PAR_LCD_DDR |= pins;
+    }
     // ---
     // warten auf die Bereitschaft des LCD
     _delay_ms( LCD_BOOTUP_MS );
 
-    lcd_out( 0 );   // init all PCF8574 outputs to 0
+    lcd_out( 0 );   // init all LCD outputs to 0
     _delay_ms( 20 );
 
     // Soft-Reset muss 3mal hintereinander gesendet werden zur Initialisierung
@@ -96,7 +126,7 @@ void lcd_setup( void )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Sendet ein Datenbyte an das LCD
+// Sendet ein Datenbyte an das LCD via pcf8574 output
 void lcd_data( uint8_t data )
 {
     lcd_out_enable( ( data     & 0xF0) | LCD_RS | LCD_BACKLIGHT );    // zuerst die oberen, 
@@ -106,7 +136,7 @@ void lcd_data( uint8_t data )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Sendet einen Befehl an das LCD
+// Sendet einen Befehl an das LCD via pcf8574 output
 void lcd_command( uint8_t data )
 {
     lcd_out_enable( ( data     & 0xF0) | LCD_BACKLIGHT );    // zuerst die oberen, 

@@ -13,6 +13,8 @@
 #define F_CPU 24000000UL
 #endif
 
+#define _EXTERN_ 
+
 #include "./main.h"
 #include "display.h"
 #include <stdio.h>
@@ -39,13 +41,6 @@ const uint8_t customchars[][8] =
 
 #define num_of_customchars  (sizeof(customchars)/sizeof(customchars[0]))
 
-enum {
-    fb_lcd_more_top_char = 0,
-    fb_lcd_more_down_char,
-    fb_lcd_cursor_char,
-    fb_lcd_dir_char,
-    fb_lcd_disk_char
- };
 
 // ---
 
@@ -71,24 +66,29 @@ int main(void)
 
         /// Menüs einrichten
         /// Hauptmenü
-        MENU_ENTRY main_menu_entrys[] = {{"Disk Image",M_IMAGE,ENTRY_MENU,0,&image_menu},{"Settings",M_SETTINGS,ENTRY_MENU,0,&settings_menu},{"Info",M_INFO,ENTRY_MENU,0,&info_menu}};
+        MENU_ENTRY main_menu_entrys[] = {{"Disk Image",M_IMAGE,ENTRY_MENU,   0,&image_menu},
+                                         {"Settings",  M_SETTINGS,ENTRY_MENU,0,&settings_menu},
+                                         {"Info",      M_INFO,ENTRY_MENU,    0,&info_menu}};
         /// Image Menü
-        MENU_ENTRY image_menu_entrys[] = {{"Insert Image",M_INSERT_IMAGE}, {"Remove Image",M_REMOVE_IMAGE}, {"WriteProtect",M_WP_IMAGE,ENTRY_ONOFF,1}, {"New Image",M_NEW_IMAGE}, {"Save Image",M_SAVE_IMAGE}};
+        MENU_ENTRY image_menu_entrys[] = {{"Insert Image",M_INSERT_IMAGE},
+                                          {"Remove Image",M_REMOVE_IMAGE},
+                                          {"WriteProtect",M_WP_IMAGE,ENTRY_ONOFF,1},
+                                          {"New Image",   M_NEW_IMAGE},
+                                          {"Save Image",  M_SAVE_IMAGE}};
         /// Setting Menü
-        MENU_ENTRY settings_menu_entrys[] = {{"Pin PB2",M_PIN_PB2, ENTRY_ONOFF, 0}, {"Pin PB3",M_PIN_PB3, ENTRY_ONOFF, 0}, {"Restart",M_RESTART}};
+        MENU_ENTRY settings_menu_entrys[] = {{"Pin PB2",M_PIN_PB2, ENTRY_ONOFF, 0},
+                                             {"Pin PB3",M_PIN_PB3, ENTRY_ONOFF, 0},
+                                             {"Restart",M_RESTART}};
         /// Info Menü
-        MENU_ENTRY info_menu_entrys[] = {{"Version",M_VERSION_INFO}, {"SD Card Info",M_SDCARD_INFO}};
+        MENU_ENTRY info_menu_entrys[] = {{"Version",     M_VERSION_INFO},
+                                         {"SD Card Info",M_SDCARD_INFO}};
 
-        main_menu.lcd_cursor_char = fb_lcd_cursor_char;  // 126 Standard Pfeil
         menu_init(&main_menu, main_menu_entrys, 3, LCD_LINE_SIZE, LCD_LINE_COUNT);
 
-        image_menu.lcd_cursor_char = fb_lcd_cursor_char;  // 126 Standard Pfeil
         menu_init(&image_menu, image_menu_entrys, 5, LCD_LINE_SIZE, LCD_LINE_COUNT);
 
-        settings_menu.lcd_cursor_char = fb_lcd_cursor_char;  // 126 Standard Pfeil
         menu_init(&settings_menu, settings_menu_entrys, 3, LCD_LINE_SIZE, LCD_LINE_COUNT);
 
-        info_menu.lcd_cursor_char = fb_lcd_cursor_char;  // 126 Standard Pfeil
         menu_init(&info_menu, info_menu_entrys, 2, LCD_LINE_SIZE, LCD_LINE_COUNT);
 
         menu_set_root(&main_menu);
@@ -125,9 +125,6 @@ void reset()
         reset();
     }
 
-    // Tasten Initialisieren
-    init_keys();
-
     // Stepper Initialisieren
     init_stepper();
 
@@ -145,6 +142,16 @@ void reset()
     {
         reset();
     }
+
+    //@TODO move to display.c - run only when LCD is detected
+    // eigene Zeichen im LCD Display setzen
+    for(int i=0; i<num_of_customchars; ++i)
+    {
+        lcd_generatechar(i, customchars[i]);
+    }
+
+    // Tasten Initialisieren
+    init_keys();
 
     // Prüfen on Button2 gedrückt ist
     if(get_key2())
@@ -568,31 +575,31 @@ void filebrowser_update(uint8_t key_code)
     switch (key_code)
     {
     case KEY0_DOWN:
-        if(fb_lcd_cursor_pos > 0)
+        if(fb_cursor_pos > 0)
         {
-            --fb_lcd_cursor_pos;
+            --fb_cursor_pos;
             filebrowser_refresh();
         }
         else
         {
-            if(fb_lcd_window_pos > 0)
+            if(fb_window_pos > 0)
             {
-                --fb_lcd_window_pos;
+                --fb_window_pos;
                 filebrowser_refresh();
             }
         }
         break;
     case KEY1_DOWN:
-        if((fb_lcd_cursor_pos < LCD_LINE_COUNT-1) && (fb_lcd_cursor_pos < fb_dir_entry_count-1))
+        if((fb_cursor_pos < LCD_LINE_COUNT-1) && (fb_cursor_pos < fb_dir_entry_count-1))
         {
-            ++fb_lcd_cursor_pos;
+            ++fb_cursor_pos;
             filebrowser_refresh();
         }
         else
         {
-            if(fb_lcd_window_pos < fb_dir_entry_count - LCD_LINE_COUNT)
+            if(fb_window_pos < fb_dir_entry_count - LCD_LINE_COUNT)
             {
-                ++fb_lcd_window_pos;
+                ++fb_window_pos;
                 filebrowser_refresh();
             }
         }
@@ -603,17 +610,17 @@ void filebrowser_update(uint8_t key_code)
 
         close_disk_image(fd);
 
-        if(fb_dir_entry[fb_lcd_cursor_pos].attributes & FAT_ATTRIB_DIR)
+        if(fb_dir_entry[fb_cursor_pos].attributes & FAT_ATTRIB_DIR)
         {
             // Eintrag ist ein Verzeichnis
-            change_dir(fb_dir_entry[fb_lcd_cursor_pos].long_name);
-            fb_lcd_cursor_pos = 0;
-            fb_lcd_window_pos = 0;
+            change_dir(fb_dir_entry[fb_cursor_pos].long_name);
+            fb_cursor_pos = 0;
+            fb_window_pos = 0;
             filebrowser_refresh();
             return;
         }
 
-        fd = open_disk_image(fs, &fb_dir_entry[fb_lcd_cursor_pos], &akt_image_type);
+        fd = open_disk_image(fs, &fb_dir_entry[fb_cursor_pos], &akt_image_type);
 
         if(akt_image_type == UNDEF_IMAGE)
         {
@@ -631,7 +638,7 @@ void filebrowser_update(uint8_t key_code)
             return ;
         }
 
-        strcpy(image_filename, fb_dir_entry[fb_lcd_cursor_pos].long_name);
+        strcpy(image_filename, fb_dir_entry[fb_cursor_pos].long_name);
 
         read_disk_track(fd,akt_image_type,akt_half_track>>1,gcr_track, &gcr_track_length);
         akt_track_pos = 0;
@@ -681,8 +688,8 @@ void filebrowser_update(uint8_t key_code)
                 }
             }
 
-            display_setcursor(2,fb_lcd_cursor_pos);
-            display_print(fb_dir_entry[fb_lcd_cursor_pos].long_name,fb_line_scroll_pos, LCD_COLS-3 );
+            display_setcursor(2,fb_cursor_pos);
+            display_print(fb_dir_entry[fb_cursor_pos].long_name,fb_line_scroll_pos, LCD_COLS-3 );
         }
         else
         {
@@ -694,18 +701,18 @@ void filebrowser_update(uint8_t key_code)
 void filebrowser_refresh()
 {
     display_clear();
-    seek_to_dir_entry(fb_lcd_window_pos);
+    seek_to_dir_entry(fb_window_pos);
 
     uint8_t i=0;
 
-    while((i<LCD_LINE_COUNT) && ((fb_lcd_window_pos + i) < fb_dir_entry_count))
+    while((i<LCD_LINE_COUNT) && ((fb_window_pos + i) < fb_dir_entry_count))
     {
         fat_read_dir(dd, &fb_dir_entry[i]);   // nächsten Directory Entry holen
         if(!(fb_dir_entry[i].attributes & (FAT_ATTRIB_SYSTEM | FAT_ATTRIB_VOLUME | FAT_ATTRIB_HIDDEN)))
         {
             display_setcursor(1,i);
             if(fb_dir_entry[i].attributes & FAT_ATTRIB_DIR)
-                display_data(fb_lcd_dir_char);
+                display_data(display_dir_char);
             else
                 display_data(' ');
 
@@ -715,24 +722,24 @@ void filebrowser_refresh()
         }
     }
 
-    display_setcursor(0,fb_lcd_cursor_pos);
-    display_data(fb_lcd_cursor_char);
+    display_setcursor(0,fb_cursor_pos);
+    display_data(display_cursor_char);
 
 
-    if(fb_lcd_window_pos > 0)
+    if(fb_window_pos > 0)
     {
         display_setcursor(LCD_COLS-1,0);
-        display_data(fb_lcd_more_top_char);
+        display_data(display_more_top_char);
     }
 
-    if((fb_lcd_window_pos + LCD_LINE_COUNT) < fb_dir_entry_count)
+    if((fb_window_pos + LCD_LINE_COUNT) < fb_dir_entry_count)
     {
         display_setcursor(LCD_COLS-1, LCD_LINE_COUNT-1);
-        display_data(fb_lcd_more_down_char);
+        display_data(display_more_down_char);
     }
 
     // Für Scrollenden Filename
-    int8_t var = (int8_t)strlen(fb_dir_entry[fb_lcd_cursor_pos].long_name) - (LCD_COLS-3);
+    int8_t var = (int8_t)strlen(fb_dir_entry[fb_cursor_pos].long_name) - (LCD_COLS-3);
     if(var < 0)
         fb_current_line_offset = 0;
     else

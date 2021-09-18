@@ -13,8 +13,9 @@
 #include <avr/pgmspace.h>
 
 // Für die LCD Ansteuerung
-#include "./lcd.h"
-#include "./i2c.h"
+#include "display.h"
+#include "lcd.h"
+#include "i2c.h"
 
 // SDCard Lib
 #include "./sd_card_lib/fat.h"
@@ -238,8 +239,8 @@ uint8_t gui_line_scroll_end_begin_wait;
 
 // Alles für den Filebrowser
 uint16_t fb_dir_entry_count=0;      // Anzahl der Einträge im aktuellen Direktory
-uint8_t fb_lcd_cursor_pos=0;        // Position des Cursors auf dem LCD Display
-uint8_t fb_lcd_window_pos=0;        // Position des Anzeigebereichs innerhablb der Menüeinträge
+uint8_t fb_cursor_pos=0;        // Position des Cursors auf dem LCD Display
+uint8_t fb_window_pos=0;        // Position des Anzeigebereichs innerhablb der Menüeinträge
 
 uint8_t fb_current_line_offset = 0;         // >0 dann ist der Name länger als die maximale Anzeigelaenge
 uint8_t fb_line_scroll_pos = 0;             // Kann zwischen 0 und fb_current_line_offset liegen

@@ -6,6 +6,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+uint8_t DEV_I2C_ADDR;
+
 void i2c_init(void)
 {
     TWSR = (0<<TWPS1) | (0<<TWPS0); //set presca1er bits to zero = 1

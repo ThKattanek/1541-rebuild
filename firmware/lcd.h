@@ -3,7 +3,7 @@
 //
 // adoption for portexpander PCF8574 via I2C:
 // implementation: F00K42
-// last change: 17/09/2021
+// last change: 18/09/2021
 
 #ifndef LCD_ROUTINES_H
 #define LCD_ROUTINES_H
@@ -18,18 +18,21 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Pinbelegung für das LCD
-// Anschluss über PCF8574 -> Signaldefinition
 
 #define LCD_RS          (1<<0)      // (RS: 1=Data, 0=Command)
 #define LCD_RW          (1<<1)
 #define LCD_EN          (1<<2)      // (EN: 1-Impuls für Daten)
 #define LCD_BACKLIGHT   (1<<3)
 
-//  LCD DB4-DB7 <-->  PCF Bits 4-7
-#define LCD_D4          (1<<4)
-#define LCD_D5          (1<<5)
-#define LCD_D6          (1<<6)
-#define LCD_D7          (1<<7)
+// --------------------------------------------------
+// -- 10 pin parallel Port pinout -------------------
+#define PAR_LCD_PORT        PORTC
+#define PAR_LCD_DDR         DDRC
+#define PAR_LCD_DB          PC0
+
+#define PAR_LCD_RS          PC4         // (RS: 1=Data, 0=Command)
+#define PAR_LCD_EN          PC5         // (EN: 1-Impuls für Daten)
+// --------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
 // LCD Ausführungszeiten (MS=Millisekunden, US=Mikrosekunden)
@@ -57,6 +60,18 @@
 // LCD 20x4
 // #define LCD_COLS (20)
 // #define LCD_ROWS (4)
+
+////////////////////////////////////////////////////////////////////////////////
+
+#ifndef _EXTERN_
+#define _EXTERN_ extern
+#endif
+
+// function pointer to be used later
+_EXTERN_ void (*lcd_out)(uint8_t);
+
+void par_lcd_out( uint8_t data );
+void pcf_lcd_out( uint8_t data );
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialisierung: muss ganz am Anfang des Programms aufgerufen werden.
