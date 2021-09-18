@@ -35,4 +35,6 @@ uint8_t i2c_write(uint8_t data);
 
 uint8_t i2c_read(uint8_t ack);
 
+uint8_t i2c_test(uint8_t addr);
+
 #endif

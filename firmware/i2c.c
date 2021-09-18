@@ -42,3 +42,19 @@ uint8_t i2c_read(uint8_t ack)
     while ( !(TWCR & (1 <<TWINT)));
     return TWDR;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Testet eine I2C-Addresse auf Antwort
+uint8_t i2c_test(uint8_t addr)
+{
+    uint8_t ret = 0;
+    if ( 0x08 == i2c_start() )
+    {
+        if ( 0x18 == i2c_write( (addr<<1) | I2C_WRITE ) )
+        {
+            ret = 1;
+        }
+    }
+    i2c_stop();
+    return ret;
+}

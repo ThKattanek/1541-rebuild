@@ -1,4 +1,8 @@
+/* menu structure handling */
+// last change: 18/09/2021
+
 #include "./menu.h"
+#include "display.h"
 #include "./gui_constants.h"
 
 static MENU_STRUCT *current_menu;
@@ -155,50 +159,50 @@ void menu_refresh()
 #endif
 {
     // Menu Neu Zeichnen
-    lcd_clear();
+    display_clear();
 
     for(int i=0; i<current_menu->lcd_row_count && i<current_menu->entry_count; i++)
     {
-        lcd_setcursor(1,i);
-        lcd_string(current_menu->entry_list[i+current_menu->lcd_window_pos].name);
+        display_setcursor(1,i);
+        display_string(current_menu->entry_list[i+current_menu->lcd_window_pos].name);
 
         switch(current_menu->entry_list[i+current_menu->lcd_window_pos].type)
         {
         case ENTRY_ONOFF:
                 if(current_menu->entry_list[i+current_menu->lcd_window_pos].var1)
-                    lcd_string(" On");
+                    display_string(" On");
                 else
-                    lcd_string(" Off");
+                    display_string(" Off");
             break;
         case ENTRY_BIN:
                 if(current_menu->entry_list[i+current_menu->lcd_window_pos].var1)
-                    lcd_string(" 0");
+                    display_string(" 0");
                 else
-                    lcd_string(" 1");
+                    display_string(" 1");
             break;
        case ENTRY_BOOL:
                 if(current_menu->entry_list[i+current_menu->lcd_window_pos].var1)
-                    lcd_string(" T");
+                    display_string(" T");
                 else
-                    lcd_string(" F");
+                    display_string(" F");
             break;
         }
 
     }
 
-    lcd_setcursor(0, current_menu->lcd_cursor_pos);
-    lcd_data(current_menu->lcd_cursor_char);
+    display_setcursor(0, current_menu->lcd_cursor_pos);
+    display_data(current_menu->lcd_cursor_char);
 
     if(current_menu->lcd_window_pos > 0)
     {
-        lcd_setcursor(current_menu->lcd_col_count-1, 0);
-        lcd_data(current_menu->lcd_more_top_char);
+        display_setcursor(current_menu->lcd_col_count-1, 0);
+        display_data(current_menu->lcd_more_top_char);
     }
 
     if(current_menu->lcd_window_pos+current_menu->lcd_row_count < current_menu->entry_count)
     {
-        lcd_setcursor(current_menu->lcd_col_count-1, current_menu->lcd_row_count-1);
-        lcd_data(current_menu->lcd_more_down_char);
+        display_setcursor(current_menu->lcd_col_count-1, current_menu->lcd_row_count-1);
+        display_data(current_menu->lcd_more_down_char);
     }
 }
 

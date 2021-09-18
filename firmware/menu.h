@@ -1,3 +1,6 @@
+/* menu structure handling */
+// last change: 18/09/2021
+
 #ifndef MENUE_H
 #define MENUE_H
 
@@ -5,12 +8,12 @@
 
 #ifdef MENU_SIMULATION_QT
     #include "../menu_sim/lcd_widget.h"
-    #define lcd_clear() lcd->Clear()
-    #define lcd_home() lcd->Home()
-    #define lcd_setcursor(column, row) lcd->SetCursor(column, row)
-    #define lcd_data(data) lcd->Data(data)
-    #define lcd_string(string) lcd->String(string)
-    #define lcd_generatechar(code, data) lcd->SetUserChar(code, data)
+    #define display_clear() lcd->Clear()
+    #define display_home() lcd->Home()
+    #define display_setcursor(column, row) lcd->SetCursor(column, row)
+    #define display_data(data) lcd->Data(data)
+    #define display_string(string) lcd->String(string)
+    #define display_generatechar(code, data) lcd->SetUserChar(code, data)
 #else
     #include "lcd.h"
 #endif

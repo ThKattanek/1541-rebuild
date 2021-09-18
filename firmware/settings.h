@@ -10,6 +10,8 @@
 #define SETTINGS_PIN_PB3       7     // 1-Byte
 #define SETTINGS_INPUT_MODE    8     // 1-Byte
 
+#define SETTINGS_MAGIC  (0x15411541)
+
 void settings_set_default_values( void );
 
 #endif // SETTINGS_H

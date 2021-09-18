@@ -6,7 +6,7 @@
 */
 // adoption for LCD I2C handling
 // implementation: F00K42
-// last change: 28/08/2021
+// last change: 18/09/2021
 
 /// CPU Clock
 #ifndef F_CPU
@@ -14,6 +14,7 @@
 #endif
 
 #include "./main.h"
+#include "display.h"
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -118,7 +119,7 @@ void reset()
                             // Nur auf Lo ziehen (hi = hiz und lo = gnd)
 
     // Settings vom EEPROM prüfen
-    if(eeprom_read_dword((uint32_t*)SETTINGS_IDENTIFIER) != 0x15411541)
+    if(eeprom_read_dword((uint32_t*)SETTINGS_IDENTIFIER) != SETTINGS_MAGIC)
     {
         settings_set_default_values(); // Default Values setzen
         reset();
@@ -139,37 +140,28 @@ void reset()
     // Interrupts erlauben
     sei();
 
-    // I2C initialisieren
-    i2c_init();
-
-    // LCD Display intialisieren
-    if (!lcd_init())
+    // initialize display (detect I2C/LCD/OLED, setup fonts, ...)
+    if (!display_init())
     {
         reset();
-    }
-
-    // eigene Zeichen im Display setzen
-    for(int i=0; i<num_of_customchars; ++i)
-    {
-        lcd_generatechar(i, customchars[i]);
     }
 
     // Prüfen on Button2 gedrückt ist
     if(get_key2())
     {
-        lcd_clear();
-        lcd_setcursor(disp_newinputmode_p);
-        lcd_string(disp_newinputmode_s);
-        lcd_setcursor(disp_inputmode_p);
+        display_clear();
+        display_setcursor(disp_newinputmode_p);
+        display_string(disp_newinputmode_s);
+        display_setcursor(disp_inputmode_p);
         if(eeprom_read_byte((uint8_t*)SETTINGS_INPUT_MODE) == INPUT_MODE_BUTTON)
         {
             eeprom_update_byte((uint8_t*)SETTINGS_INPUT_MODE, INPUT_MODE_ENCODER);
-            lcd_string(disp_encodermode_s);
+            display_string(disp_encodermode_s);
         }
         else
         {
             eeprom_update_byte((uint8_t*)SETTINGS_INPUT_MODE, INPUT_MODE_BUTTON);
-            lcd_string(disp_buttonmode_s);
+            display_string(disp_buttonmode_s);
         }
         _delay_ms(2000);
     }
@@ -194,8 +186,8 @@ void reset()
     init_timer2();
 
     // Meldung ausgeben, das auf SD Karte gewartet wird
-    lcd_setcursor(disp_wait4sdcard_p);
-    lcd_string(disp_wait4sdcard_s);
+    display_setcursor(disp_wait4sdcard_p);
+    display_string(disp_wait4sdcard_s);
 
     // SD Karte initialisieren
     // Partition und Filesystem öffnen
@@ -347,9 +339,9 @@ void update_gui()
 
         if(old_half_track != akt_half_track)
         {
-            lcd_setcursor(disp_trackno_p);
+            display_setcursor(disp_trackno_p);
             sprintf (byte_str,"%02d",akt_half_track >> 1);
-            lcd_string(byte_str);
+            display_string(byte_str);
         }
         old_half_track = akt_half_track;
 
@@ -357,11 +349,11 @@ void update_gui()
         if(old_motor_status != new_motor_status)
         {
             old_motor_status = new_motor_status;
-            lcd_setcursor(disp_motortxt_p);
+            display_setcursor(disp_motortxt_p);
             if(new_motor_status)
-                lcd_string(disp_motor_on_s);
+                display_string(disp_motor_on_s);
             else
-                lcd_string(disp_motor_off_s);
+                display_string(disp_motor_off_s);
         }
 
         if(is_image_mount)
@@ -396,8 +388,8 @@ void update_gui()
                         }
                     }
 
-                    lcd_setcursor(disp_scrollfilename_p);
-                    lcd_print(image_filename,gui_line_scroll_pos,LCD_COLS);
+                    display_setcursor(disp_scrollfilename_p);
+                    display_print(image_filename,gui_line_scroll_pos,LCD_COLS);
                 } else {
                     --gui_line_scroll_end_begin_wait;
                 }
@@ -518,31 +510,31 @@ void set_gui_mode(uint8_t gui_mode)
     switch(gui_mode)
     {
     case GUI_INFO_MODE:
-        lcd_clear();
+        display_clear();
 
-        lcd_setcursor(disp_tracktxt_p);
-        lcd_string(disp_tracktxt_s);
+        display_setcursor(disp_tracktxt_p);
+        display_string(disp_tracktxt_s);
 
-        lcd_setcursor(disp_trackno_p);
+        display_setcursor(disp_trackno_p);
         sprintf (byte_str,"%02d",akt_half_track >> 1);
-        lcd_string(byte_str);
+        display_string(byte_str);
 
-        lcd_setcursor(disp_motortxt_p);
+        display_setcursor(disp_motortxt_p);
         if(get_motor_status())
-            lcd_string(disp_motor_on_s);
+            display_string(disp_motor_on_s);
         else
-            lcd_string(disp_motor_off_s);
+            display_string(disp_motor_off_s);
 
-        lcd_setcursor(disp_writeprottxt_p);
+        display_setcursor(disp_writeprottxt_p);
         if(floppy_wp)
-            lcd_string(disp_writeprot_on_s);
+            display_string(disp_writeprot_on_s);
         else
-            lcd_string(disp_writeprot_off_s);
+            display_string(disp_writeprot_off_s);
 
-        lcd_setcursor(disp_scrollfilename_p);
+        display_setcursor(disp_scrollfilename_p);
         if(is_image_mount)
         {
-            lcd_print(image_filename,0,LCD_COLS);
+            display_print(image_filename,0,LCD_COLS);
 
             // Für Scrollenden Filename
             int8_t var = (int8_t)strlen(image_filename) - LCD_COLS;
@@ -554,7 +546,7 @@ void set_gui_mode(uint8_t gui_mode)
             gui_line_scroll_direction = 0;
             gui_line_scroll_end_begin_wait = 6;
         } else {
-            lcd_string(disp_nofilemounted_s);
+            display_string(disp_nofilemounted_s);
         }
 
         break;
@@ -625,9 +617,9 @@ void filebrowser_update(uint8_t key_code)
 
         if(akt_image_type == UNDEF_IMAGE)
         {
-            lcd_clear();
-            lcd_setcursor(disp_unsupportedimg_p);
-            lcd_string(disp_unsupportedimg_s);
+            display_clear();
+            display_setcursor(disp_unsupportedimg_p);
+            display_string(disp_unsupportedimg_s);
             _delay_ms(1000);
         }
 
@@ -689,8 +681,8 @@ void filebrowser_update(uint8_t key_code)
                 }
             }
 
-            lcd_setcursor(2,fb_lcd_cursor_pos);
-            lcd_print(fb_dir_entry[fb_lcd_cursor_pos].long_name,fb_line_scroll_pos, LCD_COLS-3 );
+            display_setcursor(2,fb_lcd_cursor_pos);
+            display_print(fb_dir_entry[fb_lcd_cursor_pos].long_name,fb_line_scroll_pos, LCD_COLS-3 );
         }
         else
         {
@@ -701,7 +693,7 @@ void filebrowser_update(uint8_t key_code)
 
 void filebrowser_refresh()
 {
-    lcd_clear();
+    display_clear();
     seek_to_dir_entry(fb_lcd_window_pos);
 
     uint8_t i=0;
@@ -711,32 +703,32 @@ void filebrowser_refresh()
         fat_read_dir(dd, &fb_dir_entry[i]);   // nächsten Directory Entry holen
         if(!(fb_dir_entry[i].attributes & (FAT_ATTRIB_SYSTEM | FAT_ATTRIB_VOLUME | FAT_ATTRIB_HIDDEN)))
         {
-            lcd_setcursor(1,i);
+            display_setcursor(1,i);
             if(fb_dir_entry[i].attributes & FAT_ATTRIB_DIR)
-                lcd_data(fb_lcd_dir_char);
+                display_data(fb_lcd_dir_char);
             else
-                lcd_data(' ');
+                display_data(' ');
 
-            lcd_print(fb_dir_entry[i].long_name,0,LCD_COLS-3);
+            display_print(fb_dir_entry[i].long_name,0,LCD_COLS-3);
 
             i++;
         }
     }
 
-    lcd_setcursor(0,fb_lcd_cursor_pos);
-    lcd_data(fb_lcd_cursor_char);
+    display_setcursor(0,fb_lcd_cursor_pos);
+    display_data(fb_lcd_cursor_char);
 
 
     if(fb_lcd_window_pos > 0)
     {
-        lcd_setcursor(LCD_COLS-1,0);
-        lcd_data(fb_lcd_more_top_char);
+        display_setcursor(LCD_COLS-1,0);
+        display_data(fb_lcd_more_top_char);
     }
 
     if((fb_lcd_window_pos + LCD_LINE_COUNT) < fb_dir_entry_count)
     {
-        lcd_setcursor(LCD_COLS-1, LCD_LINE_COUNT-1);
-        lcd_data(fb_lcd_more_down_char);
+        display_setcursor(LCD_COLS-1, LCD_LINE_COUNT-1);
+        display_data(fb_lcd_more_down_char);
     }
 
     // Für Scrollenden Filename
@@ -764,17 +756,17 @@ void init_pb2_pb3()
 int8_t init_sd_card(void)
 {
     // LCD Fehlermeldung löschen
-    lcd_setcursor(disp_errormsg_p);
-    lcd_string(disp_errormsgempty_p);
-    lcd_setcursor(disp_errormsg_p);
+    display_setcursor(disp_errormsg_p);
+    display_string(disp_errormsgempty_p);
+    display_setcursor(disp_errormsg_p);
 
     set_sleep_mode(SLEEP_MODE_IDLE);
 
     // SD Karte initialisieren
     if(!sd_raw_init())
     {
-        lcd_setcursor(disp_errormsg_p);
-        lcd_string(disp_errsdrawinit_s);
+        display_setcursor(disp_errormsg_p);
+        display_string(disp_errsdrawinit_s);
         return 1;
     }
 
@@ -785,24 +777,24 @@ int8_t init_sd_card(void)
         partition = partition_open(sd_raw_read,sd_raw_read_interval,sd_raw_write,sd_raw_write_interval,-1);
         if(!partition)
         {
-            lcd_setcursor(disp_errormsg_p);
-            lcd_string(disp_errpartopen_s);
+            display_setcursor(disp_errormsg_p);
+            display_string(disp_errpartopen_s);
             return 2;
         }
     }
 
     // FAT16/32 Filesystem versuchen zu öffnen
 
-    // lcd_string("*");
+    // display_string("*");
 
     fs = fat_open(partition);
 
-    // lcd_string("*");
+    // display_string("*");
 
     if(!fs)
     {
-        lcd_setcursor(disp_errormsg_p);
-        lcd_string(disp_errfatopen_s);
+        display_setcursor(disp_errormsg_p);
+        display_string(disp_errfatopen_s);
         return 3;
     }
 
@@ -811,8 +803,8 @@ int8_t init_sd_card(void)
     dd = fat_open_dir(fs, &dir_entry);
     if(!dd)
     {
-        lcd_setcursor(disp_errormsg_p);
-        lcd_string(disp_errfatopenroot_s);
+        display_setcursor(disp_errormsg_p);
+        display_string(disp_errfatopenroot_s);
         return 4;
     }
     return 0;
@@ -906,36 +898,36 @@ uint8_t change_dir(const char* path)
 
 void show_start_message(void)
 {
-    lcd_clear();
-    lcd_setcursor(disp_versiontxt_p);
-    lcd_string(disp_versiontxt_s);
-    lcd_setcursor(disp_firmwaretxt_p);
-    lcd_string(disp_firmwaretxt_s);
-    lcd_string(VERSION);
+    display_clear();
+    display_setcursor(disp_versiontxt_p);
+    display_string(disp_versiontxt_s);
+    display_setcursor(disp_firmwaretxt_p);
+    display_string(disp_firmwaretxt_s);
+    display_string(VERSION);
     _delay_ms(START_MESSAGE_TIME);
 
-    lcd_clear();
-    lcd_setcursor(disp_authortxt_p);
-    lcd_string(disp_authortxt_s);
-    lcd_setcursor(disp_authortxt1_p);
-    lcd_string(disp_authortxt1_s);
+    display_clear();
+    display_setcursor(disp_authortxt_p);
+    display_string(disp_authortxt_s);
+    display_setcursor(disp_authortxt1_p);
+    display_string(disp_authortxt1_s);
     _delay_ms(START_MESSAGE_TIME);
 
-    lcd_clear();
-    lcd_setcursor(disp_authortxt2_p);
-    lcd_string(disp_authortxt2_s);
-    lcd_setcursor(disp_authortxt3_p);
-    lcd_string(disp_authortxt3_s);
+    display_clear();
+    display_setcursor(disp_authortxt2_p);
+    display_string(disp_authortxt2_s);
+    display_setcursor(disp_authortxt3_p);
+    display_string(disp_authortxt3_s);
 
     _delay_ms(START_MESSAGE_TIME);
-    lcd_clear();
+    display_clear();
 }
 
 /////////////////////////////////////////////////////////////////////
 
 void show_sdcard_info_message()
 {
-    lcd_clear();
+    display_clear();
 
     struct sd_raw_info info;
 
@@ -947,23 +939,23 @@ void show_sdcard_info_message()
     {
         if(0 != sd_raw_get_info(&info))
         {
-            lcd_setcursor(disp_sdinfo_manuf_p);
-            lcd_string(disp_sdinfo_manuf_s);
+            display_setcursor(disp_sdinfo_manuf_p);
+            display_string(disp_sdinfo_manuf_s);
             sprintf(out_str, "%.x", info.manufacturer);
-            lcd_string(out_str);
+            display_string(out_str);
 
-            lcd_setcursor(disp_sdinfo_oem_p);
-            lcd_string(disp_sdinfo_oem_s);
-            lcd_string((char*) info.oem);
+            display_setcursor(disp_sdinfo_oem_p);
+            display_string(disp_sdinfo_oem_s);
+            display_string((char*) info.oem);
 
-            lcd_setcursor(disp_sdinfo_prod_p);
-            lcd_string(disp_sdinfo_prod_s);
-            lcd_string((char*) info.product);
+            display_setcursor(disp_sdinfo_prod_p);
+            display_string(disp_sdinfo_prod_s);
+            display_string((char*) info.product);
 
-            lcd_setcursor(disp_sdinfo_size_p);
-            lcd_string(disp_sdinfo_size_s);
+            display_setcursor(disp_sdinfo_size_p);
+            display_string(disp_sdinfo_size_s);
             sprintf(out_str, "%d MB", (uint16_t)(info.capacity / 1024 / 1024));
-            lcd_string(out_str);
+            display_string(out_str);
 
             get_info_ok = 1;
 
@@ -978,66 +970,66 @@ void show_sdcard_info_message()
 
     if(!get_info_ok)
     {
-        lcd_clear();
-        lcd_setcursor(disp_geterr_failure_p);
-        lcd_string(disp_geterr_failure_s);
-        lcd_setcursor(disp_sdrawgetinfo_p);
-        lcd_string(disp_sdrawgetinfo_s);
+        display_clear();
+        display_setcursor(disp_geterr_failure_p);
+        display_string(disp_geterr_failure_s);
+        display_setcursor(disp_sdrawgetinfo_p);
+        display_string(disp_sdrawgetinfo_s);
         return;
     }
 
     _delay_ms(START_MESSAGE_TIME);
 
-    lcd_clear();
+    display_clear();
 
-    lcd_setcursor(disp_sdinfo_rev_p);
-    lcd_string(disp_sdinfo_rev_s);
+    display_setcursor(disp_sdinfo_rev_p);
+    display_string(disp_sdinfo_rev_s);
     sprintf(out_str,"%c.%c",(info.revision>>4)+'0', (info.revision&0x0f)+'0');
-    lcd_string(out_str);
+    display_string(out_str);
 
-    lcd_setcursor(disp_sdinfo_serial_p);
-    lcd_string(disp_sdinfo_serial_s);
+    display_setcursor(disp_sdinfo_serial_p);
+    display_string(disp_sdinfo_serial_s);
     sprintf(out_str,"%04X%04X",(unsigned int) (info.serial >> 16),(unsigned int) (info.serial & 0xffff));
-    lcd_string(out_str);
+    display_string(out_str);
 
-    lcd_setcursor(disp_sdinfo_part_p);
-    lcd_string(disp_sdinfo_part_s);
+    display_setcursor(disp_sdinfo_part_p);
+    display_string(disp_sdinfo_part_s);
     switch(partition->type)
     {
         case 0x01:
-            lcd_string("FAT12");
+            display_string("FAT12");
             break;
 
         case 0x04:
-            lcd_string("FAT16 MAX 32MB");
+            display_string("FAT16 MAX 32MB");
             break;
 
         case 0x05:
-            lcd_string("EXTENDED");
+            display_string("EXTENDED");
             break;
 
         case 0x06:
-            lcd_string("FAT16");
+            display_string("FAT16");
             break;
 
         case 0x0b:
-            lcd_string("FAT32");
+            display_string("FAT32");
             break;
 
         case 0x0c:
-            lcd_string("FAT32 LBA");
+            display_string("FAT32 LBA");
             break;
 
         case 0x0e:
-            lcd_string("FAT16 LBA");
+            display_string("FAT16 LBA");
             break;
 
         case 0x0f:
-            lcd_string("EXT LBA");
+            display_string("EXT LBA");
             break;
 
         default:
-            lcd_string("UNKNOWN");
+            display_string("UNKNOWN");
             break;
     }
     _delay_ms(START_MESSAGE_TIME);

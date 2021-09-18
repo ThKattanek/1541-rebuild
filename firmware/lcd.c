@@ -43,44 +43,11 @@ static void lcd_out_enable( uint8_t data )
     lcd_enable( data );
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Testet eine I2C-Addresse auf Antwort
-static uint8_t i2c_test(uint8_t addr)
-{
-    uint8_t ret = 0;
-    if ( 0x08 == i2c_start() )
-    {
-        if ( 0x18 == i2c_write( (addr<<1) | I2C_WRITE ) )
-        {
-            ret = 1;
-        }
-    }
-    i2c_stop();
-    return ret;
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialisierung: muss ganz am Anfang des Programms aufgerufen werden.
-uint8_t lcd_init( void )
+void lcd_setup( void )
 {
-    // find display
-    DEV_I2C_ADDR = 0;
-    for (uint8_t i2c_addr = 0x20; i2c_addr<=0x3f; ++i2c_addr)
-    {
-        if ((0x27 < i2c_addr) && (0x38 > i2c_addr)) { continue; }
-
-        if (i2c_test(i2c_addr))
-        {
-            DEV_I2C_ADDR = i2c_addr;
-            break;
-        }
-    }
-    if (0 == DEV_I2C_ADDR)
-    {
-        return 0;
-    }
-
     // ---
     // warten auf die Bereitschaft des LCD
     _delay_ms( LCD_BOOTUP_MS );
@@ -126,7 +93,6 @@ uint8_t lcd_init( void )
                  LCD_BLINKING_OFF);
 
     lcd_clear();
-    return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
