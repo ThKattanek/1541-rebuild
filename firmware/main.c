@@ -16,7 +16,6 @@
 #define _EXTERN_ 
 
 #include "./main.h"
-#include "display.h"
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -29,21 +28,7 @@
 /// \brief Decodierungstabelle für Drehgeber
 const unsigned char drehimp_tab[16]PROGMEM = {0,0,2,0,0,0,0,0,1,0,0,0,0,0,0,0};
 
-// custom character definitions for LCD display
-const uint8_t customchars[][8] =
-                                    {   {4,14,31,0,0,0,0,0},        // Menü More Top
-                                        {0,0,0,0,31,14,4,0},        // Menü More Down
-                                        {0,4,6,31,6,4,0,0},         // Menü Position
-                                        {0,28,31,17,17,31,0,0},     // Directory Symbol
-                                        {15,27,17,27,31,27,27,31}   // Diskimage
-                                    };
-
-
-#define num_of_customchars  (sizeof(customchars)/sizeof(customchars[0]))
-
-
 // ---
-
 
 MENU_STRUCT main_menu;
 MENU_STRUCT image_menu;
@@ -141,13 +126,6 @@ void reset()
     if (!display_init())
     {
         reset();
-    }
-
-    //@TODO move to display.c - run only when LCD is detected
-    // eigene Zeichen im LCD Display setzen
-    for(int i=0; i<num_of_customchars; ++i)
-    {
-        lcd_generatechar(i, customchars[i]);
     }
 
     // Tasten Initialisieren

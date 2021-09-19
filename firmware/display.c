@@ -54,7 +54,7 @@ uint8_t display_init(void)
         if (0 == DEV_I2C_ADDR)
         {
             // no answer from any I2C device
-            // LCD may be directly attached via 10pin interface
+            // LCD may be directly attached via 10pin parallel interface
             lcd_out = &par_lcd_out;
         } else {
             // LCD attached via PCF8574 / I2C

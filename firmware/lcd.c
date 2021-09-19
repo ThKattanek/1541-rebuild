@@ -18,6 +18,17 @@ extern uint8_t DEV_I2C_ADDR;
 // definition of LCD-ROW offsets .. needed for setcursor-routine
 const uint8_t lcd_rowoffset[] = { 0, 0x40, LCD_COLS, 0x40+LCD_COLS };
 
+// custom character definitions for LCD display
+const uint8_t customchars[][8] = {
+                                    { 4,14,31, 0, 0, 0, 0, 0},  // Menü More Top
+                                    { 0, 0, 0, 0,31,14, 4, 0},  // Menü More Down
+                                    { 0, 4, 6,31, 6, 4, 0, 0},  // Menü Position
+                                    { 0,28,31,17,17,31, 0, 0},  // Directory Symbol
+                                    {15,27,17,27,31,27,27,31}   // Diskimage
+                                };
+
+#define num_of_customchars  (sizeof(customchars)/sizeof(customchars[0]))
+
 ////////////////////////////////////////////////////////////////////////////////
 // Sendet eine Ausgabeoperation an das LCD
 void par_lcd_out( uint8_t data )
@@ -123,6 +134,13 @@ void lcd_setup( void )
                  LCD_BLINKING_OFF);
 
     lcd_clear();
+
+    // eigene Zeichen im LCD Display setzen
+    for(uint8_t i=0; i<num_of_customchars; ++i)
+    {
+        lcd_generatechar(i, customchars[i]);
+    }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
