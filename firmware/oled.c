@@ -14,6 +14,61 @@
 extern uint8_t DEV_I2C_ADDR;
 uint8_t oled_cursor_x, oled_cursor_y;
 
+const uint8_t OLED_customchars[][8] = {
+{ // Menü More Top
+    0b00000000,
+    0b00010000,
+    0b00110000,
+    0b01110000,
+    0b11110000,
+    0b01110000,
+    0b00110000,
+    0b00010000
+},
+{ // Menü More Down
+    0b00000000,
+    0b00001000,
+    0b00001100,
+    0b00001110,
+    0b00001111,
+    0b00001110,
+    0b00001100,
+    0b00001000
+},
+{ // Menü Position
+    0b00000000,
+    0b00000000,
+    0b00000000,
+    0b11111110,
+    0b01111100,
+    0b00111000,
+    0b00010000,
+    0b00000000
+},
+{  // Directory Symbol
+    0b00000000,
+    0b11111110,
+    0b11000010,
+    0b11011010,
+    0b01011010,
+    0b01010010,
+    0b01000010,
+    0b00111110
+},
+{ // Diskimage
+    0b00000000,
+    0b01111111,
+    0b11111111,
+    0b11011111,
+    0b10001001,
+    0b11011111,
+    0b11111111,
+    0b11111111
+}
+};
+
+#define num_of_customchars  (sizeof(OLED_customchars)/sizeof(OLED_customchars[0]))
+
 ////////////////////////////////////////////////////////////////////////////////
 // lowlevel routines to access SSD1306 display controller
 
@@ -106,9 +161,15 @@ void oled_setcursor( uint8_t spalte, uint8_t zeile )
 // write 1 character
 void oled_data( uint8_t data )
 {
-    if ((FONT_MINCHAR > data) || (FONT_MAXCHAR < data))
+    uint8_t* FontPtr;
+    if (num_of_customchars >= data)
     {
-        data = '?';
+        FontPtr = (uint8_t*) &OLED_customchars[data][0];
+    } else if (FONT_MAXCHAR < data)
+    {
+        FontPtr = (uint8_t*) &FontData[FONT_MAXCHAR][0];       
+    } else {
+        FontPtr = (uint8_t*) &FontData[data-FONT_MINCHAR][0];
     }
 
     (void)i2c_start();
@@ -117,7 +178,7 @@ void oled_data( uint8_t data )
 
     for(uint8_t char_height=0; char_height<FONT_HEIGHT; ++char_height)
     {
-        (void)i2c_write( FontData[data-FONT_MINCHAR][char_height] );
+        (void)i2c_write( FontPtr[char_height] );
     }
     i2c_stop();
 
@@ -131,7 +192,7 @@ void oled_data( uint8_t data )
 
     for(uint8_t char_height=0; char_height<FONT_HEIGHT; ++char_height)
     {
-        (void)i2c_write( FontData[data-FONT_MINCHAR][char_height] );
+        (void)i2c_write( FontPtr[char_height] );
     }
     i2c_stop();
 
