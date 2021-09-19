@@ -10,16 +10,18 @@ done:
 
 new I2C-Version (1.4.2) of the PCB created:
 - LCD Displays can still be used
-- I2C Pins share 4 pins with LCD-Display Header -> only Software reconfiguration needed
+- I2C Pins share 4 pins with LCD-Display Headeri
 - adopted Software (firmware >= 1.3.2) needed (due to different Atmega-Ports used)
 - added a capacitor for better power stability
 
 images of new PCB (1.4.2):
-![image4](/doc/fotos/platine_rev_1.4.2/20210911_204849_kl.jpg)
 ![image5](/doc/fotos/platine_rev_1.4.2/20210911_210521_kl.jpg)
 
-this type of I2C-displays is currently supported
-LCD 16\*2 with PCF8574T port-expander
+latest development: I2C OLED Display attached
+![image6](/doc/fotos/OLED_Display/OLED_in_1541-II_Front.jpg)
+
+LCD display attached via I2C portexpander PCF8574
+![image4](/doc/fotos/platine_rev_1.4.2/20210911_204849_kl.jpg)
 ![image7](/doc/fotos/handwired_rev_1.4.2/I2C_DisplayBack.jpg)
 
 
