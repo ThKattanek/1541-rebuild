@@ -12,6 +12,7 @@
 #include <util/delay.h>
 
 extern uint8_t DEV_I2C_ADDR;
+uint8_t oled_cursor_x, oled_cursor_y;
 
 ////////////////////////////////////////////////////////////////////////////////
 // lowlevel routines to access SSD1306 display controller
@@ -45,10 +46,10 @@ void oled_setup( void )
     ssd1306_command(SSD1306_DISPLAY_OFFSET);    
     ssd1306_command(0x00);                          // no offset
     ssd1306_command(SSD1306_DSP_STARTLINE | 0x00);  // line 0
-    ssd1306_command(SSD1306_SEG_REMAP_127);         // rotate screen 180
+    ssd1306_command(SSD1306_SEG_REMAP_127);         // flip horizontal
     ssd1306_command(SSD1306_COM_LITTLEENDIAN);      // rotate screen 180
     ssd1306_command(SSD1306_COM_PINS);
-    ssd1306_command(0x02);
+    ssd1306_command(0x02);              // 02 = every 2nd Line 4 rows (2nd Line at Row 4..8) ... 12 = every Line (8 rows)
     ssd1306_command(SSD1306_SETCONTRAST);
     ssd1306_command(0x7F);
     ssd1306_command(SSD1306_ALLON_RESUME);
@@ -72,7 +73,7 @@ void oled_clear( void )
         (void)i2c_write( SSD1306_I2C_DATA );
         for(uint8_t cols=0; cols<(16*8); ++cols)
         {
-            (void)i2c_write( 0x00 );
+            (void)i2c_write( 0 );
             //delay(10);
         }
         i2c_stop();
@@ -86,6 +87,8 @@ void oled_home( void )
     ssd1306_command(SSD1306_PAGE_START );
     ssd1306_command(SSD1306_COLUMN_START_L );
     ssd1306_command(SSD1306_COLUMN_START_H );
+    oled_cursor_x = 0;
+    oled_cursor_y = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,6 +98,8 @@ void oled_setcursor( uint8_t spalte, uint8_t zeile )
     ssd1306_command(SSD1306_PAGE_START | (7-zeile));
     ssd1306_command(SSD1306_COLUMN_START_L |  ((FONT_WIDTH*spalte)     & 0x0f));
     ssd1306_command(SSD1306_COLUMN_START_H | (((FONT_WIDTH*spalte)>>4) & 0x0f));
+    oled_cursor_x = spalte;
+    oled_cursor_y = zeile;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -115,6 +120,23 @@ void oled_data( uint8_t data )
         (void)i2c_write( FontData[data-FONT_MINCHAR][char_height] );
     }
     i2c_stop();
+
+    ssd1306_command(SSD1306_PAGE_START | (7-oled_cursor_y-4));
+    ssd1306_command(SSD1306_COLUMN_START_L |  ((FONT_WIDTH*oled_cursor_x)     & 0x0f));
+    ssd1306_command(SSD1306_COLUMN_START_H | (((FONT_WIDTH*oled_cursor_x)>>4) & 0x0f));
+
+    (void)i2c_start();
+    (void)i2c_write( (DEV_I2C_ADDR<<1) | I2C_WRITE);
+    (void)i2c_write( SSD1306_I2C_DATA );
+
+    for(uint8_t char_height=0; char_height<FONT_HEIGHT; ++char_height)
+    {
+        (void)i2c_write( FontData[data-FONT_MINCHAR][char_height] );
+    }
+    i2c_stop();
+
+    ++oled_cursor_x;
+    oled_setcursor(oled_cursor_x, oled_cursor_y);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
