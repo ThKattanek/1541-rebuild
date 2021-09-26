@@ -18,7 +18,7 @@ images of new PCB (1.4.2):
 ![image5](/doc/fotos/platine_rev_1.4.2/20210911_210521_kl.jpg)
 
 latest development: I2C OLED Display attached
-![image6](/doc/fotos/OLED_Display/OLED_in_1541-II_Front.jpg)
+![image6](/doc/fotos/OLED_display/OLED_in_1541-II_Front.jpg)
 
 LCD display attached via I2C portexpander PCF8574
 ![image4](/doc/fotos/platine_rev_1.4.2/20210911_204849_kl.jpg)
