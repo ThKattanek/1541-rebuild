@@ -65,11 +65,11 @@ enum GUI_MODE{GUI_INFO_MODE, GUI_MENU_MODE, GUI_FILE_BROWSER};
 #define disp_sdinfo_size_p    8,1
 #define disp_sdinfo_size_s    ""
 #define disp_sdinfo_rev_p     0,0
-#define disp_sdinfo_rev_s     "REV:"
+#define disp_sdinfo_rev_s     "Rev:"
 #define disp_sdinfo_serial_p  8,0
 #define disp_sdinfo_serial_s  ""
 #define disp_sdinfo_part_p    0,1
-#define disp_sdinfo_part_s    "P:"
+#define disp_sdinfo_part_s    "Part:"
 
 #define disp_geterr_failure_p 0,0
 #define disp_geterr_failure_s "Err: Get Failure"

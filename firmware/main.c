@@ -51,13 +51,13 @@ int main(void)
 
         /// Menüs einrichten
         /// Hauptmenü
-        MENU_ENTRY main_menu_entrys[] = {{"Disk Image",M_IMAGE,ENTRY_MENU,   0,&image_menu},
+        MENU_ENTRY main_menu_entrys[] = {{"Disk Menu", M_IMAGE,ENTRY_MENU,   0,&image_menu},
                                          {"Settings",  M_SETTINGS,ENTRY_MENU,0,&settings_menu},
                                          {"Info",      M_INFO,ENTRY_MENU,    0,&info_menu}};
         /// Image Menü
         MENU_ENTRY image_menu_entrys[] = {{"Insert Image",M_INSERT_IMAGE},
                                           {"Remove Image",M_REMOVE_IMAGE},
-                                          {"WriteProtect",M_WP_IMAGE,ENTRY_ONOFF,1},
+                                          {"WriteProt.",  M_WP_IMAGE,ENTRY_ONOFF,1},
                                           {"New Image",   M_NEW_IMAGE},
                                           {"Save Image",  M_SAVE_IMAGE}};
         /// Setting Menü
@@ -374,7 +374,7 @@ void update_gui()
                     }
 
                     display_setcursor(disp_scrollfilename_p);
-                    display_print(image_filename,gui_line_scroll_pos,LCD_COLS);
+                    display_print(image_filename,gui_line_scroll_pos,LCD_LINE_SIZE);
                 } else {
                     --gui_line_scroll_end_begin_wait;
                 }
@@ -519,10 +519,10 @@ void set_gui_mode(uint8_t gui_mode)
         display_setcursor(disp_scrollfilename_p);
         if(is_image_mount)
         {
-            display_print(image_filename,0,LCD_COLS);
+            display_print(image_filename,0,LCD_LINE_SIZE);
 
             // Für Scrollenden Filename
-            int8_t var = (int8_t)strlen(image_filename) - LCD_COLS;
+            int8_t var = (int8_t)strlen(image_filename) - LCD_LINE_SIZE;
             if(var < 0)
                 gui_current_line_offset = 0;
             else
@@ -667,7 +667,7 @@ void filebrowser_update(uint8_t key_code)
             }
 
             display_setcursor(2,fb_cursor_pos);
-            display_print(fb_dir_entry[fb_cursor_pos].long_name,fb_line_scroll_pos, LCD_COLS-3 );
+            display_print(fb_dir_entry[fb_cursor_pos].long_name,fb_line_scroll_pos, LCD_LINE_SIZE-3 );
         }
         else
         {
@@ -694,7 +694,7 @@ void filebrowser_refresh()
             else
                 display_data(' ');
 
-            display_print(fb_dir_entry[i].long_name,0,LCD_COLS-3);
+            display_print(fb_dir_entry[i].long_name,0,LCD_LINE_SIZE-3);
 
             i++;
         }
@@ -706,18 +706,18 @@ void filebrowser_refresh()
 
     if(fb_window_pos > 0)
     {
-        display_setcursor(LCD_COLS-1,0);
+        display_setcursor(LCD_LINE_SIZE-1,0);
         display_data(display_more_top_char);
     }
 
     if((fb_window_pos + LCD_LINE_COUNT) < fb_dir_entry_count)
     {
-        display_setcursor(LCD_COLS-1, LCD_LINE_COUNT-1);
+        display_setcursor(LCD_LINE_SIZE-1, LCD_LINE_COUNT-1);
         display_data(display_more_down_char);
     }
 
     // Für Scrollenden Filename
-    int8_t var = (int8_t)strlen(fb_dir_entry[fb_cursor_pos].long_name) - (LCD_COLS-3);
+    int8_t var = (int8_t)strlen(fb_dir_entry[fb_cursor_pos].long_name) - (LCD_LINE_SIZE-3);
     if(var < 0)
         fb_current_line_offset = 0;
     else
@@ -986,7 +986,7 @@ void show_sdcard_info_message()
             break;
 
         case 0x04:
-            display_string("FAT16 MAX 32MB");
+            display_string("FAT16 <32MB");
             break;
 
         case 0x05:
@@ -1180,14 +1180,15 @@ void soe_gatearry_lo(void)
 
 struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir_entry_struct* file_entry, uint8_t* image_type)
 {
-    if(strlen(file_entry->long_name) < 4) return NULL;
+    const int namelen = strlen(file_entry->long_name);
+    if(namelen < 4) return NULL;
 
     struct fat_file_struct* fd = NULL;
     char extension[5];
     int i;
 
     // Extension überprüfen --> g64 oder d64
-    strcpy(extension, file_entry->long_name+(strlen(file_entry->long_name)-4));
+    strcpy(extension, file_entry->long_name+(namelen - 4));
 
     i=0;
     while(extension[i] != '\0')
@@ -1205,8 +1206,6 @@ struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir
             *image_type = G64_IMAGE;
             // open_g64_image(fd);
             set_write_protection(1);
-        } else {
-            *image_type = UNDEF_IMAGE;
         }
     }
     else if(!strcmp(extension,".d64"))
@@ -1218,11 +1217,10 @@ struct fat_file_struct* open_disk_image(struct fat_fs_struct* fs ,struct fat_dir
             *image_type = D64_IMAGE;
             // open_d64_image(fd);
             set_write_protection(1);
-        } else {
-            *image_type = UNDEF_IMAGE;
         }
     }
-    else
+
+    if (NULL == fd)
     {
         // Nicht unterstützt
         *image_type = UNDEF_IMAGE;
