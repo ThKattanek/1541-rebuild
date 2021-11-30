@@ -13,7 +13,7 @@
 #define FONT_MINCHAR    (0x20)
 #define FONT_MAXCHAR    (0x7F)
 
-const uint8_t FontData[FONT_MAXCHAR-FONT_MINCHAR+1][FONT_HEIGHT] = {
+const uint8_t FontData[FONT_MAXCHAR-FONT_MINCHAR+1][FONT_WIDTH] = {
 {
 0b00000000,
 0b00000000,
