@@ -210,6 +210,7 @@ void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t tr
 void remove_image();
 
 inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
+inline void ConvertFromGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
 
 void endable_wps_port(uint8_t enable);  // 0 = WPS PIN HiZ (set_write_protection() ohne Wirkung) / 1 = WPS PIN als Ausgang
 void set_write_protection(int8_t wp);   // wp=0 image nicht geschützt wp=1 image schreibgeschützt
