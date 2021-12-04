@@ -13,7 +13,9 @@
 #include <avr/pgmspace.h>
 
 // Für die LCD Ansteuerung
-#include "./lcd.h"
+#include "display.h"
+#include "lcd.h"
+#include "i2c.h"
 
 // SDCard Lib
 #include "./sd_card_lib/fat.h"
@@ -37,15 +39,15 @@
 // Konfiguration /////////////////////////////////////////////////
 
 // LCD
-#define LCD_LINE_COUNT 4
-#define LCD_LINE_SIZE 20
+#define LCD_LINE_COUNT  (LCD_ROWS)
+#define LCD_LINE_SIZE   (LCD_COLS)
 
 // Zeit in ms wie lange die Version nach dem Start angezeigt wird
 #define START_MESSAGE_TIME 1500
 
 // Spur auf dem der Lesekopf beim Start/Reset stehen soll
 // Track 18 --> Directory
-#define INIT_TRACK 18
+#define INIT_TRACK  (18)
 
 // Zeit die nach der letzten Stepperaktivität vergehen muss, um einen neuen Track von SD Karte zu laden
 // (1541 Original Rom schaltet STP1 alle 15ms)
@@ -54,30 +56,30 @@
 
 // SOE GATEWAY --> Ausgang
 // LO wenn SD Karte laufen soll damit ByteReady High bleibt
-#define SOE_GATEARRAY_DDR DDRC
-#define SOE_GATEARRAY_PORT PORTC
-#define SOE_GATEARRAY PC7
+#define SOE_GATEARRAY_DDR   DDRD
+#define SOE_GATEARRAY_PORT  PORTD
+#define SOE_GATEARRAY       PD5
 
 // Anschluss der Stepper Signale
 // Zwingend diese PINs wegen Extern Interrupts PCINT6/7
 // Bei Änderung muss der Sourcecode angepasst werden !
-#define STP_DDR  DDRA
-#define STP_PIN PINA
-#define STP1 PINA6
-#define STP0 PINA7
+#define STP_DDR     DDRD
+#define STP_PIN     PIND
+#define STP1        PIND1
+#define STP0        PIND0
 
 // Anschluss des Laufwerkmotor Signals
-#define MTR_DDR DDRC
-#define MTR_PIN PINC
-#define MTR	PINC2
+#define MTR_DDR     DDRD
+#define MTR_PIN     PIND
+#define MTR         PIND2
 
 #define get_motor_status() (MTR_PIN & (1<<MTR))
 
 // Steuersignale
 // BYTE READY
-#define BYTE_READY_DDR DDRC
-#define BYTE_READY_PORT PORTC
-#define BYTE_READY  PC0
+#define BYTE_READY_DDR  DDRD
+#define BYTE_READY_PORT PORTD
+#define BYTE_READY      PD3
 
 //DDxn = 0 , PORTxn = 0 --> HiZ
 //DDxn = 1 , PORTxn = 0 --> Output Low (Sink)
@@ -86,24 +88,24 @@
 #define clear_byte_ready() BYTE_READY_DDR |= (1 << BYTE_READY)  // auf Ground ziehen
 
 // SYNC
-#define SYNC_DDR DDRC
-#define SYNC_PORT PORTC
-#define SYNC  PC1
+#define SYNC_DDR    DDRD
+#define SYNC_PORT   PORTD
+#define SYNC        PD7
 
 #define set_sync() SYNC_PORT |= 1 << SYNC
 #define clear_sync() SYNC_PORT &= ~(1 << SYNC)
 
 // SOE
-#define SOE_DDR DDRC
-#define SOE_PIN PINC
-#define SOE	PINC6
+#define SOE_DDR     DDRD
+#define SOE_PIN     PIND
+#define SOE         PIND4
 
 #define get_soe_status() (SOE_PIN & (1<<SOE))
 
-// SO
-#define SO_DDR DDRC
-#define SO_PIN PINC
-#define SO     PINC5
+// SO ... 6522_OE = MODE?
+#define SO_DDR      DDRC
+#define SO_PIN      PINC
+#define SO          PINC7
 
 #define get_so_status() (SO_PIN & (1<<SO))
 
@@ -111,36 +113,36 @@
 // PIN ist mit PIN14 U8 VIA6522 (Input) verbunden
 // PIN ist mit PIN14 (A) GateArray (Input) verbunden
 // PIN ist mit PIN8 LS04 DM74LS04N (Output) verbunden -> Einganag PIN9 hängt auf einen PullUp (47k)
-#define WPS_DDR DDRC
-#define WPS_PORT PORTC
-#define WPS  PC4
+#define WPS_DDR     DDRD
+#define WPS_PORT    PORTD
+#define WPS         PD6
 
 #define set_wps() WPS_PORT |= 1 << WPS          // 5V Level = WritePotect
 #define clear_wps() WPS_PORT &= ~(1 << WPS)     // 0V Level = Writetable
 
 // Anschluss der Datenleitungen
-#define DATA_DDR   DDRD
-#define DATA_PORT  PORTD
-#define DATA_PIN   PIND
+#define DATA_DDR    DDRA
+#define DATA_PORT   PORTA
+#define DATA_PIN    PINA
 
 #define out_gcr_byte(gcr_byte) DATA_PORT = gcr_byte
 #define in_gcr_byte DATA_PIN
 
 // Einabetasten
-#define KEY0_DDR DDRB
-#define KEY0_PORT PORTB
-#define KEY0_PIN PINB
-#define KEY0	 PINB0
+#define KEY0_DDR    DDRB
+#define KEY0_PORT   PORTB
+#define KEY0_PIN    PINB
+#define KEY0        PINB0
 
-#define KEY1_DDR DDRB
-#define KEY1_PORT PORTB
-#define KEY1_PIN PINB
-#define KEY1	 PINB1
+#define KEY1_DDR    DDRB
+#define KEY1_PORT   PORTB
+#define KEY1_PIN    PINB
+#define KEY1        PINB1
 
-#define KEY2_DDR DDRC
-#define KEY2_PORT PORTC
-#define KEY2_PIN PINC
-#define KEY2	 PINC3
+#define KEY2_DDR    DDRC
+#define KEY2_PORT   PORTC
+#define KEY2_PIN    PINC
+#define KEY2        PINC6
 
 #define get_key0() (~KEY0_PIN & (1<<KEY0))
 #define get_key1() (~KEY1_PIN & (1<<KEY1))
@@ -166,24 +168,24 @@
 
 enum {UNDEF_IMAGE, G64_IMAGE, D64_IMAGE};
 
-void reset();
-void check_stepper_signals();
-void check_motor_signal();
-uint8_t get_key_from_buffer();
-void update_gui();
+void reset(void);
+void check_stepper_signals(void);
+void check_motor_signal(void);
+uint8_t get_key_from_buffer(void);
+void update_gui(void);
 void check_menu_events(uint16_t menu_event);
 void set_gui_mode(uint8_t gui_mode);
 void filebrowser_update(uint8_t key_code);
-void filebrowser_refresh();
-void init_pb2_pb3();
+void filebrowser_refresh(void);
+void init_pb2_pb3(void);
 int8_t init_sd_card(void);
 void release_sd_card(void);
 uint8_t change_dir(const char* path);
 uint8_t find_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name, struct fat_dir_entry_struct* dir_entry);
-uint16_t get_dir_entry_count();
+uint16_t get_dir_entry_count(void);
 uint16_t seek_to_dir_entry(uint16_t entry_num);
 void show_start_message(void);
-void show_sdcard_info_message();
+void show_sdcard_info_message(void);
 void init_stepper(void);
 void stepper_inc(void);
 void stepper_dec(void);
@@ -202,12 +204,12 @@ void soe_gatearry_hi(void);
 
 struct fat_file_struct* open_disk_image(struct fat_fs_struct *fs, struct fat_dir_entry_struct* file_entry, uint8_t *image_type);
 void close_disk_image(struct fat_file_struct*);
-int8_t open_g64_image(struct fat_file_struct *fd);
-int8_t open_d64_image(struct fat_file_struct *fd);
+// int8_t open_g64_image(struct fat_file_struct *fd);
+// int8_t open_d64_image(struct fat_file_struct *fd);
 int8_t read_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
 void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
 
-void remove_image();
+void remove_image(void);
 
 inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
 
@@ -228,7 +230,7 @@ volatile uint8_t key_buffer_w_pos;
 uint8_t input_mode = INPUT_MODE_ENCODER;
 
 uint8_t current_gui_mode;
-int8_t byte_str[16];
+char byte_str[16];
 
 uint8_t gui_current_line_offset;         // >0 dann ist der Name länger als die maximale Anzeigelaenge
 uint8_t gui_line_scroll_pos;             // Kann zwischen 0 und fb_current_line_offset liegen
@@ -236,14 +238,9 @@ uint8_t gui_line_scroll_direction;       // Richtung des Scrollings
 uint8_t gui_line_scroll_end_begin_wait;
 
 // Alles für den Filebrowser
-uint8_t fb_lcd_dir_char;            // Char Nummer für Directory Symbol
-uint8_t fb_lcd_disk_char;           // Char Nummer für Diskimage Symbol
-uint8_t fb_lcd_cursor_char;         // Char für Auswahl Cursor
-uint8_t fb_lcd_more_top_char;
-uint8_t fb_lcd_more_down_char;
 uint16_t fb_dir_entry_count=0;      // Anzahl der Einträge im aktuellen Direktory
-uint8_t fb_lcd_cursor_pos=0;        // Position des Cursors auf dem LCD Display
-uint8_t fb_lcd_window_pos=0;        // Position des Anzeigebereichs innerhablb der Menüeinträge
+uint8_t fb_cursor_pos=0;        // Position des Cursors auf dem LCD Display
+uint8_t fb_window_pos=0;        // Position des Anzeigebereichs innerhablb der Menüeinträge
 
 uint8_t fb_current_line_offset = 0;         // >0 dann ist der Name länger als die maximale Anzeigelaenge
 uint8_t fb_line_scroll_pos = 0;             // Kann zwischen 0 und fb_current_line_offset liegen

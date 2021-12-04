@@ -1,3 +1,6 @@
+/* menu structure handling */
+// last change: 18/09/2021
+
 #ifndef MENUE_H
 #define MENUE_H
 
@@ -5,12 +8,14 @@
 
 #ifdef MENU_SIMULATION_QT
     #include "../menu_sim/lcd_widget.h"
-    #define lcd_clear() lcd->Clear()
-    #define lcd_home() lcd->Home()
-    #define lcd_setcursor(column, row) lcd->SetCursor(column, row)
-    #define lcd_data(data) lcd->Data(data)
-    #define lcd_string(string) lcd->String(string)
-    #define lcd_generatechar(code, data) lcd->SetUserChar(code, data)
+    #define display_clear() lcd->Clear()
+    #define display_home() lcd->Home()
+    #define display_setcursor(column, row) lcd->SetCursor(column, row)
+    #define display_data(data) lcd->Data(data)
+    #define display_string(string) lcd->String(string)
+    #define display_generatechar(code, data) lcd->SetUserChar(code, data)
+#else
+    #include "lcd.h"
 #endif
 
 // MC_EXIT_MENU wird ausgeführt wenn ein KEY2_TIMEOUT1 kommt und das Menü schon im Hauptmenü befindet
@@ -38,6 +43,7 @@ struct MENU_STRUCT
 {
     MENU_STRUCT *parent_menu;   // Zeiger auf Übergeordnetes Menü
     MENU_ENTRY *entry_list;     // Zeiger auf Array vom TYPE MENU_ENTRY
+    uint8_t lcd_col_count;      // Anzahl der Spalten des LCD Displays
     uint8_t lcd_row_count;      // Anzahl der Zeilen des LCD Displays
     uint8_t lcd_cursor_char;    // Linkes Zeichen für die Auswahl
     uint8_t lcd_more_top_char;  // Zeichen wenn noch mehr Einträge sich oben befinden
@@ -50,21 +56,19 @@ struct MENU_STRUCT
 };
 
 
-void menu_init(MENU_STRUCT* menu, MENU_ENTRY *menu_entrys, uint8_t menu_entry_count, uint8_t lcd_row_count);
+void menu_init(MENU_STRUCT* menu, MENU_ENTRY *menu_entrys, uint8_t menu_entry_count, uint8_t lcd_col_count, uint8_t lcd_row_count);
 void menu_set_root(MENU_STRUCT* menu);
 
 #ifdef MENU_SIMULATION_QT
-    uint16_t menu_update(LCDWidget *lcd, uint8_t key_code);
-    void menu_refresh(LCDWidget *lcd);
+uint16_t menu_update(LCDWidget *lcd, uint8_t key_code);
+void menu_refresh(LCDWidget *lcd);
 #else
-    uint16_t menu_update(uint8_t key_code);
-    void menu_refresh();
+uint16_t menu_update(uint8_t key_code);
+void menu_refresh( void );
 #endif
 
-    void menu_set_entry_var1(MENU_STRUCT *menu, uint8_t id, uint8_t var1);
-    uint8_t menu_get_entry_var1(MENU_STRUCT *menu, uint8_t id);
-
-static MENU_STRUCT *current_menu;
+void menu_set_entry_var1(MENU_STRUCT *menu, uint8_t id, uint8_t var1);
+uint8_t menu_get_entry_var1(MENU_STRUCT *menu, uint8_t id);
 
 #endif // MENUE_H
 

@@ -1,16 +1,15 @@
 EESchema Schematic File Version 4
-LIBS:1541-rebuild-cache
 EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 2 3
 Title "1541-rebuid"
-Date "2020-04-18"
-Rev "1.4.0"
+Date "2021-08-26"
+Rev "1.4.2"
 Comp ""
 Comment1 "Erstellt von: Thorsten Kattanek"
-Comment2 ""
+Comment2 "redesign and i2c added: F00K42"
 Comment3 ""
 Comment4 ""
 $EndDescr
@@ -26,22 +25,11 @@ F 3 "" H 5050 3600 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 Text Notes 5950 4100 0    60   ~ 0
-Steckerbelegung für das LCD Display (20x4)\n\nPIN_01: VDD(2) ... +5V\nPIN_02: VSS(1), R/W(5), LED-/K(16) ... GND\nPIN_03: D4(11)\nPIN_04: D5(12)\nPIN_05: D6(13)\nPIN_06: D7(14)\nPIN_07: E(6)\nPIN_08: RS(4)\nPIN_09: LED+/A(15)\nPIN_10: VO(3)\n
-$Comp
-L power:+5V #PWR021
-U 1 1 5AEE3573
-P 5250 2450
-F 0 "#PWR021" H 5250 2300 50  0001 C CNN
-F 1 "+5V" H 5250 2590 50  0000 C CNN
-F 2 "" H 5250 2450 60  0000 C CNN
-F 3 "" H 5250 2450 60  0000 C CNN
-	1    5250 2450
-	1    0    0    -1  
-$EndComp
+Steckerbelegung für das LCD Display\n\nPIN_01: VDD(2) ... +5V\nPIN_02: VSS(1), R/W(5), LED-/K(16) ... GND\nPIN_03: D4(11)\nPIN_04: D5(12)\nPIN_05: D6(13)\nPIN_06: D7(14)\nPIN_07: E(6)\nPIN_08: RS(4)\nPIN_09: LED+/A(15)\nPIN_10: VO(3)\n
 Text HLabel 5150 2900 1    60   Input ~ 0
-D4
+D4_SCL
 Text HLabel 5150 4150 3    60   Input ~ 0
-D5
+D5_SDA
 Text HLabel 5050 2900 1    60   Input ~ 0
 D6
 Text HLabel 5050 4150 3    60   Input ~ 0
@@ -50,8 +38,6 @@ Text HLabel 4950 2900 1    60   Input ~ 0
 EN
 Text HLabel 4950 4150 3    60   Input ~ 0
 RS
-Wire Wire Line
-	5250 2450 5250 2550
 Wire Wire Line
 	5150 2900 5150 3400
 Wire Wire Line
@@ -77,9 +63,6 @@ F 3 "" H 4850 3100 30  0000 C CNN
 $EndComp
 Wire Wire Line
 	4850 2950 4850 2550
-Wire Wire Line
-	4850 2550 5250 2550
-Connection ~ 5250 2550
 Wire Wire Line
 	4850 3250 4850 3400
 Wire Wire Line
@@ -127,7 +110,22 @@ F 3 "" H 5250 4750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	5250 2550 5250 3400
-Wire Wire Line
 	5250 4550 5250 4750
+$Comp
+L power:+5V #PWR0106
+U 1 1 615307BF
+P 4850 2550
+F 0 "#PWR0106" H 4850 2400 50  0001 C CNN
+F 1 "+5V" H 4850 2690 50  0000 C CNN
+F 2 "" H 4850 2550 60  0000 C CNN
+F 3 "" H 4850 2550 60  0000 C CNN
+	1    4850 2550
+	1    0    0    -1  
+$EndComp
+Text HLabel 5250 2900 1    60   Input ~ 0
+DSP_PWR
+Wire Wire Line
+	5250 3400 5250 2900
+Text Notes 5950 5350 0    60   ~ 0
+Steckerbelegung für das I2C Display\n\nPIN_01: VDD ... +3.3V / +5V\nPIN_02: VSS ... GND\nPIN_03: I2C - SCL\nPIN_04: I2C - SDA\nPIN_05: n.c.\nPIN_06: n.c.\nPIN_07: n.c.\nPIN_08: n.c.\nPIN_09: n.c.\nPIN_10: n.c.\n
 $EndSCHEMATC
