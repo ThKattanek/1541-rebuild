@@ -899,8 +899,11 @@ void show_start_message(void)
     lcd_setcursor( 2,2);
     lcd_string("Firmware:  ");
     lcd_string(VERSION);
-    lcd_setcursor( 0,4);
+	lcd_setcursor( 0,4);
     lcd_string("by thorsten kattanek");
+	_delay_ms(START_MESSAGE_TIME);
+	lcd_setcursor( 0,4);
+	lcd_string("     and F00K42     ");
     _delay_ms(START_MESSAGE_TIME);
     lcd_clear();
 }

@@ -5,4 +5,4 @@
 * License: GPL 2
 */
 
-#define VERSION "1.3.0wr"
+#define VERSION "1.3.7"
