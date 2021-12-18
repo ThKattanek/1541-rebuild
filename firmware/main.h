@@ -166,24 +166,24 @@
 
 enum {UNDEF_IMAGE, G64_IMAGE, D64_IMAGE};
 
-void reset();
-void check_stepper_signals();
-void check_motor_signal();
-uint8_t get_key_from_buffer();
-void update_gui();
+void reset(void);
+void check_stepper_signals(void);
+void check_motor_signal(void);
+uint8_t get_key_from_buffer(void);
+void update_gui(void);
 void check_menu_events(uint16_t menu_event);
 void set_gui_mode(uint8_t gui_mode);
 void filebrowser_update(uint8_t key_code);
-void filebrowser_refresh();
-void init_pb2_pb3();
+void filebrowser_refresh(void);
+void init_pb2_pb3(void);
 int8_t init_sd_card(void);
 void release_sd_card(void);
 uint8_t change_dir(const char* path);
 uint8_t find_file_in_dir(struct fat_fs_struct* fs, struct fat_dir_struct* dd, const char* name, struct fat_dir_entry_struct* dir_entry);
-uint16_t get_dir_entry_count();
+uint16_t get_dir_entry_count(void);
 uint16_t seek_to_dir_entry(uint16_t entry_num);
 void show_start_message(void);
-void show_sdcard_info_message();
+void show_sdcard_info_message(void);
 void init_stepper(void);
 void stepper_inc(void);
 void stepper_dec(void);
@@ -207,9 +207,10 @@ int8_t open_d64_image(struct fat_file_struct *fd);
 int8_t read_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
 void write_disk_track(struct fat_file_struct *fd, uint8_t image_type, uint8_t track_nr, uint8_t* track_buffer, uint16_t *gcr_track_length); // Tracknummer 1-42
 
-void remove_image();
+void remove_image(void);
 
 inline void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
+inline void ConvertFromGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
 
 void endable_wps_port(uint8_t enable);  // 0 = WPS PIN HiZ (set_write_protection() ohne Wirkung) / 1 = WPS PIN als Ausgang
 void set_write_protection(int8_t wp);   // wp=0 image nicht geschützt wp=1 image schreibgeschützt
@@ -280,13 +281,16 @@ uint8_t old_half_track;
 
 volatile uint8_t old_motor_status;
 
-const uint32_t d64_track_offset[41] = {0,0x00000,0x01500,0x02A00,0x03F00,0x05400,0x06900,0x07E00,0x09300,0x0A800,0x0BD00,0x0D200,0x0E700,0x0FC00,0x11100,0x12600,0x13B00,0x15000,0x16500,0x17800,0x18B00,
-				 0x19E00,0x1B100,0x1C400,0x1D700,0x1EA00,0x1FC00,0x20E00,0x22000,0x23200,0x24400,0x25600,0x26700,0x27800,0x28900,0x29A00,0x2AB00,0x2BC00,0x2CD00,0x2DE00,0x2EF00};
+const uint16_t d64_track_offset[41] = {0,0x0000,0x0015,0x002A,0x003F,0x0054,0x0069,0x007E,0x0093,
+                                         0x00A8,0x00BD,0x00D2,0x00E7,0x00FC,0x0111,0x0126,0x013B,
+                                         0x0150,0x0165,0x0178,0x018B,0x019E,0x01B1,0x01C4,0x01D7,
+                                         0x01EA,0x01FC,0x020E,0x0220,0x0232,0x0244,0x0256,0x0267,
+                                         0x0278,0x0289,0x029A,0x02AB,0x02BC,0x02CD,0x02DE,0x02EF};
 
-const uint8_t d64_sector_count[41] = {0,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21, //Spuren 1-17
-                                       19,19,19,19,19,19,19,                                //Spuren 18-24
-                                       18,18,18,18,18,18,                                   //Spuren 25-30
-                                       17,17,17,17,17,17,17,17,17,17};                      //Spuren 31-40
+const uint8_t d64_sector_count[4] = {21,        //Spuren 1-17
+                                     19,        //Spuren 18-24
+                                     18,        //Spuren 25-30
+                                     17};       //Spuren 31-40
 
 const uint8_t d64_track_zone[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                    //Spuren 1-17
                                1,1,1,1,1,1,1,                                               //Spuren 18-24
@@ -306,7 +310,8 @@ const uint8_t timer0_orca0[4] = {77,83,89,95};              // Diese Werte erzeu
 const uint8_t d64_sector_gap[4] = {12, 21, 16, 13}; // von GPZ Code übermommen imggen
 #define HEADER_GAP_BYTES 9
 
-#define D64_SECTOR_SIZE 256
+#define D64_SECTOR_SIZE (256)
+uint8_t d64_sector_puffer[D64_SECTOR_SIZE+5];
 
 // Ringpuffer für reinkommende Stepper Signale
 uint8_t stepper_signal_puffer[0x100]; // Ringpuffer für Stepper Signale (256 Bytes)
