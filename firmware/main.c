@@ -1243,6 +1243,16 @@ int8_t open_g64_image(struct fat_file_struct* fd)
 
 int8_t open_d64_image(struct fat_file_struct* fd)
 {
+    // extract DiskID from Track18_BAM ($A2+$A3) .. better than nothing.
+    int32_t offset = (d64_track_offset[18] << 8) + 0xA2;
+    if(fat_seek_file(fd,&offset,FAT_SEEK_SET))
+    {
+        if (2 == fat_read_file(fd, d64_sector_puffer, 2))
+        {
+            id1 = d64_sector_puffer[0];
+            id2 = d64_sector_puffer[1];
+        }
+    }
     return 0;
 }
 
