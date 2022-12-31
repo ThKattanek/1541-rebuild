@@ -308,10 +308,23 @@ const uint8_t d64_track_zone[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,        
 const uint8_t timer0_orca0[4] = {77,83,89,95};              // Diese Werte erzeugen den genausten Bittakt aber nicht 100% (Bei 24MHz)
 
 const uint8_t d64_sector_gap[4] = {12, 21, 16, 13}; // von GPZ Code übermommen imggen
-#define HEADER_GAP_BYTES 9
+#define HEADER_GAP_BYTES (9)
+
+
+// use slices for d64-file-access.. size of slice depends on free atmega ram ! adjust in case of shortage
+
+// -- save approach: use 3 slices, each 7*256 bytes
+// #define NUM_OF_SLICES   (3)
+// #define MAX_SLICE_SIZE  (7)
+// const uint8_t track_slices_last[4] = { 7, 5, 4, 3 };    // 2*7 + x .. = sector_count
+
+// -- performance approach: use 2 slices, each 17*256 bytes
+#define NUM_OF_SLICES   (2)
+#define MAX_SLICE_SIZE  (17)
+const uint8_t track_slices_last[4] = { 4, 2, 1, 0 };    // 1*17 + x .. = sector_count
 
 #define D64_SECTOR_SIZE (256)
-uint8_t d64_sector_puffer[D64_SECTOR_SIZE+5];
+uint8_t d64_sector_puffer[MAX_SLICE_SIZE*D64_SECTOR_SIZE+5];
 
 // Ringpuffer für reinkommende Stepper Signale
 uint8_t stepper_signal_puffer[0x100]; // Ringpuffer für Stepper Signale (256 Bytes)
