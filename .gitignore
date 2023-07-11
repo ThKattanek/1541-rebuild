@@ -12,5 +12,6 @@ fp-info-cache
 *.ses
 _autosave-*
 firmware/firmware_1541_rebuild.*
+firmware/.qtc_clangd
 /tests
 code_snippets
